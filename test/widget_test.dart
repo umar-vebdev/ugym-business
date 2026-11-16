@@ -1,11 +1,42 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:ugym_business/core/config/app_config.dart';
+import 'package:ugym_business/core/l10n/business_localizations.dart';
 import 'package:ugym_business/core/network/business_api_client.dart';
+import 'package:ugym_business/core/router/business_shell.dart';
+import 'package:ugym_business/core/session/business_role.dart';
+import 'package:ugym_business/core/session/business_session_controller.dart';
 import 'package:ugym_business/core/storage/app_preferences.dart';
 import 'package:ugym_business/core/theme/theme_controller.dart';
 import 'package:ugym_business/main.dart';
 import 'package:ugym_core/ugym_core.dart';
+
+final class _HealthMockAdapter implements HttpClientAdapter {
+  @override
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<Uint8List>? requestStream,
+    Future<void>? cancelFuture,
+  ) async {
+    return ResponseBody.fromString(
+      jsonEncode(<String, Object?>{
+        'app': 'ok',
+        'database': 'ok',
+        'redis': 'ok',
+      }),
+      200,
+      headers: <String, List<String>>{
+        Headers.contentTypeHeader: <String>[Headers.jsonContentType],
+      },
+    );
+  }
+
+  @override
+  void close({bool force = false}) {}
+}
 
 void main() {
   group('AppConfig', () {
@@ -77,32 +108,96 @@ void main() {
     });
   });
 
-  group('UgymBusinessApp', () {
-    testWidgets('renders uCraft light theme and toggles dark theme', (
+  group('BusinessShell adaptive navigation, l10n, and health', () {
+    test('filters navigation destinations by role', () {
+      expect(
+        BusinessShell.visibleDestinationsFor(BusinessRole.owner),
+        hasLength(5),
+      );
+      expect(
+        BusinessShell.visibleDestinationsFor(BusinessRole.admin),
+        isNot(contains(BusinessDestination.analytics)),
+      );
+      expect(BusinessShell.visibleDestinationsFor(BusinessRole.trainer), const [
+        BusinessDestination.operations,
+        BusinessDestination.more,
+      ]);
+    });
+
+    testWidgets('switches ru/tg/en on the fly and checks /health', (
       tester,
     ) async {
       final prefs = AppPreferences(storage: InMemoryTokenStorage());
       final themeController = ThemeController(preferences: prefs);
+      final localeController = LocaleController(preferences: prefs);
+      final sessionController = BusinessSessionController(
+        preferences: prefs,
+        initialRole: BusinessRole.owner,
+      );
+      final apiClient = BusinessApiClient(
+        config: const AppConfig.dev(),
+        tokenStorage: InMemoryTokenStorage(),
+      );
+      apiClient.httpClient.dio.httpClientAdapter = _HealthMockAdapter();
+      final healthService = UgymHealthService(httpClient: apiClient.httpClient);
+
       addTearDown(themeController.dispose);
+      addTearDown(localeController.dispose);
+      addTearDown(sessionController.dispose);
+
+      await tester.binding.setSurfaceSize(const Size(400, 800));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
 
       await tester.pumpWidget(
-        UgymBusinessApp(themeController: themeController),
+        UgymBusinessApp(
+          themeController: themeController,
+          localeController: localeController,
+          sessionController: sessionController,
+          healthService: healthService,
+        ),
       );
 
-      expect(find.text('uGym Business'), findsOneWidget);
-      expect(find.text('dev'), findsOneWidget);
+      expect(find.byType(NavigationBar), findsOneWidget);
+      expect(find.byType(NavigationRail), findsNothing);
+      expect(find.text('Аналитика'), findsOneWidget);
 
-      final lightScaffold = tester.widget<Scaffold>(find.byType(Scaffold));
-      expect(
-        lightScaffold.backgroundColor ?? UcraftColors.light.background,
-        UcraftColors.light.background,
-      );
-
-      await tester.tap(find.byType(UcraftButton));
+      await tester.tap(find.text('TG'));
       await tester.pumpAndSettle();
+      expect(localeController.localeCode, 'tg');
+      expect(await prefs.readLocaleCode(), 'tg');
+      expect(find.text('Таҳлил'), findsOneWidget);
 
+      await tester.tap(find.text('EN'));
+      await tester.pumpAndSettle();
+      expect(find.text('Analytics'), findsOneWidget);
+
+      await tester.tap(find.text('Check health'));
+      await tester.pumpAndSettle();
+      expect(find.text('Server and databases are healthy'), findsOneWidget);
+
+      await tester.tap(find.text('Dark theme'));
+      await tester.pumpAndSettle();
       expect(themeController.themeMode, ThemeMode.dark);
-      expect(find.text('Light theme'), findsOneWidget);
+    });
+
+    testWidgets('uses NavigationRail on tablet width >= 600dp', (tester) async {
+      final prefs = AppPreferences(storage: InMemoryTokenStorage());
+      final sessionController = BusinessSessionController(
+        preferences: prefs,
+        initialRole: BusinessRole.admin,
+      );
+      addTearDown(sessionController.dispose);
+
+      await tester.binding.setSurfaceSize(const Size(900, 700));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(
+        UgymBusinessApp(sessionController: sessionController),
+      );
+
+      expect(find.byType(NavigationRail), findsOneWidget);
+      expect(find.byType(NavigationBar), findsNothing);
+      expect(find.text('Аналитика'), findsNothing);
     });
   });
 }

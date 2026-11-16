@@ -1,0 +1,16 @@
+{
+  "@@locale": "ru",
+  "appTitle": "uGym Business",
+  "navOverview": "Обзор",
+  "navMembers": "Клиенты",
+  "navOperations": "Операции",
+  "navAnalytics": "Аналитика",
+  "navMore": "Ещё",
+  "readOnlyBanner": "Подписка истекла — доступен только просмотр",
+  "healthOk": "Сервер и базы доступны",
+  "healthError": "Сервер недоступен",
+  "checkHealth": "Проверить связь",
+  "switchTheme": "Сменить тему",
+  "selectBranch": "Выбор филиала"
+}
+

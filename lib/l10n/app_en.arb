@@ -1,0 +1,16 @@
+{
+  "@@locale": "en",
+  "appTitle": "uGym Business",
+  "navOverview": "Overview",
+  "navMembers": "Members",
+  "navOperations": "Operations",
+  "navAnalytics": "Analytics",
+  "navMore": "More",
+  "readOnlyBanner": "Subscription expired — read-only mode",
+  "healthOk": "Server and databases are healthy",
+  "healthError": "Server unavailable",
+  "checkHealth": "Check health",
+  "switchTheme": "Switch theme",
+  "selectBranch": "Select branch"
+}
+

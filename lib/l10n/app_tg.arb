@@ -1,0 +1,16 @@
+{
+  "@@locale": "tg",
+  "appTitle": "uGym Business",
+  "navOverview": "Шарҳ",
+  "navMembers": "Мизоҷон",
+  "navOperations": "Амалиёт",
+  "navAnalytics": "Таҳлил",
+  "navMore": "Бештар",
+  "readOnlyBanner": "Обуна ба охир расид — танҳо дидан дастрас аст",
+  "healthOk": "Сервер ва пойгоҳҳо дастрасанд",
+  "healthError": "Сервер дастнорас аст",
+  "checkHealth": "Санҷиши пайваст",
+  "switchTheme": "Иваз кардани мавзӯъ",
+  "selectBranch": "Интихоби филиал"
+}
+
