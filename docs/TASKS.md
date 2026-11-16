@@ -16,6 +16,7 @@
 
 - [x] **B0-01** (заметка: `flutter create` в Flutter 3.50 добавил `material_ui: ^1.1.0` в `pubspec.yaml` и исключения `android/**`, `ios/**` в `analysis_options.yaml`) Инициализирован Flutter-проект `uGym Business` (`tj.ugym.business` в `build.gradle.kts`, `MainActivity.kt`, `Info.plist`, `project.pbxproj`), настроены строгие правила `analysis_options.yaml`, `AppConfig` (`dev`/`staging`/`prod`), стартовый экран в `lib/main.dart` и 2 теста в `test/widget_test.dart` (`format ✓`, `analyze ✓`, `test ✓`).
 - [x] **B0-02** (заметка: `ugym_core` переведён на `material_ui: ^1.1.0` по `D-003` для полной совместимости типов `ThemeData` в Flutter 3.50) Подключён общий пакет `ugym_core` (`path: ../ugym_core`, `D-002`), реализованы `AppPreferences` поверх `TokenStorage`, `ThemeController` (Light по умолчанию, сохранение Light/Dark/System) и `BusinessApiClient`, подключены `UcraftTheme.light()` / `UcraftTheme.dark()` в `lib/main.dart`; 4 теста зелёные (`format ✓`, `analyze ✓`, `test ✓`).
+- [x] **B0-03** (заметка: в `ugym_core/lib/ugym_core.dart` реэкспортированы типы `Dio`, чтобы не нарушать `depend_on_referenced_packages`; в `docs/api/` добавлен `platform.yaml` для биллинга) Реализованы матрица RBAC (`BusinessRole` / `BusinessPermission` для `owner`/`admin`/`trainer`/`noCompany`), `GymSummary`, `BusinessSessionController` (`bootstrapFromApi`, `isReadOnly` при `SUBSCRIPTION_EXPIRED`, выбор филиала), а также `SubscriptionReadOnlyBanner`, `RoleGuard` и `GymBranchSelector`; 11 тестов зелёные (`format ✓`, `analyze ✓`, `test ✓`).
 
 ---
 
@@ -23,8 +24,6 @@
 
 **ТЗ:** [uGym_Business_Mobile_TZ.md](../specs/uGym_Business_Mobile_TZ.md) (разделы 1, 2, 6.2, 7.1), [uCraft_Design_System.md](../specs/uCraft_Design_System.md) (разделы 2–9, 13, 18, 20–22)
 
-- [ ] **B0-03** Перехватчик `SUBSCRIPTION_EXPIRED` (`is_read_only` глобальный баннер и блокировка мутаций), `RoleBootstrap` / `RoleGuard` для ролей `owner` / `admin` / `trainer` и локальное переключение текущего филиала `gym_id`
-  - Проверка: unit- и widget-тесты на права ролей и режим только-чтение
 - [ ] **B0-04** Локализация `ru` / `tg` / `en` (ARB), адаптивный навигационный каркас (Bottom Navigation для `<600dp` и Navigation Rail / Sidebar для планшетов `>=600dp`) и проверка `GET /api/v1/health`
   - Проверка: `dart format --output=none --set-exit-if-changed . && flutter analyze && flutter test`
 
