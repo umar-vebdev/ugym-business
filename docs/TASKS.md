@@ -14,7 +14,7 @@
 
 ## Готово
 
-*(пока нет завершённых задач)*
+- [x] **B0-01** (заметка: `flutter create` в Flutter 3.50 добавил `material_ui: ^1.1.0` в `pubspec.yaml` и исключения `android/**`, `ios/**` в `analysis_options.yaml`) Инициализирован Flutter-проект `uGym Business` (`tj.ugym.business` в `build.gradle.kts`, `MainActivity.kt`, `Info.plist`, `project.pbxproj`), настроены строгие правила `analysis_options.yaml`, `AppConfig` (`dev`/`staging`/`prod`), стартовый экран в `lib/main.dart` и 2 теста в `test/widget_test.dart` (`format ✓`, `analyze ✓`, `test ✓`).
 
 ---
 
@@ -22,8 +22,6 @@
 
 **ТЗ:** [uGym_Business_Mobile_TZ.md](../specs/uGym_Business_Mobile_TZ.md) (разделы 1, 2, 6.2, 7.1), [uCraft_Design_System.md](../specs/uCraft_Design_System.md) (разделы 2–9, 13, 18, 20–22)
 
-- [ ] **B0-01** Инициализация Flutter-проекта `uGym Business` (`tj.ugym.business`), git-репозитория, строгих правил `analysis_options.yaml` и структуры каталогов `Feature-First`
-  - Проверка: `flutter analyze && flutter test`
 - [ ] **B0-02** Подключение общего пакета `ugym_core` (дизайн-система uCraft Midnight & Cobalt, базовые компоненты, `Dio`-клиент, форматтеры денег и дат с поддержкой `Gym.timezone`, `SecureStorage`)
   - Проверка: `flutter analyze && flutter test`
 - [ ] **B0-03** Перехватчик `SUBSCRIPTION_EXPIRED` (`is_read_only` глобальный баннер и блокировка мутаций), `RoleBootstrap` / `RoleGuard` для ролей `owner` / `admin` / `trainer` и локальное переключение текущего филиала `gym_id`
