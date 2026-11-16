@@ -1,0 +1,547 @@
+openapi: 3.0.3
+info:
+  title: GymTrack — аутентификация, OTP и профиль клиента
+  version: 1.0.0
+  description: |
+    Публичные и защищённые эндпоинты регистрации, входа по Sanctum-токену,
+    подтверждения email по OTP, профиля клиента и проверки состояния сервиса.
+    Для локализации сообщений об ошибках передавайте заголовок `Accept-Language: ru | tg`.
+paths:
+  /api/v1/health:
+    get:
+      summary: Проверка состояния приложения, БД и Redis
+      responses:
+        '200':
+          description: Все зависимости доступны
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthStatus'
+        '503':
+          description: Одна из зависимостей (БД или Redis) недоступна
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthStatus'
+
+  /api/v1/auth/register:
+    post:
+      summary: Регистрация пользователя (владелец/сотрудник или базовый аккаунт)
+      description: Ограничение частоты запросов — `auth-register` (10 запросов/мин с IP).
+      parameters:
+        - $ref: '#/components/parameters/AcceptLanguage'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterUserPayload'
+      responses:
+        '201':
+          description: Пользователь зарегистрирован
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    required: [id, message]
+                    properties:
+                      id:
+                        type: integer
+                      message:
+                        type: string
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+
+  /api/v1/auth/login:
+    post:
+      summary: Вход по email или телефону и паролю (выдача Sanctum Bearer-токена)
+      description: Ограничение частоты — `auth-login` (5/мин по email/телефону и IP, 20/мин с IP).
+      parameters:
+        - $ref: '#/components/parameters/AcceptLanguage'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginUserPayload'
+      responses:
+        '200':
+          description: Успешный вход
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    required: [token]
+                    properties:
+                      token:
+                        type: string
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+
+  /api/v1/auth/send-otp:
+    post:
+      summary: Отправка одноразового 6-значного OTP-кода на email
+      description: Ограничение частоты — `auth-otp-send` (3/мин на email, 10/мин с IP).
+      parameters:
+        - $ref: '#/components/parameters/AcceptLanguage'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendOtpPayload'
+      responses:
+        '200':
+          description: Код отправлен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageEnvelopeResponse'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+
+  /api/v1/auth/verify-email:
+    post:
+      summary: Подтверждение email одноразовым 6-значным OTP-кодом
+      description: Ограничение частоты — `auth-otp-verify` (5/мин по email и IP, 15/мин с IP).
+      parameters:
+        - $ref: '#/components/parameters/AcceptLanguage'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyEmailPayload'
+      responses:
+        '200':
+          description: Email подтверждён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageEnvelopeResponse'
+        '400':
+          description: Неверный или просроченный OTP-код
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+
+  /api/v1/auth/reset-password:
+    post:
+      summary: Сброс пароля по одноразовому 6-значному OTP-коду с email
+      description: Проверяет Email OTP (`otp:email:{email}`), обновляет пароль, подтверждает email при необходимости и отзывает все Sanctum-токены пользователя. Ограничение частоты — `auth-otp-verify` (5/мин по email и IP, 15/мин с IP).
+      parameters:
+        - $ref: '#/components/parameters/AcceptLanguage'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordPayload'
+      responses:
+        '200':
+          description: Пароль успешно изменён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageEnvelopeResponse'
+        '400':
+          description: Неверный или просроченный OTP-код
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+
+  /api/v1/auth/logout:
+    post:
+      summary: Выход из текущей сессии (отзыв текущего Sanctum Bearer-токена)
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/AcceptLanguage'
+      responses:
+        '200':
+          description: Текущий токен отозван
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [logged_out]
+                    properties:
+                      logged_out:
+                        type: boolean
+                        enum: [true]
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/v1/user:
+    get:
+      summary: Текущий авторизованный пользователь (Sanctum)
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/AcceptLanguage'
+      responses:
+        '200':
+          description: Модель текущего пользователя
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                    nullable: true
+                  email:
+                    type: string
+                    nullable: true
+                  email_verified_at:
+                    type: string
+                    format: date-time
+                    nullable: true
+                  phone:
+                    type: string
+                    nullable: true
+                  is_phone_verified:
+                    type: boolean
+                  is_platform_admin:
+                    type: boolean
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/v1/client/auth/register:
+    post:
+      summary: Регистрация клиента мобильного приложения (18+ и согласие на ПДн)
+      description: Ограничение частоты — `auth-register` (10 запросов/мин с IP).
+      parameters:
+        - $ref: '#/components/parameters/AcceptLanguage'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterClientPayload'
+      responses:
+        '201':
+          description: Клиентский аккаунт создан
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/RegisteredClient'
+        '409':
+          description: Email (`EMAIL_ALREADY_REGISTERED`) или телефон (`PHONE_ALREADY_REGISTERED`) уже зарегистрирован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Возраст менее 18 лет (`UNDERAGE_REGISTRATION_NOT_ALLOWED`), нет согласия (`PERSONAL_DATA_CONSENT_REQUIRED`) или ошибка валидации
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+
+  /api/v1/client/profile:
+    get:
+      summary: Получение профиля текущего клиента
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/AcceptLanguage'
+      responses:
+        '200':
+          description: Данные профиля клиента
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ClientProfile'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    delete:
+      summary: Обезличивание и удаление аккаунта клиента по запросу ПДн
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/AcceptLanguage'
+      responses:
+        '200':
+          description: Аккаунт удалён и обезличен
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    required: [status]
+                    properties:
+                      status:
+                        type: string
+                        enum: [deleted]
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  parameters:
+    AcceptLanguage:
+      name: Accept-Language
+      in: header
+      required: false
+      schema:
+        type: string
+        enum: [ru, tg]
+        default: ru
+      description: Язык локализованных сообщений (`ru` или `tg`, по умолчанию `ru`).
+  responses:
+    Unauthorized:
+      description: Необходима авторизация или неверные учётные данные
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    ValidationFailed:
+      description: Ошибка валидации входных данных
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    TooManyRequests:
+      description: Превышен лимит запросов
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+          description: Количество секунд до сброса лимита
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+  schemas:
+    HealthStatus:
+      type: object
+      required: [app, database, redis]
+      properties:
+        app:
+          type: string
+          enum: [ok]
+        database:
+          type: string
+          enum: [ok, error]
+        redis:
+          type: string
+          enum: [ok, error]
+    RegisterUserPayload:
+      type: object
+      required: [password]
+      properties:
+        phone:
+          type: string
+          maxLength: 20
+          nullable: true
+          description: Обязателен, если не передан `email`.
+        email:
+          type: string
+          format: email
+          maxLength: 255
+          nullable: true
+          description: Обязателен, если не передан `phone`.
+        password:
+          type: string
+          minLength: 8
+    LoginUserPayload:
+      type: object
+      required: [password]
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 255
+          nullable: true
+          description: Обязателен, если не передан `phone`.
+        phone:
+          type: string
+          maxLength: 20
+          nullable: true
+          description: Обязателен, если не передан `email`.
+        password:
+          type: string
+        device:
+          type: string
+          maxLength: 255
+          nullable: true
+          default: mobile
+    SendOtpPayload:
+      type: object
+      required: [email]
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 255
+    VerifyEmailPayload:
+      type: object
+      required: [email, code]
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 255
+        code:
+          type: string
+          minLength: 6
+          maxLength: 6
+    ResetPasswordPayload:
+      type: object
+      required: [email, code, password]
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 255
+        code:
+          type: string
+          minLength: 6
+          maxLength: 6
+        password:
+          type: string
+          minLength: 8
+    MessageEnvelopeResponse:
+      type: object
+      required: [data, message]
+      properties:
+        data:
+          type: object
+          required: [message]
+          properties:
+            message:
+              type: string
+        message:
+          type: string
+          description: Дублирующий ключ верхнего уровня для обратной совместимости.
+    RegisterClientPayload:
+      type: object
+      required: [email, name, password, birth_date, consent]
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 255
+        phone:
+          type: string
+          maxLength: 20
+          nullable: true
+        name:
+          type: string
+          maxLength: 255
+        password:
+          type: string
+          minLength: 8
+        birth_date:
+          type: string
+          format: date
+          example: '1995-06-01'
+        consent:
+          type: boolean
+    RegisteredClient:
+      type: object
+      required: [id, email, name, birth_date, is_email_verified]
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+          nullable: true
+        name:
+          type: string
+        birth_date:
+          type: string
+          format: date
+        is_email_verified:
+          type: boolean
+    ClientProfile:
+      type: object
+      required: [id, is_email_verified]
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+          format: email
+          nullable: true
+        phone:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+        birth_date:
+          type: string
+          format: date
+          nullable: true
+        is_email_verified:
+          type: boolean
+        personal_data_consented_at:
+          type: string
+          format: date-time
+          nullable: true
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            details:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  type: string

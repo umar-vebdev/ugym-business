@@ -1,0 +1,643 @@
+openapi: 3.0.3
+info:
+  title: GymTrack — публичный каталог залов
+  version: 1.0.0
+paths:
+  /api/v1/public/gyms:
+    get:
+      summary: Поиск и фильтрация опубликованных залов в публичном каталоге
+      description: |
+        Доступно без авторизации. Возвращает только одобренные модерацией (`approved`)
+        и явно опубликованные владельцем (`is_public = true`) витрины залов.
+        Сортировка по публичному идентификатору (`id` — ULID).
+        При указании `price_min` или `price_max` параметр `currency` обязателен.
+      parameters:
+        - in: query
+          name: q
+          required: false
+          description: Поиск по подстроке названия зала без учёта регистра
+          schema:
+            type: string
+            maxLength: 100
+        - in: query
+          name: district
+          required: false
+          description: Точное совпадение района без учёта регистра
+          schema:
+            type: string
+            maxLength: 100
+        - in: query
+          name: amenities
+          required: false
+          description: Все указанные удобства должны присутствовать у зала
+          style: form
+          explode: true
+          schema:
+            type: array
+            maxItems: 30
+            items:
+              type: string
+              maxLength: 50
+        - in: query
+          name: price_min
+          required: false
+          description: Минимальная цена активного абонемента в минимальных единицах (включительно)
+          schema:
+            type: integer
+            minimum: 0
+        - in: query
+          name: price_max
+          required: false
+          description: Максимальная цена активного абонемента в минимальных единицах (включительно, не меньше price_min)
+          schema:
+            type: integer
+            minimum: 0
+        - in: query
+          name: currency
+          required: false
+          description: Трёхбуквенный код валюты (обязателен при указании price_min или price_max)
+          schema:
+            type: string
+            minLength: 3
+            maxLength: 3
+            example: TJS
+        - in: query
+          name: page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - in: query
+          name: per_page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - in: query
+          name: lat
+          required: false
+          description: Широта центра поиска по радиусу. Передаётся вместе с lng и radius_km. Залы без координат не возвращаются.
+          schema: {type: number, minimum: -90, maximum: 90, example: 38.5598}
+        - in: query
+          name: lng
+          required: false
+          description: Долгота центра поиска по радиусу (вместе с lat и radius_km)
+          schema: {type: number, minimum: -180, maximum: 180, example: 68.787}
+        - in: query
+          name: radius_km
+          required: false
+          description: Радиус поиска в километрах, (0, 100] (вместе с lat и lng)
+          schema: {type: number, exclusiveMinimum: true, minimum: 0, maximum: 100, example: 5}
+        - in: query
+          name: sw_lat
+          required: false
+          description: Юго-западный угол области карты, широта. sw_lat, sw_lng, ne_lat, ne_lng передаются все вместе; sw_lat <= ne_lat. Границы включаются.
+          schema: {type: number, minimum: -90, maximum: 90}
+        - in: query
+          name: sw_lng
+          required: false
+          description: Юго-западный угол области карты, долгота (sw_lng <= ne_lng; пересечение 180-го меридиана не поддерживается)
+          schema: {type: number, minimum: -180, maximum: 180}
+        - in: query
+          name: ne_lat
+          required: false
+          description: Северо-восточный угол области карты, широта
+          schema: {type: number, minimum: -90, maximum: 90}
+        - in: query
+          name: ne_lng
+          required: false
+          description: Северо-восточный угол области карты, долгота
+          schema: {type: number, minimum: -180, maximum: 180}
+      responses:
+        '200':
+          description: Постраничный список публичных витрин залов
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, meta]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PublicGym'
+                  meta:
+                    $ref: '#/components/schemas/PaginationMeta'
+        '422':
+          description: VALIDATION_FAILED — некорректные параметры поиска, цены или пагинации
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+  /api/v1/public/gyms/{publicId}:
+    get:
+      summary: Публичная карточка зала по ULID с активными типами абонементов
+      description: |
+        Доступно без авторизации. Возвращает полную витрину одобренного и опубликованного зала
+        (`approved` + `is_public = true`) вместе со списком активных типов абонементов компании
+        с актуальными ценами и правилами (отсортированных по публичному `id` ULID).
+        Если зал не найден, не одобрен или публикация отключена — возвращается 404.
+      parameters:
+        - in: path
+          name: publicId
+          required: true
+          description: Публичный идентификатор зала (ULID)
+          schema:
+            type: string
+            example: 01JCXYZ0000000000000000000
+      responses:
+        '200':
+          description: Публичная карточка зала
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/PublicGymCard'
+        '404':
+          description: NOT_FOUND — зал не найден или скрыт из каталога
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundErrorResponse'
+  /api/v1/public/gyms/{publicId}/schedule:
+    get:
+      summary: Публичное расписание групповых занятий зала по ULID
+      description: |
+        Доступно без авторизации. Возвращает только предстоящие неотменённые (`scheduled`)
+        занятия одобренного и опубликованного зала в выбранном интервале дат (по умолчанию —
+        7 дней от текущей даты UTC, максимум 62 дня), отсортированные по `(starts_at, id)`.
+        Внутренние идентификаторы и список записавшихся клиентов не возвращаются.
+      parameters:
+        - in: path
+          name: publicId
+          required: true
+          description: Публичный идентификатор зала (ULID)
+          schema:
+            type: string
+            example: 01JCXYZ0000000000000000000
+        - in: query
+          name: from_date
+          required: false
+          description: Начальная дата периода (Y-m-d, UTC; по умолчанию — сегодня)
+          schema:
+            type: string
+            format: date
+            example: '2026-11-12'
+        - in: query
+          name: to_date
+          required: false
+          description: Конечная дата периода (Y-m-d, UTC; по умолчанию — from_date + 6 дней, максимум 62 дня от from_date)
+          schema:
+            type: string
+            format: date
+            example: '2026-11-18'
+      responses:
+        '200':
+          description: Публичное расписание зала
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, meta]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PublicClassSession'
+                  meta:
+                    $ref: '#/components/schemas/SchedulePeriodMeta'
+        '404':
+          description: NOT_FOUND — зал не найден или скрыт из каталога
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundErrorResponse'
+        '422':
+          description: VALIDATION_FAILED — некорректный формат или диапазон дат
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+  /api/v1/public/gyms/{publicId}/reviews:
+    get:
+      summary: Список публичных отзывов опубликованного зала с пагинацией
+      description: |
+        Доступно без авторизации. Возвращает отзывы только для одобренных и опубликованных
+        витрин залов (отсортированы от новых к старым).
+      parameters:
+        - in: path
+          name: publicId
+          required: true
+          description: Публичный идентификатор зала (ULID)
+          schema:
+            type: string
+            example: 01JCXYZ0000000000000000000
+        - in: query
+          name: page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - in: query
+          name: per_page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: Страница отзывов о зале
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, meta]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PublicGymReview'
+                  meta:
+                    $ref: '#/components/schemas/PaginationMeta'
+        '404':
+          description: NOT_FOUND — зал не найден или скрыт из каталога
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundErrorResponse'
+        '422':
+          description: VALIDATION_FAILED — некорректные параметры пагинации
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+  /api/v1/client/gyms/{publicId}/review:
+    put:
+      summary: Создать или обновить отзыв клиента о зале
+      description: |
+        Доступно авторизованному клиенту (`auth:sanctum`). Один пользователь может иметь
+        не более одного отзыва на конкретный зал; повторный запрос обновляет оценку и текст.
+        Оставить отзыв можно только при наличии хотя бы одного подтверждённого (`completed`)
+        посещения этого зала.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: publicId
+          required: true
+          description: Публичный идентификатор зала (ULID)
+          schema:
+            type: string
+            example: 01JCXYZ0000000000000000000
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [rating]
+              properties:
+                rating:
+                  type: integer
+                  minimum: 1
+                  maximum: 5
+                  example: 5
+                comment:
+                  type: string
+                  nullable: true
+                  maxLength: 1000
+                  example: Отличный зал и вежливый персонал.
+      responses:
+        '200':
+          description: Отзыв сохранён или обновлён
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/PublicGymReview'
+        '401':
+          description: UNAUTHORIZED — требуется авторизация клиента
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleErrorResponse'
+        '403':
+          description: VISIT_REQUIRED_FOR_REVIEW — нет завершённого посещения этого зала
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleErrorResponse'
+        '404':
+          description: NOT_FOUND — зал не найден или скрыт из каталога
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundErrorResponse'
+        '422':
+          description: VALIDATION_FAILED — некорректная оценка или комментарий
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: SanctumToken
+  schemas:
+    PublicGym:
+      type: object
+      required:
+        - id
+        - name
+        - description
+        - address
+        - district
+        - latitude
+        - longitude
+        - phone
+        - working_hours
+        - amenities
+        - photos
+        - rating_avg
+        - reviews_count
+      properties:
+        id:
+          type: string
+          description: Публичный идентификатор зала (ULID)
+          example: 01JCXYZ0000000000000000000
+        name:
+          type: string
+          example: Олимп Фитнес
+        description:
+          type: string
+          nullable: true
+        address:
+          type: string
+          nullable: true
+        district:
+          type: string
+          nullable: true
+          example: Сино
+        latitude:
+          type: number
+          nullable: true
+        longitude:
+          type: number
+          nullable: true
+        phone:
+          type: string
+          nullable: true
+        working_hours:
+          type: object
+          additionalProperties: true
+        amenities:
+          type: array
+          items:
+            type: string
+        photos:
+          type: array
+          items:
+            type: string
+            format: uri
+        rating_avg:
+          type: number
+          nullable: true
+          description: Средняя оценка зала (1–5), null если отзывов нет
+          example: 4.5
+        reviews_count:
+          type: integer
+          minimum: 0
+          description: Количество отзывов о зале
+          example: 2
+    PublicGymCard:
+      allOf:
+        - $ref: '#/components/schemas/PublicGym'
+        - type: object
+          required:
+            - membership_types
+          properties:
+            membership_types:
+              type: array
+              items:
+                $ref: '#/components/schemas/PublicMembershipType'
+    PublicMembershipType:
+      type: object
+      required:
+        - id
+        - name
+        - kind
+        - start_mode
+        - price_minor
+        - currency
+        - visits_count
+        - duration_days
+        - validity_days
+        - daily_limit
+        - time_from_minute
+        - time_to_minute
+        - freeze_max_days
+        - freeze_max_times
+      properties:
+        id:
+          type: string
+          description: Публичный идентификатор типа абонемента (ULID)
+          example: 01JCXYZ1111111111111111111
+        name:
+          type: string
+          example: 12 занятий
+        kind:
+          type: string
+          enum: [visits, duration, unlimited, single]
+        start_mode:
+          type: string
+          enum: [on_sale, first_visit]
+        price_minor:
+          type: integer
+          minimum: 0
+          example: 25000
+        currency:
+          type: string
+          example: TJS
+        visits_count:
+          type: integer
+          nullable: true
+        duration_days:
+          type: integer
+          nullable: true
+        validity_days:
+          type: integer
+          nullable: true
+        daily_limit:
+          type: integer
+          example: 1
+        time_from_minute:
+          type: integer
+          nullable: true
+        time_to_minute:
+          type: integer
+          nullable: true
+        freeze_max_days:
+          type: integer
+          example: 0
+        freeze_max_times:
+          type: integer
+          example: 0
+    PaginationMeta:
+      type: object
+      required: [page, per_page, total]
+      properties:
+        page:
+          type: integer
+          example: 1
+        per_page:
+          type: integer
+          example: 20
+        total:
+          type: integer
+          example: 1
+    SchedulePeriodMeta:
+      type: object
+      required: [from_date, to_date]
+      properties:
+        from_date:
+          type: string
+          format: date
+          example: '2026-11-12'
+        to_date:
+          type: string
+          format: date
+          example: '2026-11-18'
+    PublicScheduleTrainer:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: string
+          description: Публичный идентификатор тренера (ULID)
+          example: 01JCXYZ2222222222222222222
+        name:
+          type: string
+          example: Алишер
+    PublicClassSession:
+      type: object
+      required:
+        - id
+        - title
+        - starts_at
+        - ends_at
+        - capacity
+        - available_seats
+        - trainer
+      properties:
+        id:
+          type: string
+          description: Публичный идентификатор занятия (ULID)
+          example: 01JCXYZ3333333333333333333
+        title:
+          type: string
+          example: Йога
+        starts_at:
+          type: string
+          format: date-time
+          example: '2026-11-12T12:00:00+00:00'
+        ends_at:
+          type: string
+          format: date-time
+          example: '2026-11-12T13:00:00+00:00'
+        capacity:
+          type: integer
+          minimum: 1
+          example: 12
+        available_seats:
+          type: integer
+          minimum: 0
+          example: 10
+        trainer:
+          nullable: true
+          allOf:
+            - $ref: '#/components/schemas/PublicScheduleTrainer'
+    ValidationErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message, details]
+          properties:
+            code:
+              type: string
+              example: VALIDATION_FAILED
+            message:
+              type: string
+            details:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  type: string
+    NotFoundErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              example: NOT_FOUND
+            message:
+              type: string
+    SimpleErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              example: VISIT_REQUIRED_FOR_REVIEW
+            message:
+              type: string
+    PublicGymReview:
+      type: object
+      required: [id, rating, comment, author_name, created_at, updated_at]
+      properties:
+        id:
+          type: string
+          description: Публичный идентификатор отзыва (ULID)
+          example: 01JCXYZ4444444444444444444
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+          example: 5
+        comment:
+          type: string
+          nullable: true
+          example: Отличный зал и удобное расположение.
+        author_name:
+          type: string
+          example: Самир
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
