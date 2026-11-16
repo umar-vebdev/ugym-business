@@ -2,12 +2,13 @@
 
 **Обновлено:** 2026-11-16
 **Текущий этап:** B0 — Фундамент проекта
-**Текущая задача:** `B0-01` `[x]` завершена; следующая — `B0-02`
+**Текущая задача:** `B0-02` `[x]` завершена; следующая — `B0-03`
 
 ## Что сделано в последней сессии
 
-- **`B0-01`**: инициализирован Flutter-проект `uGym Business` (iOS + Android) с идентификатором `tj.ugym.business` (`build.gradle.kts`, `MainActivity.kt`, `project.pbxproj`, `Info.plist`, `AndroidManifest.xml`), настроены строгие правила `analysis_options.yaml`, добавлены `AppConfig` (`dev`/`staging`/`prod`) и стартовая точка входа `lib/main.dart` с тестами.
-- Все проверки пройдены: `dart format` ✓, `flutter analyze` ✓ (`No issues found!`), `flutter test` ✓ (`2 passed`).
+- **`B0-01`**: инициализирован Flutter-проект `uGym Business` (`tj.ugym.business`), настроены строгие правила `analysis_options.yaml` и `AppConfig` (`dev`/`staging`/`prod`).
+- **`B0-02`**: подключён пакет `ugym_core` (`path: ../ugym_core`, `D-002`; в `ugym_core` также выполнена миграция `D-003` на `material_ui: ^1.1.0`), реализованы `AppPreferences` поверх `TokenStorage`, `ThemeController` (Light по умолчанию, Light/Dark/System с сохранением), `BusinessApiClient` и подключение тем `UcraftTheme.light()` / `UcraftTheme.dark()` в `lib/main.dart`.
+- Все проверки пройдены: `dart format` ✓, `flutter analyze` ✓ (`No issues found!`), `flutter test` ✓ (`4 passed`).
 
 ## Актуальное состояние окружения
 
@@ -16,4 +17,4 @@
 
 ## Точный следующий шаг
 
-- Выполнить задачу **`B0-02`**: подключить пакет `ugym_core` (`path: ../ugym_core`), применить тему `UcraftTheme.light()` / `UcraftTheme.dark()` с сохранением выбранной темы, настроить `UgymHttpClient` на базе `AppConfig` и проверить тестами.
+- Выполнить задачу **`B0-03`**: реализовать состояние/баннер режима чтения `SUBSCRIPTION_EXPIRED` (`is_read_only`), `RoleBootstrap` / `RoleGuard` для ролей `owner` / `admin` / `trainer` (по матрице прав из `uGym_Business_Mobile_TZ.md` п. 1) и контроллер локального переключения текущего филиала `gym_id` с unit- и widget-тестами.
