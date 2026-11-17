@@ -94,7 +94,7 @@
   - Цель: `analytics/overview`, `analytics/revenue`, `notifications/announcements` (`202`), `billing/subscription`, `billing/plans`
   - Проверка: unit-тесты `RemoteAnalyticsAndBillingRepository`
 
-- [ ] **B3-07** UI аналитики владельца, рассылок и подписки (`AnalyticsScreen`, `AnnouncementsScreen`, `BillingStatusScreen`)
+- [x] **B3-07** UI аналитики владельца, рассылок и подписки (`AnalyticsScreen`, `AnnouncementsScreen`, `BillingStatusScreen`) — 3 теста зелёные
   - Цель: фильтры периода и `inactive_days`, сводка и отчёт выручки (`owner`), рассылка `push`/`sms` (`owner`/`admin`), статус подписки платформы
   - Проверка: widget-тесты аналитики, рассылок и биллинга
 

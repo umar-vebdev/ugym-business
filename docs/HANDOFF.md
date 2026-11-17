@@ -1,7 +1,7 @@
 # HANDOFF — uGym Business
 
 **Текущий этап:** `B3` — Расписание, Тренеры, Витрина, Штат и Аналитика  
-**Текущая задача:** `B3-07` — UI аналитики владельца, рассылок и подписки (`AnalyticsScreen`, `AnnouncementsScreen`, `BillingStatusScreen`)  
+**Текущая задача:** `B3-08` — интеграция экранов `B3` в `BusinessShell` и `UgymBusinessApp`  
 **Репозиторий:** `/home/umar/ugym-mobile/uGym Business` (`main`)
 
 ## Что сделано
