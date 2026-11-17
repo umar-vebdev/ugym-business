@@ -50,7 +50,7 @@
   - Цель: `membership-types` (`GET`/`POST`/`PATCH active`), `clients/{id}/memberships`, `memberships/expiring`, `freeze`/`unfreeze`/`cancel`
   - Проверка: unit-тесты `RemoteMembershipsRepository`
 
-- [ ] **B2-04** UI конструктора тарифов, истекающих за 7 дней и операций заморозки/отмены (`MembershipTypesScreen`, `CreateMembershipTypeScreen`, `ExpiringMembershipsTab`)
+- [x] **B2-04** UI конструктора тарифов, истекающих за 7 дней и операций заморозки/отмены (`MembershipTypesScreen`, `CreateMembershipTypeScreen`, `ExpiringMembershipsTab`) — 3 теста зелёные
   - Цель: конструктор тарифов (`owner`), валидация `kind`/`start_mode`/`time_from`+`time_to`, список истекающих, `freeze`/`unfreeze` (`owner`/`admin`), `cancel` с причиной (`owner`)
   - Проверка: widget-тесты конструктора тарифов, истекающих абонементов и операций
 

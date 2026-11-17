@@ -1,7 +1,7 @@
 # HANDOFF — uGym Business
 
 **Текущий этап:** `B2` — CRM клиентов, Абонементы и Касса (`PaymentMark`)  
-**Текущая задача:** `B2-04` — UI конструктора тарифов, истекающих за 7 дней и операций заморозки/отмены  
+**Текущая задача:** `B2-05` — доменные модели и REST-репозиторий кассы, заявок и товаров (`SalesAndRequestsRepository`, `RemoteSalesAndRequestsRepository`)  
 **Репозиторий:** `/home/umar/ugym-mobile/uGym Business` (`main`)
 
 ## Что сделано
