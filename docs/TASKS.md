@@ -21,6 +21,7 @@
 - [x] **B1-01** Реализованы доменные модели и контракт аутентификации (`AuthenticatedUser`, `AuthRepository` на чистом Dart) и `RemoteAuthRepository` (`login` с сохранением токена в `TokenStorage`, `register`, `send-otp`, `verify-email`, `reset-password`, `logout` с гарантированной очисткой токена и `GET /user`); 18 тестов зелёные (`format ✓`, `analyze ✓`, `test ✓`).
 - [x] **B1-02** Реализованы `AuthController` (вход по email/телефону, восстановление сессии `tryRestoreSession`, регистрация + OTP, сброс пароля, выход со сбросом роли) и `AuthFlowScreen` в стиле uCraft 1.0 + кнопка «Выйти» в `BusinessShell` и привязка в `lib/main.dart`; 21 тест зелёный (`format ✓`, `analyze ✓`, `test ✓`).
 - [x] **B1-03** Реализованы доменные модели и контракт онбординга (`CreatedCompanyResult`, `GymBranch`, `CurrencyOption`, `CompanyOnboardingRepository`), `RemoteCompanyOnboardingRepository` (`POST /business/companies`, `GET/POST/PATCH /business/gyms`, `currencies`, `PATCH /company/currency`), экран `CompanyOnboardingCard` (перевод `noCompany` → `owner` + 14-дневный триал) и `CompanyBranchesAndCurrencyCard` (управление филиалами, геозоной `50..5000` м и валютой); 24 теста зелёные (`format ✓`, `analyze ✓`, `test ✓`).
+- [x] **B1-04** Реализованы доменные модели и контракт ресепшна/визитов (`VisitMethod`, `VisitStatus`, `GymQrToken`, `CheckInResult`, `VisitRecord` с проверкой 24-часовой отмены `canCancelAt`, `ReceptionVisitsRepository`) и `RemoteReceptionVisitsRepository` (`/gyms/{id}/qr`, `/check-in-qr` с `Idempotency-Key`, `/visits`, `/clients/{id}/visits`, `/visits/{id}/cancel`); 27 тестов зелёные (`format ✓`, `analyze ✓`, `test ✓`).
 
 ---
 
@@ -28,8 +29,6 @@
 
 **ТЗ:** [uGym_Business_Mobile_TZ.md](specs/uGym_Business_Mobile_TZ.md) (разделы 2.4, 3–5.2, 6.1, 7.1), [identity-auth.yaml](api/identity-auth.yaml), [companies.yaml](api/companies.yaml), [visits-analytics.yaml](api/visits-analytics.yaml)
 
-- [ ] **B1-04** Домен и слой данных ресепшна и визитов (`GymQrPayload`, `CheckInResult`, `VisitRecord`, `ReceptionVisitsRepository`: `qr`, `check-in-qr` с `Idempotency-Key`, `visits`, ручной чекин, отмена за 24 ч)
-  - Проверка: unit-тесты репозитория и сохранения `Idempotency-Key` при повторах
 - [ ] **B1-05** Киоск-режим QR зала (`GymQrKioskScreen`: 60с обратный отсчёт, автообновление токена, PIN-блокировка выхода с хешем в `TokenStorage`)
   - Проверка: widget-тесты таймера обновления и PIN-блокировки выхода
 - [ ] **B1-06** Рабочее место ресепшна (`ReceptionDeskScreen`: сканер QR клиента с защитой от дублей, экран успеха/отказа `422`, журнал визитов, ручная отметка и отмена за 24 ч)
