@@ -58,7 +58,7 @@
   - Цель: `products` (`GET`/`POST`/`PATCH`), `sales` (`GET`/`POST` с `Idempotency-Key`, `refund`, `clients/{id}/sales`), `membership-requests` (`GET`, `pay` с `Idempotency-Key`, `cancel`)
   - Проверка: unit-тесты `RemoteSalesAndRequestsRepository`
 
-- [ ] **B2-06** UI кассы (`PosCheckoutScreen`), очереди заявок (`MembershipRequestsQueueTab`), истории продаж и склада товаров (`ProductsScreen`)
+- [x] **B2-06** UI кассы (`PosCheckoutScreen`), очереди заявок (`MembershipRequestsQueueTab`), истории продаж и склада товаров (`ProductsScreen`) — 3 теста зелёные
   - Цель: подтверждение/отмена заявок (`cash|card_terminal|transfer`, таймер `expires_at`), POS-касса с корзиной и валютой зала, возвраты (`owner`), склад товаров
   - Проверка: widget-тесты заявок, кассы, возвратов и склада
 

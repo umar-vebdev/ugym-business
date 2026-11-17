@@ -1,7 +1,7 @@
 # HANDOFF — uGym Business
 
 **Текущий этап:** `B2` — CRM клиентов, Абонементы и Касса (`PaymentMark`)  
-**Текущая задача:** `B2-06` — UI кассы (`PosCheckoutScreen`), очереди заявок (`MembershipRequestsQueueTab`), истории продаж и склада товаров (`ProductsScreen`)  
+**Текущая задача:** `B2-07` — карточка клиента 360° (`ClientDetailScreen`) и интеграция `B2` в `BusinessShell` / `UgymBusinessApp`  
 **Репозиторий:** `/home/umar/ugym-mobile/uGym Business` (`main`)
 
 ## Что сделано
