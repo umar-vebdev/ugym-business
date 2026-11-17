@@ -68,7 +68,42 @@
 
 ---
 
+## Текущий этап: `B3` — Расписание, Тренеры, Витрина, Штат и Аналитика
+
+- [ ] **B3-01** Доменные модели и REST-репозиторий тренеров и расписания (`TrainersScheduleRepository`, `RemoteTrainersScheduleRepository`)
+  - Цель: `/business/trainers`, `/business/schedule/templates`, `/business/schedule/sessions` (`GET`, `generate`, `cancel`, `bookings`)
+  - Проверка: unit-тесты `RemoteTrainersScheduleRepository`
+
+- [ ] **B3-02** UI тренеров, шаблонов, генерации до 62 дней, отмены и записей (`TrainersScreen`, `ScheduleTab`, `SessionBookingsScreen`)
+  - Цель: CRUD тренеров (`owner`), шаблоны (`weekday`, `HH:MM`, `duration`, `capacity`), мастер генерации (<=62 дн.), отмена с возвратом визитов, просмотр `bookings` (включая `trainer`)
+  - Проверка: widget-тесты шаблонов, генерации, отмены и `bookings`
+
+- [ ] **B3-03** Доменные модели и REST-репозиторий витрины, фото и штата (`StorefrontAndStaffRepository`, `RemoteStorefrontAndStaffRepository`)
+  - Цель: `gyms/{gym}/profile` (`PUT`, `submit`), `publication` (`PATCH`), `photos` (`POST` multipart, `DELETE`), `staff` (`GET`, `POST`, `PATCH`, `DELETE`)
+  - Проверка: unit-тесты `RemoteStorefrontAndStaffRepository`
+
+- [ ] **B3-04** UI редактора витрины и фотогалереи до 10 фото (`StorefrontEditorScreen`, `GymPhotosManager`)
+  - Цель: редактирование профиля, предупреждение `approved -> draft`, блокировка в `pending`, отправка на модерацию, публикация при `approved`, загрузка/удаление до 10 фото
+  - Проверка: widget-тесты статусов модерации, публикации и лимита фото
+
+- [ ] **B3-05** UI штата сотрудников по email (`StaffManagementScreen`, `owner` only)
+  - Цель: список штата, приглашение по email с памяткой при `400 BAD_REQUEST`, смена роли `admin <-> trainer`, удаление
+  - Проверка: widget-тесты приглашения, ошибки `400`, смены роли и удаления
+
+- [ ] **B3-06** Доменные модели и REST-репозиторий аналитики, рассылок и подписки (`AnalyticsAndBillingRepository`, `RemoteAnalyticsAndBillingRepository`)
+  - Цель: `analytics/overview`, `analytics/revenue`, `notifications/announcements` (`202`), `billing/subscription`, `billing/plans`
+  - Проверка: unit-тесты `RemoteAnalyticsAndBillingRepository`
+
+- [ ] **B3-07** UI аналитики владельца, рассылок и подписки (`AnalyticsScreen`, `AnnouncementsScreen`, `BillingStatusScreen`)
+  - Цель: фильтры периода и `inactive_days`, сводка и отчёт выручки (`owner`), рассылка `push`/`sms` (`owner`/`admin`), статус подписки платформы
+  - Проверка: widget-тесты аналитики, рассылок и биллинга
+
+- [ ] **B3-08** Интеграция экранов `B3` в `BusinessShell` и `UgymBusinessApp`
+  - Цель: подключение расписания, аналитики, витрины, штата, рассылок и биллинга в `BusinessShell` / `main.dart` с проверкой RBAC
+  - Проверка: интеграционные widget-тесты `B3` + полный прогон `dart format`, `flutter analyze`, `flutter test`
+
+---
+
 ## Будущие этапы (эпики — раскрыть перед стартом каждого)
 
-- [ ] **B3 — Расписание, Тренеры, Витрина, Штат и Аналитика** (Тренеры, Шаблоны и генерация до 62 дней, Отмена занятия, Экран тренера, Витрина + до 10 фото + модерация + публикация, Штат по email, Аналитика `overview`/`revenue`, Рассылки, Подписка платформы)
 - [ ] **B4 — Полировка UX, Режим чтения, QA и Релиз** (Тесты RBAC и `SUBSCRIPTION_EXPIRED`, устойчивость к потере сети, iPad/tablet адаптация, `PrivacyInfo.xcprivacy`, Data Safety, TestFlight / Google Play)
