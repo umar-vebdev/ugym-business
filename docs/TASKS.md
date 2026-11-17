@@ -54,7 +54,7 @@
   - Цель: конструктор тарифов (`owner`), валидация `kind`/`start_mode`/`time_from`+`time_to`, список истекающих, `freeze`/`unfreeze` (`owner`/`admin`), `cancel` с причиной (`owner`)
   - Проверка: widget-тесты конструктора тарифов, истекающих абонементов и операций
 
-- [ ] **B2-05** Доменные модели и REST-репозиторий кассы, заявок и товаров (`SalesAndRequestsRepository`, `RemoteSalesAndRequestsRepository`)
+- [x] **B2-05** Доменные модели и REST-репозиторий кассы, заявок и товаров (`SalesAndRequestsRepository`, `RemoteSalesAndRequestsRepository`) — 4 теста зелёные
   - Цель: `products` (`GET`/`POST`/`PATCH`), `sales` (`GET`/`POST` с `Idempotency-Key`, `refund`, `clients/{id}/sales`), `membership-requests` (`GET`, `pay` с `Idempotency-Key`, `cancel`)
   - Проверка: unit-тесты `RemoteSalesAndRequestsRepository`
 

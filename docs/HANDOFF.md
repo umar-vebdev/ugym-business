@@ -1,7 +1,7 @@
 # HANDOFF — uGym Business
 
 **Текущий этап:** `B2` — CRM клиентов, Абонементы и Касса (`PaymentMark`)  
-**Текущая задача:** `B2-05` — доменные модели и REST-репозиторий кассы, заявок и товаров (`SalesAndRequestsRepository`, `RemoteSalesAndRequestsRepository`)  
+**Текущая задача:** `B2-06` — UI кассы (`PosCheckoutScreen`), очереди заявок (`MembershipRequestsQueueTab`), истории продаж и склада товаров (`ProductsScreen`)  
 **Репозиторий:** `/home/umar/ugym-mobile/uGym Business` (`main`)
 
 ## Что сделано
