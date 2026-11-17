@@ -10,6 +10,9 @@ import 'core/router/business_shell.dart';
 import 'core/session/business_session_controller.dart';
 import 'core/storage/app_preferences.dart';
 import 'core/theme/theme_controller.dart';
+import 'features/auth/data/remote_auth_repository.dart';
+import 'features/auth/presentation/auth_controller.dart';
+import 'features/auth/presentation/auth_flow_screen.dart';
 
 void main() {
   const config = AppConfig.dev();
@@ -20,16 +23,35 @@ void main() {
   final localeController = LocaleController(preferences: preferences);
   final sessionController = BusinessSessionController(preferences: preferences);
 
+  late final AuthController authController;
+
   final apiClient = BusinessApiClient(
     config: config,
     tokenStorage: storage,
     localeProvider: () => localeController.localeCode,
+    onUnauthorized: () => unawaited(authController.logout()),
     onSubscriptionExpired: sessionController.markSubscriptionExpired,
   );
   final healthService = UgymHealthService(httpClient: apiClient.httpClient);
+  final authRepository = RemoteAuthRepository(
+    httpClient: apiClient.httpClient,
+    tokenStorage: storage,
+  );
+
+  authController = AuthController(
+    repository: authRepository,
+    onAuthenticated: () async {
+      await sessionController.bootstrapFromApi(apiClient.httpClient);
+    },
+    onSignedOut: () {
+      sessionController.setRole(null);
+      sessionController.setSubscriptionStatus(isReadOnly: false);
+    },
+  );
 
   unawaited(themeController.load());
   unawaited(localeController.load());
+  unawaited(authController.tryRestoreSession(storage));
 
   runApp(
     UgymBusinessApp(
@@ -37,6 +59,7 @@ void main() {
       themeController: themeController,
       localeController: localeController,
       sessionController: sessionController,
+      authController: authController,
       healthService: healthService,
     ),
   );
@@ -50,6 +73,7 @@ final class UgymBusinessApp extends StatefulWidget {
     this.themeController,
     this.localeController,
     this.sessionController,
+    this.authController,
     this.healthService,
   });
 
@@ -57,6 +81,7 @@ final class UgymBusinessApp extends StatefulWidget {
   final ThemeController? themeController;
   final LocaleController? localeController;
   final BusinessSessionController? sessionController;
+  final AuthController? authController;
   final UgymHealthService? healthService;
 
   @override
@@ -110,24 +135,32 @@ final class _UgymBusinessAppState extends State<UgymBusinessApp> {
     final listened = Listenable.merge([
       _effectiveThemeController,
       _effectiveLocaleController,
+      if (widget.authController != null) widget.authController,
     ]);
 
     return ListenableBuilder(
       listenable: listened,
       builder: (context, _) {
+        final bool requiresAuth =
+            widget.authController != null &&
+            !widget.authController!.isAuthenticated;
+
         return MaterialApp(
           title: 'uGym Business',
           debugShowCheckedModeBanner: false,
           theme: UcraftTheme.light(),
           darkTheme: UcraftTheme.dark(),
           themeMode: _effectiveThemeController.themeMode,
-          home: BusinessShell(
-            config: widget.config,
-            sessionController: _effectiveSessionController,
-            localeController: _effectiveLocaleController,
-            themeController: _effectiveThemeController,
-            healthService: widget.healthService,
-          ),
+          home: requiresAuth
+              ? AuthFlowScreen(controller: widget.authController!)
+              : BusinessShell(
+                  config: widget.config,
+                  sessionController: _effectiveSessionController,
+                  localeController: _effectiveLocaleController,
+                  themeController: _effectiveThemeController,
+                  authController: widget.authController,
+                  healthService: widget.healthService,
+                ),
         );
       },
     );

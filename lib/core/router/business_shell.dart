@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:material_ui/material_ui.dart';
 import 'package:ugym_core/ugym_core.dart';
 
+import '../../features/auth/presentation/auth_controller.dart';
 import '../config/app_config.dart';
 import '../l10n/business_localizations.dart';
 import '../session/business_role.dart';
@@ -21,6 +22,7 @@ final class BusinessShell extends StatefulWidget {
     required this.sessionController,
     required this.localeController,
     required this.themeController,
+    this.authController,
     this.healthService,
   });
 
@@ -28,6 +30,7 @@ final class BusinessShell extends StatefulWidget {
   final BusinessSessionController sessionController;
   final LocaleController localeController;
   final ThemeController themeController;
+  final AuthController? authController;
   final UgymHealthService? healthService;
 
   static List<BusinessDestination> visibleDestinationsFor(BusinessRole? role) {
@@ -97,6 +100,7 @@ final class _BusinessShellState extends State<BusinessShell> {
       widget.sessionController,
       widget.localeController,
       widget.themeController,
+      if (widget.authController != null) widget.authController,
     ]);
 
     return ListenableBuilder(
@@ -243,6 +247,18 @@ final class _BusinessShellState extends State<BusinessShell> {
                                 ],
                               ),
                             ],
+                          ],
+                          if (widget.authController != null) ...[
+                            const SizedBox(height: UcraftSpacing.space3),
+                            UcraftButton(
+                              label: 'Выйти',
+                              variant: UcraftButtonVariant.destructive,
+                              fullWidth: true,
+                              isLoading: widget.authController!.isSubmitting,
+                              onPressed: () {
+                                unawaited(widget.authController!.logout());
+                              },
+                            ),
                           ],
                         ],
                       ),

@@ -2,14 +2,14 @@
 
 **Обновлено:** 2026-11-17
 **Текущий этап:** B1 — Авторизация, Онбординг, Киоск QR и Визиты
-**Текущая задача:** `B1-01` `[x]` завершена; следующая — `B1-02`
+**Текущая задача:** `B1-02` `[x]` завершена; следующая — `B1-03`
 
 ## Что сделано в последней сессии
 
-- Завершён этап **`B0`** (`B0-01`–`B0-04` `[x]`).
-- Эпик **`B1`** раскрыт на задачи **`B1-01`–`B1-06`** в `docs/TASKS.md`.
-- **`B1-01`**: реализованы `AuthenticatedUser`, `AuthRepository` (`features/auth/domain`) и `RemoteAuthRepository` (`features/auth/data`: `/auth/login` с записью токена, `/auth/register`, `/auth/send-otp`, `/auth/verify-email`, `/auth/reset-password`, `/auth/logout` с очисткой `TokenStorage`, `GET /user`), покрыты 5 новыми unit-тестами (`400`/`401`/`422`/`429`, офлайн-выход).
-- Все проверки пройдены: `dart format` ✓, `flutter analyze` ✓ (`No issues found!`), `flutter test` ✓ (`18 passed`).
+- Завершён этап **`B0`** (`B0-01`–`B0-04` `[x]`), эпик **`B1`** декомпозирован на `B1-01`–`B1-06`.
+- **`B1-01`**: реализованы `AuthenticatedUser`, `AuthRepository` и `RemoteAuthRepository` (`login`, `register`, `send-otp`, `verify-email`, `reset-password`, `logout`, `GET /user`).
+- **`B1-02`**: реализованы `AuthController` (авторизация по email/телефону, восстановление сессии `tryRestoreSession`, регистрация + Email OTP, сброс пароля, выход со сбросом роли) и `AuthFlowScreen` в стиле uCraft 1.0, подключённые к `UgymBusinessApp` и `BusinessShell`.
+- Все проверки пройдены: `dart format` ✓, `flutter analyze` ✓ (`No issues found!`), `flutter test` ✓ (`21 passed`).
 
 ## Актуальное состояние окружения
 
@@ -18,4 +18,4 @@
 
 ## Точный следующий шаг
 
-- Выполнить задачу **`B1-02`**: реализовать `AuthController` (автозапуск сессии/роли при наличии токена, вход, регистрация + Email OTP, сброс пароля и выход с очисткой хранилища) и UI-экраны (`LoginScreen`, `RegisterUserScreen`, `EmailOtpVerifyScreen`, `ResetPasswordScreen`) в стиле uCraft Design System 1.0 с widget-тестами.
+- Выполнить задачу **`B1-03`**: реализовать онбординг новой компании (`POST /business/companies` для `noCompany` → `owner`), управление филиалами (`POST/PATCH /business/gyms`, геозона `50..5000` м) и смену валюты компании (`GET /business/currencies`, `PATCH /business/company/currency`) с unit- и widget-тестами.

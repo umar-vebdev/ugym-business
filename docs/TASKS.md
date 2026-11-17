@@ -19,6 +19,7 @@
 - [x] **B0-03** (заметка: в `ugym_core/lib/ugym_core.dart` реэкспортированы типы `Dio`, чтобы не нарушать `depend_on_referenced_packages`; в `docs/api/` добавлен `platform.yaml` для биллинга) Реализованы матрица RBAC (`BusinessRole` / `BusinessPermission` для `owner`/`admin`/`trainer`/`noCompany`), `GymSummary`, `BusinessSessionController` (`bootstrapFromApi`, `isReadOnly` при `SUBSCRIPTION_EXPIRED`, выбор филиала), а также `SubscriptionReadOnlyBanner`, `RoleGuard` и `GymBranchSelector`; 11 тестов зелёные (`format ✓`, `analyze ✓`, `test ✓`).
 - [x] **B0-04** (заметка: в `ugym_core` добавлен общий `UgymHealthService` / `UgymHealthStatus` для `GET /api/v1/health`) Реализованы ARB-словари (`app_ru.arb`, `app_tg.arb`, `app_en.arb`), `BusinessStrings` и `LocaleController` с переключением языка на лету, адаптивный `BusinessShell` (`NavigationBar` на `<600dp` и `NavigationRail` на `>=600dp`, фильтрация вкладок по ролям, баннер чтения, селектор филиала, смена темы и проверка `/health`); 13 тестов зелёные (`format ✓`, `analyze ✓`, `test ✓`).
 - [x] **B1-01** Реализованы доменные модели и контракт аутентификации (`AuthenticatedUser`, `AuthRepository` на чистом Dart) и `RemoteAuthRepository` (`login` с сохранением токена в `TokenStorage`, `register`, `send-otp`, `verify-email`, `reset-password`, `logout` с гарантированной очисткой токена и `GET /user`); 18 тестов зелёные (`format ✓`, `analyze ✓`, `test ✓`).
+- [x] **B1-02** Реализованы `AuthController` (вход по email/телефону, восстановление сессии `tryRestoreSession`, регистрация + OTP, сброс пароля, выход со сбросом роли) и `AuthFlowScreen` в стиле uCraft 1.0 + кнопка «Выйти» в `BusinessShell` и привязка в `lib/main.dart`; 21 тест зелёный (`format ✓`, `analyze ✓`, `test ✓`).
 
 ---
 
@@ -26,8 +27,6 @@
 
 **ТЗ:** [uGym_Business_Mobile_TZ.md](specs/uGym_Business_Mobile_TZ.md) (разделы 2.4, 3–5.2, 6.1, 7.1), [identity-auth.yaml](api/identity-auth.yaml), [companies.yaml](api/companies.yaml), [visits-analytics.yaml](api/visits-analytics.yaml)
 
-- [ ] **B1-02** Экраны входа, регистрации с Email OTP, сброса пароля и выхода (`AuthController`, `LoginScreen`, `RegisterUserScreen`, `EmailOtpVerifyScreen`, `ResetPasswordScreen`)
-  - Проверка: widget-тесты потоков входа, OTP, сброса пароля и выхода в Light/Dark темах
 - [ ] **B1-03** Онбординг компании (`POST /business/companies` для `noCompany` → `owner`), управление филиалами (`POST/PATCH /business/gyms`) и валюта компании (`currencies`, `PATCH /company/currency`)
   - Проверка: unit- и widget-тесты онбординга, создания/правки зала и смены валюты
 - [ ] **B1-04** Домен и слой данных ресепшна и визитов (`GymQrPayload`, `CheckInResult`, `VisitRecord`, `ReceptionVisitsRepository`: `qr`, `check-in-qr` с `Idempotency-Key`, `visits`, ручной чекин, отмена за 24 ч)
