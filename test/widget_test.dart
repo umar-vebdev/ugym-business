@@ -161,6 +161,9 @@ void main() {
       expect(find.byType(NavigationRail), findsNothing);
       expect(find.text('Аналитика'), findsOneWidget);
 
+      await tester.tap(find.text('Ещё'));
+      await tester.pumpAndSettle();
+
       await tester.tap(find.text('TG'));
       await tester.pumpAndSettle();
       expect(localeController.localeCode, 'tg');

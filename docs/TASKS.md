@@ -31,7 +31,7 @@
 
 **ТЗ:** [uGym_Business_Mobile_TZ.md](specs/uGym_Business_Mobile_TZ.md) (разделы 2.4, 3–5.2, 6.1, 7.1), [identity-auth.yaml](api/identity-auth.yaml), [companies.yaml](api/companies.yaml), [visits-analytics.yaml](api/visits-analytics.yaml)
 
-- [ ] **B1-06b** Журнал визитов, ручная отметка (в т.ч. задним числом) и отмена за 24 ч с причиной (`VisitsLogScreen`, `ManualCheckInSheet`) + подключение экранов B1 в `BusinessShell`
+- [x] **B1-06b** Журнал визитов, ручная отметка (в т.ч. задним числом) и отмена за 24 ч с причиной (`VisitsLogScreen`, `ManualCheckInSheet`) + подключение экранов B1 в `BusinessShell` (39 тестов зелёные)
   - Проверка: widget-тесты журнала, ручной отметки и отмены
 
 ---

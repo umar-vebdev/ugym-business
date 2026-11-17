@@ -4,6 +4,15 @@ import 'package:material_ui/material_ui.dart';
 import 'package:ugym_core/ugym_core.dart';
 
 import '../../features/auth/presentation/auth_controller.dart';
+import '../../features/company_onboarding/domain/company_onboarding_models.dart';
+import '../../features/company_onboarding/presentation/company_onboarding_screen.dart';
+import '../../features/reception_qr/domain/kiosk_security.dart';
+import '../../features/reception_qr/domain/reception_visits_models.dart';
+import '../../features/reception_qr/presentation/gym_qr_kiosk_screen.dart';
+import '../../features/reception_qr/presentation/qr_scanner_view.dart';
+import '../../features/reception_qr/presentation/reception_scan_controller.dart';
+import '../../features/reception_qr/presentation/scan_client_qr_screen.dart';
+import '../../features/reception_qr/presentation/visits_log_screen.dart';
 import '../config/app_config.dart';
 import '../l10n/business_localizations.dart';
 import '../session/business_role.dart';
@@ -24,6 +33,11 @@ final class BusinessShell extends StatefulWidget {
     required this.themeController,
     this.authController,
     this.healthService,
+    this.onboardingRepository,
+    this.visitsRepository,
+    this.kioskPinGuard,
+    this.kioskWakeLock = const PlatformKioskWakeLock(),
+    this.qrScannerBuilder = buildMobileQrScanner,
   });
 
   final AppConfig config;
@@ -32,6 +46,11 @@ final class BusinessShell extends StatefulWidget {
   final ThemeController themeController;
   final AuthController? authController;
   final UgymHealthService? healthService;
+  final CompanyOnboardingRepository? onboardingRepository;
+  final ReceptionVisitsRepository? visitsRepository;
+  final KioskPinGuard? kioskPinGuard;
+  final KioskWakeLock kioskWakeLock;
+  final QrScannerBuilder qrScannerBuilder;
 
   static List<BusinessDestination> visibleDestinationsFor(BusinessRole? role) {
     return switch (role) {
@@ -155,113 +174,11 @@ final class _BusinessShellState extends State<BusinessShell> {
                       ],
                     ),
                     const SizedBox(height: UcraftSpacing.space4),
-                    UcraftCard(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Text(
-                            strings.appTitle,
-                            style: UcraftTypography.title.copyWith(
-                              color: colors.foreground,
-                            ),
-                          ),
-                          const SizedBox(height: UcraftSpacing.space1),
-                          Text(
-                            widget.config.flavor.name,
-                            style: UcraftTypography.mono.copyWith(
-                              color: colors.foregroundSecondary,
-                            ),
-                          ),
-                          const SizedBox(height: UcraftSpacing.space4),
-                          Wrap(
-                            spacing: UcraftSpacing.space2,
-                            runSpacing: UcraftSpacing.space2,
-                            children: [
-                              for (final locale in AppLocale.values)
-                                UcraftButton(
-                                  label: locale.shortLabel,
-                                  variant:
-                                      widget.localeController.locale == locale
-                                      ? UcraftButtonVariant.primary
-                                      : UcraftButtonVariant.secondary,
-                                  onPressed: () {
-                                    unawaited(
-                                      widget.localeController.setLocale(locale),
-                                    );
-                                  },
-                                ),
-                            ],
-                          ),
-                          const SizedBox(height: UcraftSpacing.space4),
-                          UcraftButton(
-                            label: isDark
-                                ? strings.themeLightLabel
-                                : strings.themeDarkLabel,
-                            variant: UcraftButtonVariant.secondary,
-                            fullWidth: true,
-                            onPressed: () {
-                              unawaited(
-                                widget.themeController.setThemeMode(
-                                  isDark ? ThemeMode.light : ThemeMode.dark,
-                                ),
-                              );
-                            },
-                          ),
-                          if (widget.healthService != null) ...[
-                            const SizedBox(height: UcraftSpacing.space3),
-                            UcraftButton(
-                              label: strings.checkHealth,
-                              isLoading: _checkingHealth,
-                              fullWidth: true,
-                              onPressed: _runHealthCheck,
-                            ),
-                            if (_healthOk != null) ...[
-                              const SizedBox(height: UcraftSpacing.space3),
-                              Row(
-                                children: [
-                                  Icon(
-                                    _healthOk!
-                                        ? Icons.check_circle_outline
-                                        : Icons.error_outline,
-                                    size: 18,
-                                    color: _healthOk!
-                                        ? colors.success
-                                        : colors.destructive,
-                                  ),
-                                  const SizedBox(
-                                    width: UcraftSpacing.iconLabelGap,
-                                  ),
-                                  Expanded(
-                                    child: Text(
-                                      _healthOk!
-                                          ? strings.healthOk
-                                          : strings.healthError,
-                                      style: UcraftTypography.bodyMedium
-                                          .copyWith(
-                                            color: _healthOk!
-                                                ? colors.successForeground
-                                                : colors.destructiveForeground,
-                                          ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ],
-                          if (widget.authController != null) ...[
-                            const SizedBox(height: UcraftSpacing.space3),
-                            UcraftButton(
-                              label: 'Выйти',
-                              variant: UcraftButtonVariant.destructive,
-                              fullWidth: true,
-                              isLoading: widget.authController!.isSubmitting,
-                              onPressed: () {
-                                unawaited(widget.authController!.logout());
-                              },
-                            ),
-                          ],
-                        ],
-                      ),
+                    _buildDestinationBody(
+                      context,
+                      activeDestination,
+                      strings,
+                      isDark,
                     ),
                   ],
                 ),
@@ -320,6 +237,300 @@ final class _BusinessShellState extends State<BusinessShell> {
           },
         );
       },
+    );
+  }
+
+  Widget _buildDestinationBody(
+    BuildContext context,
+    BusinessDestination destination,
+    BusinessStrings strings,
+    bool isDark,
+  ) {
+    return switch (destination) {
+      BusinessDestination.overview => _buildOverview(context, strings),
+      BusinessDestination.operations => _buildOperations(context),
+      BusinessDestination.members => UcraftEmptyState(
+        title: strings.navMembers,
+        description:
+            'Раздел клиентов, абонементов и оплат появится на этапе B2.',
+      ),
+      BusinessDestination.analytics => UcraftEmptyState(
+        title: strings.navAnalytics,
+        description: 'Аналитика и аудит появятся на этапе B4.',
+      ),
+      BusinessDestination.more => _buildMore(context, strings, isDark),
+    };
+  }
+
+  Widget _buildOverview(BuildContext context, BusinessStrings strings) {
+    final colors = context.ucraftColors;
+    final role = widget.sessionController.role;
+    if (role == BusinessRole.noCompany && widget.onboardingRepository != null) {
+      return CompanyOnboardingCard(
+        repository: widget.onboardingRepository!,
+        sessionController: widget.sessionController,
+      );
+    }
+
+    final gymName =
+        widget.sessionController.selectedGym?.name ?? 'Филиал не выбран';
+    return UcraftCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            strings.appTitle,
+            style: UcraftTypography.title.copyWith(color: colors.foreground),
+          ),
+          const SizedBox(height: UcraftSpacing.space2),
+          Text(
+            'Роль: ${role?.name ?? 'не определена'} • Филиал: $gymName',
+            style: UcraftTypography.body.copyWith(
+              color: colors.foregroundSecondary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOperations(BuildContext context) {
+    final colors = context.ucraftColors;
+    final visitsRepo = widget.visitsRepository;
+    if (visitsRepo == null) {
+      return const UcraftEmptyState(
+        title: 'Операции',
+        description: 'Подключите сервис визитов для сканера QR и журнала.',
+      );
+    }
+
+    final role = widget.sessionController.role;
+    final selectedGym = widget.sessionController.selectedGym;
+    final canScan =
+        selectedGym != null &&
+        widget.sessionController.canMutate(
+          BusinessPermission.manageReceptionQrAndVisits,
+        );
+    final canOpenKiosk =
+        selectedGym != null &&
+        (role == BusinessRole.owner || role == BusinessRole.admin);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        UcraftCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'Ресепшен и QR',
+                style: UcraftTypography.title.copyWith(
+                  color: colors.foreground,
+                ),
+              ),
+              const SizedBox(height: UcraftSpacing.space3),
+              Wrap(
+                spacing: UcraftSpacing.space2,
+                runSpacing: UcraftSpacing.space2,
+                children: [
+                  UcraftButton(
+                    label: 'Сканер QR клиента',
+                    onPressed: canScan
+                        ? () => unawaited(
+                            _openClientScanner(
+                              context,
+                              visitsRepo,
+                              selectedGym.id,
+                            ),
+                          )
+                        : null,
+                  ),
+                  if (canOpenKiosk)
+                    UcraftButton(
+                      label: 'Киоск QR зала',
+                      variant: UcraftButtonVariant.secondary,
+                      onPressed: () => unawaited(
+                        _openKiosk(context, visitsRepo, selectedGym.id),
+                      ),
+                    ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: UcraftSpacing.space4),
+        VisitsLogScreen(
+          repository: visitsRepo,
+          sessionController: widget.sessionController,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMore(
+    BuildContext context,
+    BusinessStrings strings,
+    bool isDark,
+  ) {
+    final colors = context.ucraftColors;
+    final onboardingRepo = widget.onboardingRepository;
+    final showOwnerSettings =
+        onboardingRepo != null &&
+        widget.sessionController.role == BusinessRole.owner;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (showOwnerSettings) ...[
+          CompanyBranchesAndCurrencyCard(
+            repository: onboardingRepo,
+            sessionController: widget.sessionController,
+          ),
+          const SizedBox(height: UcraftSpacing.space4),
+        ],
+        UcraftCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                strings.appTitle,
+                style: UcraftTypography.title.copyWith(
+                  color: colors.foreground,
+                ),
+              ),
+              const SizedBox(height: UcraftSpacing.space1),
+              Text(
+                widget.config.flavor.name,
+                style: UcraftTypography.mono.copyWith(
+                  color: colors.foregroundSecondary,
+                ),
+              ),
+              const SizedBox(height: UcraftSpacing.space4),
+              Wrap(
+                spacing: UcraftSpacing.space2,
+                runSpacing: UcraftSpacing.space2,
+                children: [
+                  for (final locale in AppLocale.values)
+                    UcraftButton(
+                      label: locale.shortLabel,
+                      variant: widget.localeController.locale == locale
+                          ? UcraftButtonVariant.primary
+                          : UcraftButtonVariant.secondary,
+                      onPressed: () {
+                        unawaited(widget.localeController.setLocale(locale));
+                      },
+                    ),
+                ],
+              ),
+              const SizedBox(height: UcraftSpacing.space4),
+              UcraftButton(
+                label: isDark
+                    ? strings.themeLightLabel
+                    : strings.themeDarkLabel,
+                variant: UcraftButtonVariant.secondary,
+                fullWidth: true,
+                onPressed: () {
+                  unawaited(
+                    widget.themeController.setThemeMode(
+                      isDark ? ThemeMode.light : ThemeMode.dark,
+                    ),
+                  );
+                },
+              ),
+              if (widget.healthService != null) ...[
+                const SizedBox(height: UcraftSpacing.space3),
+                UcraftButton(
+                  label: strings.checkHealth,
+                  isLoading: _checkingHealth,
+                  fullWidth: true,
+                  onPressed: _runHealthCheck,
+                ),
+                if (_healthOk != null) ...[
+                  const SizedBox(height: UcraftSpacing.space3),
+                  Row(
+                    children: [
+                      Icon(
+                        _healthOk!
+                            ? Icons.check_circle_outline
+                            : Icons.error_outline,
+                        size: 18,
+                        color: _healthOk! ? colors.success : colors.destructive,
+                      ),
+                      const SizedBox(width: UcraftSpacing.iconLabelGap),
+                      Expanded(
+                        child: Text(
+                          _healthOk! ? strings.healthOk : strings.healthError,
+                          style: UcraftTypography.bodyMedium.copyWith(
+                            color: _healthOk!
+                                ? colors.successForeground
+                                : colors.destructiveForeground,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ],
+              if (widget.authController != null) ...[
+                const SizedBox(height: UcraftSpacing.space3),
+                UcraftButton(
+                  label: 'Выйти',
+                  variant: UcraftButtonVariant.destructive,
+                  fullWidth: true,
+                  isLoading: widget.authController!.isSubmitting,
+                  onPressed: () {
+                    unawaited(widget.authController!.logout());
+                  },
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _openClientScanner(
+    BuildContext context,
+    ReceptionVisitsRepository visitsRepo,
+    int gymId,
+  ) async {
+    final scanController = ReceptionScanController(
+      repository: visitsRepo,
+      gymId: gymId,
+    );
+    try {
+      await Navigator.of(context).push<void>(
+        MaterialPageRoute<void>(
+          builder: (_) => ScanClientQrScreen(
+            controller: scanController,
+            scannerBuilder: widget.qrScannerBuilder,
+          ),
+        ),
+      );
+    } finally {
+      scanController.dispose();
+    }
+  }
+
+  Future<void> _openKiosk(
+    BuildContext context,
+    ReceptionVisitsRepository visitsRepo,
+    int gymId,
+  ) async {
+    final pinGuard =
+        widget.kioskPinGuard ??
+        const KioskPinGuard(storage: SecureTokenStorage());
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
+        builder: (kioskContext) => GymQrKioskScreen(
+          gymId: gymId,
+          repository: visitsRepo,
+          pinGuard: pinGuard,
+          wakeLock: widget.kioskWakeLock,
+          onExitKiosk: () => Navigator.of(kioskContext).pop(),
+        ),
+      ),
     );
   }
 

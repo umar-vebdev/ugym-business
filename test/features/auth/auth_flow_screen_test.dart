@@ -134,6 +134,11 @@ void main() {
       expect(authController.isAuthenticated, isTrue);
       expect(find.byType(BusinessShell), findsOneWidget);
 
+      await tester.tap(find.text('Ещё'));
+      await tester.pumpAndSettle();
+
+      await tester.ensureVisible(find.text('Выйти'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Выйти'));
       await tester.pumpAndSettle();
 

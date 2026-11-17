@@ -13,6 +13,11 @@ import 'core/theme/theme_controller.dart';
 import 'features/auth/data/remote_auth_repository.dart';
 import 'features/auth/presentation/auth_controller.dart';
 import 'features/auth/presentation/auth_flow_screen.dart';
+import 'features/company_onboarding/data/remote_company_onboarding_repository.dart';
+import 'features/company_onboarding/domain/company_onboarding_models.dart';
+import 'features/reception_qr/data/remote_reception_visits_repository.dart';
+import 'features/reception_qr/domain/kiosk_security.dart';
+import 'features/reception_qr/domain/reception_visits_models.dart';
 
 void main() {
   const config = AppConfig.dev();
@@ -37,6 +42,13 @@ void main() {
     httpClient: apiClient.httpClient,
     tokenStorage: storage,
   );
+  final onboardingRepository = RemoteCompanyOnboardingRepository(
+    httpClient: apiClient.httpClient,
+  );
+  final visitsRepository = RemoteReceptionVisitsRepository(
+    httpClient: apiClient.httpClient,
+  );
+  const kioskPinGuard = KioskPinGuard(storage: storage);
 
   authController = AuthController(
     repository: authRepository,
@@ -61,6 +73,9 @@ void main() {
       sessionController: sessionController,
       authController: authController,
       healthService: healthService,
+      onboardingRepository: onboardingRepository,
+      visitsRepository: visitsRepository,
+      kioskPinGuard: kioskPinGuard,
     ),
   );
 }
@@ -75,6 +90,9 @@ final class UgymBusinessApp extends StatefulWidget {
     this.sessionController,
     this.authController,
     this.healthService,
+    this.onboardingRepository,
+    this.visitsRepository,
+    this.kioskPinGuard,
   });
 
   final AppConfig config;
@@ -83,6 +101,9 @@ final class UgymBusinessApp extends StatefulWidget {
   final BusinessSessionController? sessionController;
   final AuthController? authController;
   final UgymHealthService? healthService;
+  final CompanyOnboardingRepository? onboardingRepository;
+  final ReceptionVisitsRepository? visitsRepository;
+  final KioskPinGuard? kioskPinGuard;
 
   @override
   State<UgymBusinessApp> createState() => _UgymBusinessAppState();
@@ -160,6 +181,9 @@ final class _UgymBusinessAppState extends State<UgymBusinessApp> {
                   themeController: _effectiveThemeController,
                   authController: widget.authController,
                   healthService: widget.healthService,
+                  onboardingRepository: widget.onboardingRepository,
+                  visitsRepository: widget.visitsRepository,
+                  kioskPinGuard: widget.kioskPinGuard,
                 ),
         );
       },

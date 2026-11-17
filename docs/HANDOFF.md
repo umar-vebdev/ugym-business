@@ -1,22 +1,19 @@
-# Handoff — uGym Business (Business App)
+# HANDOFF — uGym Business
 
-**Обновлено:** 2026-11-17
-**Текущий этап:** B1 — Авторизация, Онбординг, Киоск QR и Визиты
-**Текущая задача:** `B1-06a` `[x]` завершена; следующая — `B1-06b`
+**Текущий этап:** `B1` завершён → переход к `B2` (Clients, Memberships, Payments, Applications)  
+**Текущая задача:** раскрытие эпика `B2` в мелкие задачи и согласование с разработчиком (`AGENTS.md` §4.3)  
+**Репозиторий:** `/home/umar/ugym-mobile/uGym Business` (`main`)
 
-## Что сделано в последней сессии
-
-- **`B1-01`–`B1-04`**: домен и репозитории Auth, CompanyOnboarding, Reception/Visits; UI входа, OTP, сброса пароля, онбординга компании, филиалов и валюты.
-- **`B1-05`**: киоск QR зала (`GymQrKioskScreen`, `KioskPinGuard` со SHA-256 + соль, `KioskWakeLock`), зависимости `crypto`, `qr_flutter`, `wakelock_plus` (`D-003`).
-- **`B1-06a`** (задача `B1-06` разбита на `a`/`b`): `mobile_scanner` (`D-004`), `QrScannerBuilder`, `ReceptionScanController` (пауза сканера, повтор с тем же `Idempotency-Key` при сбое сети) и `ScanClientQrScreen` (карточка успеха, крупные экраны отказа для кодов `422`).
-- Все проверки пройдены: `dart format` ✓, `flutter analyze` ✓ (`No issues found!`), `flutter test` ✓ (`35 passed`).
-
-## Актуальное состояние окружения
-
-- Flutter SDK `3.50.0` и Dart SDK `3.14.0` установлены; локальное тестирование и статический анализ работают полностью.
-- Для сборки APK/запуска на телефоне позже понадобится Android SDK (`flutter doctor`).
-- Для `mobile_scanner` на реальном устройстве нужны разрешения камеры: `NSCameraUsageDescription` (iOS `Info.plist`) и `android.permission.CAMERA` (`AndroidManifest.xml`) — добавить в `B1-06b` или `B4`.
+## Что сделано
+- Этап `B0` (`B0-01`–`B0-04`) завершён: каркас `tj.ugym.business`, `AppConfig`, `BusinessApiClient`, `BusinessRole`, `BusinessSessionController`, `SubscriptionReadOnlyBanner`, `RoleGuard`, `GymBranchSelector`, `LocaleController`, `BusinessShell`.
+- Этап `B1` (`B1-01`–`B1-06b`) завершён полностью:
+  - Auth (`AuthRepository`, `AuthController`, `AuthFlowScreen`);
+  - Company Onboarding, филиалы и валюта (`CompanyOnboardingCard`, `CompanyBranchesAndCurrencyCard`);
+  - Kiosk QR 60с HMAC + PIN + WakeLock (`GymQrKioskScreen`);
+  - Сканер QR клиента (`ScanClientQrScreen`, разрешения камеры в Android/iOS);
+  - Журнал визитов, ручная отметка (в т.ч. задним числом с `Idempotency-Key`), отмена в окне 24 ч с причиной (`VisitsLogScreen`, `ManualCheckInSheet`) и интеграция экранов `B1` в `BusinessShell` / `UgymBusinessApp`.
+- Проверки: `dart format --output=none --set-exit-if-changed .`, `flutter analyze` (0 issues), `flutter test` (39 passed).
 
 ## Точный следующий шаг
-
-- Выполнить **`B1-06b`**: `VisitsLogScreen` (журнал `GET /business/visits`, отмена в пределах 24 ч с обязательной причиной), `ManualCheckInSheet` (ручной визит с `visited_at` задним числом и `Idempotency-Key`) и подключение сканера, киоска и журнала в `BusinessShell` (вкладка «Операции») с учётом ролей.
+1. Прочитать раздел `B2` в `uGym_Business_Mobile_TZ.md` и эндпоинты в `business-core.yaml`.
+2. Раскрыть эпик `B2` в мелкие задачи в `docs/TASKS.md` и показать список разработчику для подтверждения.
