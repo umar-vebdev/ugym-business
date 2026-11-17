@@ -23,6 +23,7 @@
 - [x] **B1-03** Реализованы доменные модели и контракт онбординга (`CreatedCompanyResult`, `GymBranch`, `CurrencyOption`, `CompanyOnboardingRepository`), `RemoteCompanyOnboardingRepository` (`POST /business/companies`, `GET/POST/PATCH /business/gyms`, `currencies`, `PATCH /company/currency`), экран `CompanyOnboardingCard` (перевод `noCompany` → `owner` + 14-дневный триал) и `CompanyBranchesAndCurrencyCard` (управление филиалами, геозоной `50..5000` м и валютой); 24 теста зелёные (`format ✓`, `analyze ✓`, `test ✓`).
 - [x] **B1-04** Реализованы доменные модели и контракт ресепшна/визитов (`VisitMethod`, `VisitStatus`, `GymQrToken`, `CheckInResult`, `VisitRecord` с проверкой 24-часовой отмены `canCancelAt`, `ReceptionVisitsRepository`) и `RemoteReceptionVisitsRepository` (`/gyms/{id}/qr`, `/check-in-qr` с `Idempotency-Key`, `/visits`, `/clients/{id}/visits`, `/visits/{id}/cancel`); 27 тестов зелёные (`format ✓`, `analyze ✓`, `test ✓`).
 - [x] **B1-05** Добавлены `crypto`, `qr_flutter`, `wakelock_plus` (`D-003`); реализованы `KioskWakeLock` (`PlatformKioskWakeLock` / `NoOpKioskWakeLock`), `KioskPinGuard` (SHA-256 + случайная соль в `TokenStorage`) и `GymQrKioskScreen` (QR-матрица `QrImageView`, 60с отсчёт, автообновление за 4с до `expiresAt`, остановка таймера и отключение WakeLock при выходе, PIN-блокировка `PopScope`); 30 тестов зелёные (`format ✓`, `analyze ✓`, `test ✓`).
+- [x] **B1-06a** (заметка: задача `B1-06` разбита на `a`/`b` по правилу ≤5 файлов) Добавлен `mobile_scanner` (`D-004`); реализованы `QrScannerBuilder` (камера подменяется в тестах), `ReceptionScanController` (пауза сканера на время запроса, повтор после сбоя сети с тем же токеном и `Idempotency-Key`, новый ключ для следующего клиента) и `ScanClientQrScreen` (карточка успеха с остатком занятий, крупные экраны отказа для всех кодов `422`, кнопка «Принять оплату» при `NO_ACTIVE_MEMBERSHIP`); 35 тестов зелёные (`format ✓`, `analyze ✓`, `test ✓`).
 
 ---
 
@@ -30,8 +31,8 @@
 
 **ТЗ:** [uGym_Business_Mobile_TZ.md](specs/uGym_Business_Mobile_TZ.md) (разделы 2.4, 3–5.2, 6.1, 7.1), [identity-auth.yaml](api/identity-auth.yaml), [companies.yaml](api/companies.yaml), [visits-analytics.yaml](api/visits-analytics.yaml)
 
-- [ ] **B1-06** Рабочее место ресепшна (`ReceptionDeskScreen`: сканер QR клиента с защитой от дублей, экран успеха/отказа `422`, журнал визитов, ручная отметка и отмена за 24 ч)
-  - Проверка: widget-тесты чекина, отказа `422`, ручной отметки и отмены
+- [ ] **B1-06b** Журнал визитов, ручная отметка (в т.ч. задним числом) и отмена за 24 ч с причиной (`VisitsLogScreen`, `ManualCheckInSheet`) + подключение экранов B1 в `BusinessShell`
+  - Проверка: widget-тесты журнала, ручной отметки и отмены
 
 ---
 
