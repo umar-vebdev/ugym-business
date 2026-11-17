@@ -70,7 +70,7 @@
 
 ## Текущий этап: `B3` — Расписание, Тренеры, Витрина, Штат и Аналитика
 
-- [ ] **B3-01** Доменные модели и REST-репозиторий тренеров и расписания (`TrainersScheduleRepository`, `RemoteTrainersScheduleRepository`)
+- [x] **B3-01** Доменные модели и REST-репозиторий тренеров и расписания (`TrainersScheduleRepository`, `RemoteTrainersScheduleRepository`) — 3 теста зелёные
   - Цель: `/business/trainers`, `/business/schedule/templates`, `/business/schedule/sessions` (`GET`, `generate`, `cancel`, `bookings`)
   - Проверка: unit-тесты `RemoteTrainersScheduleRepository`
 
