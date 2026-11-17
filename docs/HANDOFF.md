@@ -1,7 +1,7 @@
 # HANDOFF — uGym Business
 
 **Текущий этап:** `B3` — Расписание, Тренеры, Витрина, Штат и Аналитика  
-**Текущая задача:** `B3-03` — доменные модели и REST-репозиторий витрины, фото и штата (`StorefrontAndStaffRepository`, `RemoteStorefrontAndStaffRepository`)  
+**Текущая задача:** `B3-04` — UI редактора витрины и фотогалереи до 10 фото (`StorefrontEditorScreen`, `GymPhotosManager`)  
 **Репозиторий:** `/home/umar/ugym-mobile/uGym Business` (`main`)
 
 ## Что сделано

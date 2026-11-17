@@ -78,7 +78,7 @@
   - Цель: CRUD тренеров (`owner`), шаблоны (`weekday`, `HH:MM`, `duration`, `capacity`), мастер генерации (<=62 дн.), отмена с возвратом визитов, просмотр `bookings` (включая `trainer`)
   - Проверка: widget-тесты шаблонов, генерации, отмены и `bookings`
 
-- [ ] **B3-03** Доменные модели и REST-репозиторий витрины, фото и штата (`StorefrontAndStaffRepository`, `RemoteStorefrontAndStaffRepository`)
+- [x] **B3-03** Доменные модели и REST-репозиторий витрины, фото и штата (`StorefrontAndStaffRepository`, `RemoteStorefrontAndStaffRepository`) — 3 теста зелёные
   - Цель: `gyms/{gym}/profile` (`PUT`, `submit`), `publication` (`PATCH`), `photos` (`POST` multipart, `DELETE`), `staff` (`GET`, `POST`, `PATCH`, `DELETE`)
   - Проверка: unit-тесты `RemoteStorefrontAndStaffRepository`
 
