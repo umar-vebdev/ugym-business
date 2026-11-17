@@ -82,7 +82,7 @@
   - Цель: `gyms/{gym}/profile` (`PUT`, `submit`), `publication` (`PATCH`), `photos` (`POST` multipart, `DELETE`), `staff` (`GET`, `POST`, `PATCH`, `DELETE`)
   - Проверка: unit-тесты `RemoteStorefrontAndStaffRepository`
 
-- [ ] **B3-04** UI редактора витрины и фотогалереи до 10 фото (`StorefrontEditorScreen`, `GymPhotosManager`)
+- [x] **B3-04** UI редактора витрины и фотогалереи до 10 фото (`StorefrontEditorScreen`, `GymPhotosManager`) — 2 теста зелёные
   - Цель: редактирование профиля, предупреждение `approved -> draft`, блокировка в `pending`, отправка на модерацию, публикация при `approved`, загрузка/удаление до 10 фото
   - Проверка: widget-тесты статусов модерации, публикации и лимита фото
 
