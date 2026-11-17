@@ -46,7 +46,7 @@
   - Цель: поиск по имени/телефону/email, бейдж `linked`, подсказка про email-привязку, обработка `409 CLIENT_PHONE_EXISTS`, слияние дублей только для `owner`
   - Проверка: widget-тесты поиска, создания, `409` и RBAC-ограничения `merge`
 
-- [ ] **B2-03** Доменные модели и REST-репозиторий тарифов и абонементов (`MembershipsRepository`, `RemoteMembershipsRepository`)
+- [x] **B2-03** Доменные модели и REST-репозиторий тарифов и абонементов (`MembershipsRepository`, `RemoteMembershipsRepository`) — 4 теста зелёные
   - Цель: `membership-types` (`GET`/`POST`/`PATCH active`), `clients/{id}/memberships`, `memberships/expiring`, `freeze`/`unfreeze`/`cancel`
   - Проверка: unit-тесты `RemoteMembershipsRepository`
 
