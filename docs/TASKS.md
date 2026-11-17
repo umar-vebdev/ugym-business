@@ -74,7 +74,7 @@
   - Цель: `/business/trainers`, `/business/schedule/templates`, `/business/schedule/sessions` (`GET`, `generate`, `cancel`, `bookings`)
   - Проверка: unit-тесты `RemoteTrainersScheduleRepository`
 
-- [ ] **B3-02** UI тренеров, шаблонов, генерации до 62 дней, отмены и записей (`TrainersScreen`, `ScheduleTab`, `SessionBookingsScreen`)
+- [x] **B3-02** UI тренеров, шаблонов, генерации до 62 дней, отмены и записей (`TrainersScreen`, `ScheduleTab`, `SessionBookingsScreen`) — 3 теста зелёные
   - Цель: CRUD тренеров (`owner`), шаблоны (`weekday`, `HH:MM`, `duration`, `capacity`), мастер генерации (<=62 дн.), отмена с возвратом визитов, просмотр `bookings` (включая `trainer`)
   - Проверка: widget-тесты шаблонов, генерации, отмены и `bookings`
 
