@@ -1,7 +1,7 @@
 # HANDOFF — uGym Business
 
-**Текущий этап:** `B1` завершён → переход к `B2` (Clients, Memberships, Payments, Applications)  
-**Текущая задача:** раскрытие эпика `B2` в мелкие задачи и согласование с разработчиком (`AGENTS.md` §4.3)  
+**Текущий этап:** `B2` — CRM клиентов, Абонементы и Касса (`PaymentMark`)  
+**Текущая задача:** `B2-02` — UI CRM клиентов (`ClientsListScreen`, `CreateClientSheet`, слияние дублей для `owner`)  
 **Репозиторий:** `/home/umar/ugym-mobile/uGym Business` (`main`)
 
 ## Что сделано

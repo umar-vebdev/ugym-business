@@ -36,8 +36,39 @@
 
 ---
 
+## Текущий этап: `B2` — CRM клиентов, Абонементы и Касса (`PaymentMark`)
+
+- [x] **B2-01** Доменные модели и REST-репозиторий CRM клиентов (`ClientsRepository`, `RemoteClientsRepository`) — 4 теста зелёные
+  - Цель: `GET /business/clients`, `POST /business/clients` (включая маппинг `409 CLIENT_PHONE_EXISTS`), `POST /business/clients/merge`
+  - Проверка: unit-тесты `RemoteClientsRepository` с mock-адаптером Dio
+
+- [ ] **B2-02** UI CRM клиентов: список, поиск, быстрая регистрация и слияние дублей (`ClientsListScreen`, `CreateClientSheet`)
+  - Цель: поиск по имени/телефону/email, бейдж `linked`, подсказка про email-привязку, обработка `409 CLIENT_PHONE_EXISTS`, слияние дублей только для `owner`
+  - Проверка: widget-тесты поиска, создания, `409` и RBAC-ограничения `merge`
+
+- [ ] **B2-03** Доменные модели и REST-репозиторий тарифов и абонементов (`MembershipsRepository`, `RemoteMembershipsRepository`)
+  - Цель: `membership-types` (`GET`/`POST`/`PATCH active`), `clients/{id}/memberships`, `memberships/expiring`, `freeze`/`unfreeze`/`cancel`
+  - Проверка: unit-тесты `RemoteMembershipsRepository`
+
+- [ ] **B2-04** UI конструктора тарифов, истекающих за 7 дней и операций заморозки/отмены (`MembershipTypesScreen`, `CreateMembershipTypeScreen`, `ExpiringMembershipsTab`)
+  - Цель: конструктор тарифов (`owner`), валидация `kind`/`start_mode`/`time_from`+`time_to`, список истекающих, `freeze`/`unfreeze` (`owner`/`admin`), `cancel` с причиной (`owner`)
+  - Проверка: widget-тесты конструктора тарифов, истекающих абонементов и операций
+
+- [ ] **B2-05** Доменные модели и REST-репозиторий кассы, заявок и товаров (`SalesAndRequestsRepository`, `RemoteSalesAndRequestsRepository`)
+  - Цель: `products` (`GET`/`POST`/`PATCH`), `sales` (`GET`/`POST` с `Idempotency-Key`, `refund`, `clients/{id}/sales`), `membership-requests` (`GET`, `pay` с `Idempotency-Key`, `cancel`)
+  - Проверка: unit-тесты `RemoteSalesAndRequestsRepository`
+
+- [ ] **B2-06** UI кассы (`PosCheckoutScreen`), очереди заявок (`MembershipRequestsQueueTab`), истории продаж и склада товаров (`ProductsScreen`)
+  - Цель: подтверждение/отмена заявок (`cash|card_terminal|transfer`, таймер `expires_at`), POS-касса с корзиной и валютой зала, возвраты (`owner`), склад товаров
+  - Проверка: widget-тесты заявок, кассы, возвратов и склада
+
+- [ ] **B2-07** Карточка клиента 360° (`ClientDetailScreen`) и интеграция `B2` в `BusinessShell`
+  - Цель: вкладки Абонементы/Посещения/Чеки + быстрые кнопки в `ClientDetailScreen`; подключение экранов `B2` во вкладки `Клиенты` и `Операции` в `BusinessShell` и `UgymBusinessApp`
+  - Проверка: widget-тесты `ClientDetailScreen` и `BusinessShell` + полный прогон `dart format`, `flutter analyze`, `flutter test`
+
+---
+
 ## Будущие этапы (эпики — раскрыть перед стартом каждого)
 
-- [ ] **B2 — CRM клиентов, Абонементы и Касса (`PaymentMark`)** (Поиск/создание клиента, Карточка 360°, Слияние дублей `owner`, Истекающие за 7 дней, Заморозка/разморозка/отмена, Конструктор тарифов, Заявки `pay`/`cancel`, Касса `POST /sales`, Возвраты `refund`, Товары)
 - [ ] **B3 — Расписание, Тренеры, Витрина, Штат и Аналитика** (Тренеры, Шаблоны и генерация до 62 дней, Отмена занятия, Экран тренера, Витрина + до 10 фото + модерация + публикация, Штат по email, Аналитика `overview`/`revenue`, Рассылки, Подписка платформы)
 - [ ] **B4 — Полировка UX, Режим чтения, QA и Релиз** (Тесты RBAC и `SUBSCRIPTION_EXPIRED`, устойчивость к потере сети, iPad/tablet адаптация, `PrivacyInfo.xcprivacy`, Data Safety, TestFlight / Google Play)
