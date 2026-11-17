@@ -1,7 +1,7 @@
 # HANDOFF — uGym Business
 
 **Текущий этап:** `B2` — CRM клиентов, Абонементы и Касса (`PaymentMark`)  
-**Текущая задача:** `B2-02` — UI CRM клиентов (`ClientsListScreen`, `CreateClientSheet`, слияние дублей для `owner`)  
+**Текущая задача:** `B2-03` — доменные модели и REST-репозиторий тарифов и абонементов (`MembershipsRepository`, `RemoteMembershipsRepository`)  
 **Репозиторий:** `/home/umar/ugym-mobile/uGym Business` (`main`)
 
 ## Что сделано

@@ -42,7 +42,7 @@
   - Цель: `GET /business/clients`, `POST /business/clients` (включая маппинг `409 CLIENT_PHONE_EXISTS`), `POST /business/clients/merge`
   - Проверка: unit-тесты `RemoteClientsRepository` с mock-адаптером Dio
 
-- [ ] **B2-02** UI CRM клиентов: список, поиск, быстрая регистрация и слияние дублей (`ClientsListScreen`, `CreateClientSheet`)
+- [x] **B2-02** UI CRM клиентов: список, поиск, быстрая регистрация и слияние дублей (`ClientsListScreen`, `CreateClientSheet`) — 3 теста зелёные
   - Цель: поиск по имени/телефону/email, бейдж `linked`, подсказка про email-привязку, обработка `409 CLIENT_PHONE_EXISTS`, слияние дублей только для `owner`
   - Проверка: widget-тесты поиска, создания, `409` и RBAC-ограничения `merge`
 
