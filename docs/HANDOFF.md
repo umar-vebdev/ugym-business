@@ -1,7 +1,7 @@
 # HANDOFF — uGym Business
 
 **Текущий этап:** `B3` — Расписание, Тренеры, Витрина, Штат и Аналитика  
-**Текущая задача:** `B3-06` — доменные модели и REST-репозиторий аналитики, рассылок и подписки (`AnalyticsAndBillingRepository`, `RemoteAnalyticsAndBillingRepository`)  
+**Текущая задача:** `B3-07` — UI аналитики владельца, рассылок и подписки (`AnalyticsScreen`, `AnnouncementsScreen`, `BillingStatusScreen`)  
 **Репозиторий:** `/home/umar/ugym-mobile/uGym Business` (`main`)
 
 ## Что сделано

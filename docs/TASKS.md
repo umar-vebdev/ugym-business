@@ -90,7 +90,7 @@
   - Цель: список штата, приглашение по email с памяткой при `400 BAD_REQUEST`, смена роли `admin <-> trainer`, удаление
   - Проверка: widget-тесты приглашения, ошибки `400`, смены роли и удаления
 
-- [ ] **B3-06** Доменные модели и REST-репозиторий аналитики, рассылок и подписки (`AnalyticsAndBillingRepository`, `RemoteAnalyticsAndBillingRepository`)
+- [x] **B3-06** Доменные модели и REST-репозиторий аналитики, рассылок и подписки (`AnalyticsAndBillingRepository`, `RemoteAnalyticsAndBillingRepository`) — 3 теста зелёные
   - Цель: `analytics/overview`, `analytics/revenue`, `notifications/announcements` (`202`), `billing/subscription`, `billing/plans`
   - Проверка: unit-тесты `RemoteAnalyticsAndBillingRepository`
 
