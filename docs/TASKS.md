@@ -62,7 +62,7 @@
   - Цель: подтверждение/отмена заявок (`cash|card_terminal|transfer`, таймер `expires_at`), POS-касса с корзиной и валютой зала, возвраты (`owner`), склад товаров
   - Проверка: widget-тесты заявок, кассы, возвратов и склада
 
-- [ ] **B2-07** Карточка клиента 360° (`ClientDetailScreen`) и интеграция `B2` в `BusinessShell`
+- [x] **B2-07** Карточка клиента 360° (`ClientDetailScreen`) и интеграция `B2` в `BusinessShell` (62 теста зелёные)
   - Цель: вкладки Абонементы/Посещения/Чеки + быстрые кнопки в `ClientDetailScreen`; подключение экранов `B2` во вкладки `Клиенты` и `Операции` в `BusinessShell` и `UgymBusinessApp`
   - Проверка: widget-тесты `ClientDetailScreen` и `BusinessShell` + полный прогон `dart format`, `flutter analyze`, `flutter test`
 

@@ -13,11 +13,17 @@ import 'core/theme/theme_controller.dart';
 import 'features/auth/data/remote_auth_repository.dart';
 import 'features/auth/presentation/auth_controller.dart';
 import 'features/auth/presentation/auth_flow_screen.dart';
+import 'features/clients/data/remote_clients_repository.dart';
+import 'features/clients/domain/clients_models.dart';
 import 'features/company_onboarding/data/remote_company_onboarding_repository.dart';
 import 'features/company_onboarding/domain/company_onboarding_models.dart';
+import 'features/memberships/data/remote_memberships_repository.dart';
+import 'features/memberships/domain/memberships_models.dart';
 import 'features/reception_qr/data/remote_reception_visits_repository.dart';
 import 'features/reception_qr/domain/kiosk_security.dart';
 import 'features/reception_qr/domain/reception_visits_models.dart';
+import 'features/sales/data/remote_sales_and_requests_repository.dart';
+import 'features/sales/domain/sales_and_requests_models.dart';
 
 void main() {
   const config = AppConfig.dev();
@@ -48,6 +54,15 @@ void main() {
   final visitsRepository = RemoteReceptionVisitsRepository(
     httpClient: apiClient.httpClient,
   );
+  final clientsRepository = RemoteClientsRepository(
+    httpClient: apiClient.httpClient,
+  );
+  final membershipsRepository = RemoteMembershipsRepository(
+    httpClient: apiClient.httpClient,
+  );
+  final salesRepository = RemoteSalesAndRequestsRepository(
+    httpClient: apiClient.httpClient,
+  );
   const kioskPinGuard = KioskPinGuard(storage: storage);
 
   authController = AuthController(
@@ -75,6 +90,9 @@ void main() {
       healthService: healthService,
       onboardingRepository: onboardingRepository,
       visitsRepository: visitsRepository,
+      clientsRepository: clientsRepository,
+      membershipsRepository: membershipsRepository,
+      salesRepository: salesRepository,
       kioskPinGuard: kioskPinGuard,
     ),
   );
@@ -92,6 +110,9 @@ final class UgymBusinessApp extends StatefulWidget {
     this.healthService,
     this.onboardingRepository,
     this.visitsRepository,
+    this.clientsRepository,
+    this.membershipsRepository,
+    this.salesRepository,
     this.kioskPinGuard,
   });
 
@@ -103,6 +124,9 @@ final class UgymBusinessApp extends StatefulWidget {
   final UgymHealthService? healthService;
   final CompanyOnboardingRepository? onboardingRepository;
   final ReceptionVisitsRepository? visitsRepository;
+  final ClientsRepository? clientsRepository;
+  final MembershipsRepository? membershipsRepository;
+  final SalesAndRequestsRepository? salesRepository;
   final KioskPinGuard? kioskPinGuard;
 
   @override
@@ -183,6 +207,9 @@ final class _UgymBusinessAppState extends State<UgymBusinessApp> {
                   healthService: widget.healthService,
                   onboardingRepository: widget.onboardingRepository,
                   visitsRepository: widget.visitsRepository,
+                  clientsRepository: widget.clientsRepository,
+                  membershipsRepository: widget.membershipsRepository,
+                  salesRepository: widget.salesRepository,
                   kioskPinGuard: widget.kioskPinGuard,
                 ),
         );
