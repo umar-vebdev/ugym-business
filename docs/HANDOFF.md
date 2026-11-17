@@ -1,16 +1,15 @@
 # Handoff — uGym Business (Business App)
 
-**Обновлено:** 2026-11-16
-**Текущий этап:** B0 — Фундамент проекта (завершён)
-**Текущая задача:** Все задачи этапа `B0` завершены (`B0-01`–`B0-04` `[x]`)
+**Обновлено:** 2026-11-17
+**Текущий этап:** B1 — Авторизация, Онбординг, Киоск QR и Визиты
+**Текущая задача:** `B1-01` `[x]` завершена; следующая — `B1-02`
 
 ## Что сделано в последней сессии
 
-- **`B0-01`**: инициализирован Flutter-проект `uGym Business` (`tj.ugym.business`), настроены строгие правила `analysis_options.yaml` и `AppConfig` (`dev`/`staging`/`prod`).
-- **`B0-02`**: подключён пакет `ugym_core` (`path: ../ugym_core`, `D-002`; `D-003` на `material_ui: ^1.1.0`), реализованы `AppPreferences`, `ThemeController` (Light по умолчанию, Light/Dark/System) и `BusinessApiClient`.
-- **`B0-03`**: реализованы RBAC (`BusinessRole`, `BusinessPermission`), `GymSummary`, `BusinessSessionController` (`bootstrapFromApi`, `isReadOnly` при `SUBSCRIPTION_EXPIRED`, выбор филиала), виджеты `SubscriptionReadOnlyBanner`, `RoleGuard` и `GymBranchSelector`.
-- **`B0-04`**: добавлены ARB-словари (`ru`, `tg`, `en`), `LocaleController` + `BusinessStrings` с переключением на лету, адаптивный `BusinessShell` (`NavigationBar` `<600dp` / `NavigationRail` `>=600dp`, фильтрация разделов по ролям) и проверка связи через `UgymHealthService`.
-- Все проверки пройдены: `dart format` ✓, `flutter analyze` ✓ (`No issues found!`), `flutter test` ✓ (`13 passed`).
+- Завершён этап **`B0`** (`B0-01`–`B0-04` `[x]`).
+- Эпик **`B1`** раскрыт на задачи **`B1-01`–`B1-06`** в `docs/TASKS.md`.
+- **`B1-01`**: реализованы `AuthenticatedUser`, `AuthRepository` (`features/auth/domain`) и `RemoteAuthRepository` (`features/auth/data`: `/auth/login` с записью токена, `/auth/register`, `/auth/send-otp`, `/auth/verify-email`, `/auth/reset-password`, `/auth/logout` с очисткой `TokenStorage`, `GET /user`), покрыты 5 новыми unit-тестами (`400`/`401`/`422`/`429`, офлайн-выход).
+- Все проверки пройдены: `dart format` ✓, `flutter analyze` ✓ (`No issues found!`), `flutter test` ✓ (`18 passed`).
 
 ## Актуальное состояние окружения
 
@@ -19,4 +18,4 @@
 
 ## Точный следующий шаг
 
-- Раскрыть эпик **`B1`** (Авторизация, Онбординг компании, Киоск QR 60с и Визиты) на мелкие задачи в `docs/TASKS.md` и согласовать план с разработчиком, либо начать этап **`M0`** в `/home/umar/ugym-mobile/uGym`.
+- Выполнить задачу **`B1-02`**: реализовать `AuthController` (автозапуск сессии/роли при наличии токена, вход, регистрация + Email OTP, сброс пароля и выход с очисткой хранилища) и UI-экраны (`LoginScreen`, `RegisterUserScreen`, `EmailOtpVerifyScreen`, `ResetPasswordScreen`) в стиле uCraft Design System 1.0 с widget-тестами.

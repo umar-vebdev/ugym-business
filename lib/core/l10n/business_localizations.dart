@@ -149,4 +149,3 @@ final class LocaleController extends ChangeNotifier {
     await preferences.writeLocaleCode(newLocale.code);
   }
 }
-
