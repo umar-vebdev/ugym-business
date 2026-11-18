@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:material_ui/material_ui.dart';
 import 'package:ugym_core/ugym_core.dart';
 
+import '../../features/analytics_billing/domain/analytics_and_billing_models.dart';
+import '../../features/analytics_billing/presentation/analytics_and_billing_screens.dart';
 import '../../features/auth/presentation/auth_controller.dart';
 import '../../features/clients/domain/clients_models.dart';
 import '../../features/clients/presentation/client_detail_screen.dart';
@@ -21,6 +23,12 @@ import '../../features/reception_qr/presentation/visits_log_screen.dart';
 import '../../features/sales/domain/sales_and_requests_models.dart';
 import '../../features/sales/presentation/membership_requests_and_sales_tabs.dart';
 import '../../features/sales/presentation/pos_and_products_screens.dart';
+import '../../features/schedule/domain/trainers_schedule_models.dart';
+import '../../features/schedule/presentation/schedule_tab.dart';
+import '../../features/schedule/presentation/trainers_screen.dart';
+import '../../features/storefront_staff/domain/storefront_and_staff_models.dart';
+import '../../features/storefront_staff/presentation/staff_management_screen.dart';
+import '../../features/storefront_staff/presentation/storefront_editor_screen.dart';
 import '../config/app_config.dart';
 import '../l10n/business_localizations.dart';
 import '../session/business_role.dart';
@@ -33,7 +41,9 @@ enum BusinessDestination { overview, members, operations, analytics, more }
 
 enum _MembersSubTab { clients, expiring, types }
 
-enum _OperationsSubTab { visits, requests, sales, products }
+enum _OperationsSubTab { visits, requests, sales, products, schedule, trainers }
+
+enum _MoreSubTab { settings, storefront, staff, announcements, billing }
 
 /// Adaptive role-aware navigation shell (BottomBar on phones, Rail on tablets).
 final class BusinessShell extends StatefulWidget {
@@ -50,6 +60,9 @@ final class BusinessShell extends StatefulWidget {
     this.clientsRepository,
     this.membershipsRepository,
     this.salesRepository,
+    this.trainersScheduleRepository,
+    this.storefrontAndStaffRepository,
+    this.analyticsAndBillingRepository,
     this.kioskPinGuard,
     this.kioskWakeLock = const PlatformKioskWakeLock(),
     this.qrScannerBuilder = buildMobileQrScanner,
@@ -66,6 +79,9 @@ final class BusinessShell extends StatefulWidget {
   final ClientsRepository? clientsRepository;
   final MembershipsRepository? membershipsRepository;
   final SalesAndRequestsRepository? salesRepository;
+  final TrainersScheduleRepository? trainersScheduleRepository;
+  final StorefrontAndStaffRepository? storefrontAndStaffRepository;
+  final AnalyticsAndBillingRepository? analyticsAndBillingRepository;
   final KioskPinGuard? kioskPinGuard;
   final KioskWakeLock kioskWakeLock;
   final QrScannerBuilder qrScannerBuilder;
@@ -102,6 +118,7 @@ final class _BusinessShellState extends State<BusinessShell> {
   BusinessDestination _selected = BusinessDestination.overview;
   _MembersSubTab _membersTab = _MembersSubTab.clients;
   _OperationsSubTab _operationsTab = _OperationsSubTab.visits;
+  _MoreSubTab _moreTab = _MoreSubTab.settings;
   bool _checkingHealth = false;
   bool? _healthOk;
 
@@ -270,10 +287,16 @@ final class _BusinessShellState extends State<BusinessShell> {
       BusinessDestination.overview => _buildOverview(context, strings),
       BusinessDestination.operations => _buildOperations(context),
       BusinessDestination.members => _buildMembers(context, strings),
-      BusinessDestination.analytics => UcraftEmptyState(
-        title: strings.navAnalytics,
-        description: 'Аналитика и аудит появятся на этапе B4.',
-      ),
+      BusinessDestination.analytics =>
+        widget.analyticsAndBillingRepository != null
+            ? AnalyticsScreen(
+                repository: widget.analyticsAndBillingRepository!,
+                sessionController: widget.sessionController,
+              )
+            : UcraftEmptyState(
+                title: strings.navAnalytics,
+                description: 'Аналитика и аудит появятся на этапе B4.',
+              ),
       BusinessDestination.more => _buildMore(context, strings, isDark),
     };
   }
@@ -389,8 +412,9 @@ final class _BusinessShellState extends State<BusinessShell> {
     final visitsRepo = widget.visitsRepository;
     final salesRepo = widget.salesRepository;
     final membershipsRepo = widget.membershipsRepository;
+    final scheduleRepo = widget.trainersScheduleRepository;
 
-    if (visitsRepo == null && salesRepo == null) {
+    if (visitsRepo == null && salesRepo == null && scheduleRepo == null) {
       return const UcraftEmptyState(
         title: 'Операции',
         description: 'Подключите сервис визитов и кассы.',
@@ -398,6 +422,13 @@ final class _BusinessShellState extends State<BusinessShell> {
     }
 
     final role = widget.sessionController.role;
+    if (role == BusinessRole.trainer && scheduleRepo != null) {
+      return ScheduleTab(
+        repository: scheduleRepo,
+        sessionController: widget.sessionController,
+      );
+    }
+
     final selectedGym = widget.sessionController.selectedGym;
     final canScan =
         visitsRepo != null &&
@@ -420,61 +451,87 @@ final class _BusinessShellState extends State<BusinessShell> {
         widget.sessionController.canView(
           BusinessPermission.manageMembershipRequestsAndSales,
         );
+    final showScheduleTab =
+        scheduleRepo != null &&
+        widget.sessionController.canView(
+          BusinessPermission.viewSessionBookings,
+        );
+    final showTrainersTab =
+        scheduleRepo != null &&
+        widget.sessionController.canView(BusinessPermission.viewTrainers);
+
+    final availableTabs = <_OperationsSubTab>[
+      if (visitsRepo != null) _OperationsSubTab.visits,
+      if (showSalesTabs) ...[
+        _OperationsSubTab.requests,
+        _OperationsSubTab.sales,
+        _OperationsSubTab.products,
+      ],
+      if (showScheduleTab) _OperationsSubTab.schedule,
+      if (showTrainersTab) _OperationsSubTab.trainers,
+    ];
+    final _OperationsSubTab? effectiveTab =
+        availableTabs.contains(_operationsTab)
+        ? _operationsTab
+        : (availableTabs.isNotEmpty ? availableTabs.first : null);
+    final showTabBar = showSalesTabs || showScheduleTab || showTrainersTab;
+    final showReceptionCard = visitsRepo != null || canPos;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        UcraftCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                'Ресепшен и касса',
-                style: UcraftTypography.title.copyWith(
-                  color: colors.foreground,
+        if (showReceptionCard)
+          UcraftCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  'Ресепшен и касса',
+                  style: UcraftTypography.title.copyWith(
+                    color: colors.foreground,
+                  ),
                 ),
-              ),
-              const SizedBox(height: UcraftSpacing.space3),
-              Wrap(
-                spacing: UcraftSpacing.space2,
-                runSpacing: UcraftSpacing.space2,
-                children: [
-                  if (visitsRepo != null)
-                    UcraftButton(
-                      label: 'Сканер QR клиента',
-                      onPressed: canScan
-                          ? () => unawaited(
-                              _openClientScanner(
-                                context,
-                                visitsRepo,
-                                selectedGym.id,
-                              ),
-                            )
-                          : null,
-                    ),
-                  if (canOpenKiosk)
-                    UcraftButton(
-                      label: 'Киоск QR зала',
-                      variant: UcraftButtonVariant.secondary,
-                      onPressed: () => unawaited(
-                        _openKiosk(context, visitsRepo, selectedGym.id),
+                const SizedBox(height: UcraftSpacing.space3),
+                Wrap(
+                  spacing: UcraftSpacing.space2,
+                  runSpacing: UcraftSpacing.space2,
+                  children: [
+                    if (visitsRepo != null)
+                      UcraftButton(
+                        label: 'Сканер QR клиента',
+                        onPressed: canScan
+                            ? () => unawaited(
+                                _openClientScanner(
+                                  context,
+                                  visitsRepo,
+                                  selectedGym.id,
+                                ),
+                              )
+                            : null,
                       ),
-                    ),
-                  if (canPos)
-                    UcraftButton(
-                      label: 'Открыть кассу',
-                      variant: UcraftButtonVariant.secondary,
-                      onPressed: () => unawaited(
-                        _openPosCheckout(context, salesRepo, membershipsRepo),
+                    if (canOpenKiosk)
+                      UcraftButton(
+                        label: 'Киоск QR зала',
+                        variant: UcraftButtonVariant.secondary,
+                        onPressed: () => unawaited(
+                          _openKiosk(context, visitsRepo, selectedGym.id),
+                        ),
                       ),
-                    ),
-                ],
-              ),
-            ],
+                    if (canPos)
+                      UcraftButton(
+                        label: 'Открыть кассу',
+                        variant: UcraftButtonVariant.secondary,
+                        onPressed: () => unawaited(
+                          _openPosCheckout(context, salesRepo, membershipsRepo),
+                        ),
+                      ),
+                  ],
+                ),
+              ],
+            ),
           ),
-        ),
-        if (showSalesTabs) ...[
-          const SizedBox(height: UcraftSpacing.space3),
+        if (showTabBar && availableTabs.isNotEmpty) ...[
+          if (showReceptionCard) const SizedBox(height: UcraftSpacing.space3),
           Wrap(
             spacing: UcraftSpacing.space2,
             runSpacing: UcraftSpacing.space2,
@@ -482,66 +539,93 @@ final class _BusinessShellState extends State<BusinessShell> {
               if (visitsRepo != null)
                 UcraftButton(
                   label: 'Визиты',
-                  variant: _operationsTab == _OperationsSubTab.visits
+                  variant: effectiveTab == _OperationsSubTab.visits
                       ? UcraftButtonVariant.primary
                       : UcraftButtonVariant.secondary,
                   onPressed: () =>
                       setState(() => _operationsTab = _OperationsSubTab.visits),
                 ),
-              UcraftButton(
-                label: 'Заявки',
-                variant: _operationsTab == _OperationsSubTab.requests
-                    ? UcraftButtonVariant.primary
-                    : UcraftButtonVariant.secondary,
-                onPressed: () =>
-                    setState(() => _operationsTab = _OperationsSubTab.requests),
-              ),
-              UcraftButton(
-                label: 'Продажи',
-                variant: _operationsTab == _OperationsSubTab.sales
-                    ? UcraftButtonVariant.primary
-                    : UcraftButtonVariant.secondary,
-                onPressed: () =>
-                    setState(() => _operationsTab = _OperationsSubTab.sales),
-              ),
-              UcraftButton(
-                label: 'Товары',
-                variant: _operationsTab == _OperationsSubTab.products
-                    ? UcraftButtonVariant.primary
-                    : UcraftButtonVariant.secondary,
-                onPressed: () =>
-                    setState(() => _operationsTab = _OperationsSubTab.products),
-              ),
+              if (showSalesTabs) ...[
+                UcraftButton(
+                  label: 'Заявки',
+                  variant: effectiveTab == _OperationsSubTab.requests
+                      ? UcraftButtonVariant.primary
+                      : UcraftButtonVariant.secondary,
+                  onPressed: () => setState(
+                    () => _operationsTab = _OperationsSubTab.requests,
+                  ),
+                ),
+                UcraftButton(
+                  label: 'Продажи',
+                  variant: effectiveTab == _OperationsSubTab.sales
+                      ? UcraftButtonVariant.primary
+                      : UcraftButtonVariant.secondary,
+                  onPressed: () =>
+                      setState(() => _operationsTab = _OperationsSubTab.sales),
+                ),
+                UcraftButton(
+                  label: 'Товары',
+                  variant: effectiveTab == _OperationsSubTab.products
+                      ? UcraftButtonVariant.primary
+                      : UcraftButtonVariant.secondary,
+                  onPressed: () => setState(
+                    () => _operationsTab = _OperationsSubTab.products,
+                  ),
+                ),
+              ],
+              if (showScheduleTab)
+                UcraftButton(
+                  label: 'Расписание',
+                  variant: effectiveTab == _OperationsSubTab.schedule
+                      ? UcraftButtonVariant.primary
+                      : UcraftButtonVariant.secondary,
+                  onPressed: () => setState(
+                    () => _operationsTab = _OperationsSubTab.schedule,
+                  ),
+                ),
+              if (showTrainersTab)
+                UcraftButton(
+                  label: 'Тренеры',
+                  variant: effectiveTab == _OperationsSubTab.trainers
+                      ? UcraftButtonVariant.primary
+                      : UcraftButtonVariant.secondary,
+                  onPressed: () => setState(
+                    () => _operationsTab = _OperationsSubTab.trainers,
+                  ),
+                ),
             ],
           ),
         ],
         const SizedBox(height: UcraftSpacing.space4),
-        if (!showSalesTabs && visitsRepo != null)
-          VisitsLogScreen(
+        switch (effectiveTab) {
+          _OperationsSubTab.visits when visitsRepo != null => VisitsLogScreen(
             repository: visitsRepo,
             sessionController: widget.sessionController,
-          )
-        else
-          switch (_operationsTab) {
-            _OperationsSubTab.visits when visitsRepo != null => VisitsLogScreen(
-              repository: visitsRepo,
-              sessionController: widget.sessionController,
-            ),
-            _OperationsSubTab.requests when salesRepo != null =>
-              MembershipRequestsQueueTab(
-                repository: salesRepo,
-                sessionController: widget.sessionController,
-              ),
-            _OperationsSubTab.sales when salesRepo != null => SalesHistoryTab(
+          ),
+          _OperationsSubTab.requests when salesRepo != null =>
+            MembershipRequestsQueueTab(
               repository: salesRepo,
               sessionController: widget.sessionController,
             ),
-            _OperationsSubTab.products when salesRepo != null => ProductsScreen(
-              repository: salesRepo,
+          _OperationsSubTab.sales when salesRepo != null => SalesHistoryTab(
+            repository: salesRepo,
+            sessionController: widget.sessionController,
+          ),
+          _OperationsSubTab.products when salesRepo != null => ProductsScreen(
+            repository: salesRepo,
+            sessionController: widget.sessionController,
+          ),
+          _OperationsSubTab.schedule when scheduleRepo != null => ScheduleTab(
+            repository: scheduleRepo,
+            sessionController: widget.sessionController,
+          ),
+          _OperationsSubTab.trainers when scheduleRepo != null =>
+            TrainersScreen(
+              repository: scheduleRepo,
               sessionController: widget.sessionController,
             ),
-            _ => const SizedBox.shrink(),
-          },
+          _ => const SizedBox.shrink(),
+        },
       ],
     );
   }
@@ -585,118 +669,229 @@ final class _BusinessShellState extends State<BusinessShell> {
   ) {
     final colors = context.ucraftColors;
     final onboardingRepo = widget.onboardingRepository;
+    final storefrontRepo = widget.storefrontAndStaffRepository;
+    final analyticsRepo = widget.analyticsAndBillingRepository;
     final showOwnerSettings =
         onboardingRepo != null &&
         widget.sessionController.role == BusinessRole.owner;
 
+    final canStorefront =
+        storefrontRepo != null &&
+        widget.sessionController.canView(BusinessPermission.manageStorefront);
+    final canStaff =
+        storefrontRepo != null &&
+        widget.sessionController.canView(BusinessPermission.manageStaff);
+    final canAnnouncements =
+        analyticsRepo != null &&
+        widget.sessionController.canView(BusinessPermission.sendAnnouncements);
+    final canBilling =
+        analyticsRepo != null &&
+        widget.sessionController.canView(BusinessPermission.viewBilling);
+
+    final showSubTabs =
+        canStorefront || canStaff || canAnnouncements || canBilling;
+
+    final _MoreSubTab effectiveTab = switch (_moreTab) {
+      _MoreSubTab.storefront when canStorefront => _MoreSubTab.storefront,
+      _MoreSubTab.staff when canStaff => _MoreSubTab.staff,
+      _MoreSubTab.announcements when canAnnouncements =>
+        _MoreSubTab.announcements,
+      _MoreSubTab.billing when canBilling => _MoreSubTab.billing,
+      _ => _MoreSubTab.settings,
+    };
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (showOwnerSettings) ...[
-          CompanyBranchesAndCurrencyCard(
-            repository: onboardingRepo,
-            sessionController: widget.sessionController,
+        if (showSubTabs) ...[
+          Wrap(
+            spacing: UcraftSpacing.space2,
+            runSpacing: UcraftSpacing.space2,
+            children: [
+              UcraftButton(
+                label: 'Настройки',
+                variant: effectiveTab == _MoreSubTab.settings
+                    ? UcraftButtonVariant.primary
+                    : UcraftButtonVariant.secondary,
+                onPressed: () =>
+                    setState(() => _moreTab = _MoreSubTab.settings),
+              ),
+              if (canStorefront)
+                UcraftButton(
+                  label: 'Витрина',
+                  variant: effectiveTab == _MoreSubTab.storefront
+                      ? UcraftButtonVariant.primary
+                      : UcraftButtonVariant.secondary,
+                  onPressed: () =>
+                      setState(() => _moreTab = _MoreSubTab.storefront),
+                ),
+              if (canStaff)
+                UcraftButton(
+                  label: 'Штат',
+                  variant: effectiveTab == _MoreSubTab.staff
+                      ? UcraftButtonVariant.primary
+                      : UcraftButtonVariant.secondary,
+                  onPressed: () => setState(() => _moreTab = _MoreSubTab.staff),
+                ),
+              if (canAnnouncements)
+                UcraftButton(
+                  label: 'Рассылки',
+                  variant: effectiveTab == _MoreSubTab.announcements
+                      ? UcraftButtonVariant.primary
+                      : UcraftButtonVariant.secondary,
+                  onPressed: () =>
+                      setState(() => _moreTab = _MoreSubTab.announcements),
+                ),
+              if (canBilling)
+                UcraftButton(
+                  label: 'Подписка',
+                  variant: effectiveTab == _MoreSubTab.billing
+                      ? UcraftButtonVariant.primary
+                      : UcraftButtonVariant.secondary,
+                  onPressed: () =>
+                      setState(() => _moreTab = _MoreSubTab.billing),
+                ),
+            ],
           ),
           const SizedBox(height: UcraftSpacing.space4),
         ],
-        UcraftCard(
-          child: Column(
+        switch (effectiveTab) {
+          _MoreSubTab.storefront when storefrontRepo != null =>
+            StorefrontEditorScreen(
+              repository: storefrontRepo,
+              sessionController: widget.sessionController,
+            ),
+          _MoreSubTab.staff when storefrontRepo != null =>
+            StaffManagementScreen(
+              repository: storefrontRepo,
+              sessionController: widget.sessionController,
+            ),
+          _MoreSubTab.announcements when analyticsRepo != null =>
+            AnnouncementsScreen(
+              repository: analyticsRepo,
+              sessionController: widget.sessionController,
+            ),
+          _MoreSubTab.billing when analyticsRepo != null => BillingStatusScreen(
+            repository: analyticsRepo,
+            sessionController: widget.sessionController,
+          ),
+          _ => Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                strings.appTitle,
-                style: UcraftTypography.title.copyWith(
-                  color: colors.foreground,
+              if (showOwnerSettings) ...[
+                CompanyBranchesAndCurrencyCard(
+                  repository: onboardingRepo,
+                  sessionController: widget.sessionController,
                 ),
-              ),
-              const SizedBox(height: UcraftSpacing.space1),
-              Text(
-                widget.config.flavor.name,
-                style: UcraftTypography.mono.copyWith(
-                  color: colors.foregroundSecondary,
-                ),
-              ),
-              const SizedBox(height: UcraftSpacing.space4),
-              Wrap(
-                spacing: UcraftSpacing.space2,
-                runSpacing: UcraftSpacing.space2,
-                children: [
-                  for (final locale in AppLocale.values)
+                const SizedBox(height: UcraftSpacing.space4),
+              ],
+              UcraftCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      strings.appTitle,
+                      style: UcraftTypography.title.copyWith(
+                        color: colors.foreground,
+                      ),
+                    ),
+                    const SizedBox(height: UcraftSpacing.space1),
+                    Text(
+                      widget.config.flavor.name,
+                      style: UcraftTypography.mono.copyWith(
+                        color: colors.foregroundSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: UcraftSpacing.space4),
+                    Wrap(
+                      spacing: UcraftSpacing.space2,
+                      runSpacing: UcraftSpacing.space2,
+                      children: [
+                        for (final locale in AppLocale.values)
+                          UcraftButton(
+                            label: locale.shortLabel,
+                            variant: widget.localeController.locale == locale
+                                ? UcraftButtonVariant.primary
+                                : UcraftButtonVariant.secondary,
+                            onPressed: () {
+                              unawaited(
+                                widget.localeController.setLocale(locale),
+                              );
+                            },
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: UcraftSpacing.space4),
                     UcraftButton(
-                      label: locale.shortLabel,
-                      variant: widget.localeController.locale == locale
-                          ? UcraftButtonVariant.primary
-                          : UcraftButtonVariant.secondary,
+                      label: isDark
+                          ? strings.themeLightLabel
+                          : strings.themeDarkLabel,
+                      variant: UcraftButtonVariant.secondary,
+                      fullWidth: true,
                       onPressed: () {
-                        unawaited(widget.localeController.setLocale(locale));
+                        unawaited(
+                          widget.themeController.setThemeMode(
+                            isDark ? ThemeMode.light : ThemeMode.dark,
+                          ),
+                        );
                       },
                     ),
-                ],
-              ),
-              const SizedBox(height: UcraftSpacing.space4),
-              UcraftButton(
-                label: isDark
-                    ? strings.themeLightLabel
-                    : strings.themeDarkLabel,
-                variant: UcraftButtonVariant.secondary,
-                fullWidth: true,
-                onPressed: () {
-                  unawaited(
-                    widget.themeController.setThemeMode(
-                      isDark ? ThemeMode.light : ThemeMode.dark,
-                    ),
-                  );
-                },
-              ),
-              if (widget.healthService != null) ...[
-                const SizedBox(height: UcraftSpacing.space3),
-                UcraftButton(
-                  label: strings.checkHealth,
-                  isLoading: _checkingHealth,
-                  fullWidth: true,
-                  onPressed: _runHealthCheck,
-                ),
-                if (_healthOk != null) ...[
-                  const SizedBox(height: UcraftSpacing.space3),
-                  Row(
-                    children: [
-                      Icon(
-                        _healthOk!
-                            ? Icons.check_circle_outline
-                            : Icons.error_outline,
-                        size: 18,
-                        color: _healthOk! ? colors.success : colors.destructive,
+                    if (widget.healthService != null) ...[
+                      const SizedBox(height: UcraftSpacing.space3),
+                      UcraftButton(
+                        label: strings.checkHealth,
+                        isLoading: _checkingHealth,
+                        fullWidth: true,
+                        onPressed: _runHealthCheck,
                       ),
-                      const SizedBox(width: UcraftSpacing.iconLabelGap),
-                      Expanded(
-                        child: Text(
-                          _healthOk! ? strings.healthOk : strings.healthError,
-                          style: UcraftTypography.bodyMedium.copyWith(
-                            color: _healthOk!
-                                ? colors.successForeground
-                                : colors.destructiveForeground,
-                          ),
+                      if (_healthOk != null) ...[
+                        const SizedBox(height: UcraftSpacing.space3),
+                        Row(
+                          children: [
+                            Icon(
+                              _healthOk!
+                                  ? Icons.check_circle_outline
+                                  : Icons.error_outline,
+                              size: 18,
+                              color: _healthOk!
+                                  ? colors.success
+                                  : colors.destructive,
+                            ),
+                            const SizedBox(width: UcraftSpacing.iconLabelGap),
+                            Expanded(
+                              child: Text(
+                                _healthOk!
+                                    ? strings.healthOk
+                                    : strings.healthError,
+                                style: UcraftTypography.bodyMedium.copyWith(
+                                  color: _healthOk!
+                                      ? colors.successForeground
+                                      : colors.destructiveForeground,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
+                      ],
+                    ],
+                    if (widget.authController != null) ...[
+                      const SizedBox(height: UcraftSpacing.space3),
+                      UcraftButton(
+                        label: 'Выйти',
+                        variant: UcraftButtonVariant.destructive,
+                        fullWidth: true,
+                        isLoading: widget.authController!.isSubmitting,
+                        onPressed: () {
+                          unawaited(widget.authController!.logout());
+                        },
                       ),
                     ],
-                  ),
-                ],
-              ],
-              if (widget.authController != null) ...[
-                const SizedBox(height: UcraftSpacing.space3),
-                UcraftButton(
-                  label: 'Выйти',
-                  variant: UcraftButtonVariant.destructive,
-                  fullWidth: true,
-                  isLoading: widget.authController!.isSubmitting,
-                  onPressed: () {
-                    unawaited(widget.authController!.logout());
-                  },
+                  ],
                 ),
-              ],
+              ),
             ],
           ),
-        ),
+        },
       ],
     );
   }

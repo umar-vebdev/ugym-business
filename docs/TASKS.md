@@ -1,6 +1,6 @@
 # uGym Business — чек-лист задач
 
-**Текущий этап:** B1 — Авторизация, Онбординг, Киоск QR и Визиты
+**Текущий этап:** B4 — Полировка UX, Режим чтения, QA и Релиз
 **Статусы:** `[ ]` не начата · `[~]` в работе · `[x]` готова · `[!]` заблокирована (причина в заметках)
 
 ## Правила ведения файла
@@ -24,86 +24,38 @@
 - [x] **B1-04** Реализованы доменные модели и контракт ресепшна/визитов (`VisitMethod`, `VisitStatus`, `GymQrToken`, `CheckInResult`, `VisitRecord` с проверкой 24-часовой отмены `canCancelAt`, `ReceptionVisitsRepository`) и `RemoteReceptionVisitsRepository` (`/gyms/{id}/qr`, `/check-in-qr` с `Idempotency-Key`, `/visits`, `/clients/{id}/visits`, `/visits/{id}/cancel`); 27 тестов зелёные (`format ✓`, `analyze ✓`, `test ✓`).
 - [x] **B1-05** Добавлены `crypto`, `qr_flutter`, `wakelock_plus` (`D-003`); реализованы `KioskWakeLock` (`PlatformKioskWakeLock` / `NoOpKioskWakeLock`), `KioskPinGuard` (SHA-256 + случайная соль в `TokenStorage`) и `GymQrKioskScreen` (QR-матрица `QrImageView`, 60с отсчёт, автообновление за 4с до `expiresAt`, остановка таймера и отключение WakeLock при выходе, PIN-блокировка `PopScope`); 30 тестов зелёные (`format ✓`, `analyze ✓`, `test ✓`).
 - [x] **B1-06a** (заметка: задача `B1-06` разбита на `a`/`b` по правилу ≤5 файлов) Добавлен `mobile_scanner` (`D-004`); реализованы `QrScannerBuilder` (камера подменяется в тестах), `ReceptionScanController` (пауза сканера на время запроса, повтор после сбоя сети с тем же токеном и `Idempotency-Key`, новый ключ для следующего клиента) и `ScanClientQrScreen` (карточка успеха с остатком занятий, крупные экраны отказа для всех кодов `422`, кнопка «Принять оплату» при `NO_ACTIVE_MEMBERSHIP`); 35 тестов зелёные (`format ✓`, `analyze ✓`, `test ✓`).
+- [x] **B1-06b** Журнал визитов, ручная отметка (в т.ч. задним числом) и отмена за 24 ч с причиной (`VisitsLogScreen`, `ManualCheckInSheet`) + подключение экранов B1 в `BusinessShell`; 39 тестов зелёные (`format ✓`, `analyze ✓`, `test ✓`).
+- [x] **B2-01** Доменные модели и REST-репозиторий CRM клиентов (`ClientsRepository`, `RemoteClientsRepository`); 4 теста зелёные (`format ✓`, `analyze ✓`, `test ✓`).
+- [x] **B2-02** UI CRM клиентов: список, поиск, быстрая регистрация, обработка `409 CLIENT_PHONE_EXISTS` и слияние дублей `owner` (`ClientsListScreen`, `CreateClientSheet`); 3 теста зелёные (`format ✓`, `analyze ✓`, `test ✓`).
+- [x] **B2-03** Доменные модели и REST-репозиторий тарифов и абонементов (`MembershipsRepository`, `RemoteMembershipsRepository`); 4 теста зелёные (`format ✓`, `analyze ✓`, `test ✓`).
+- [x] **B2-04** UI конструктора тарифов, истекающих за 7 дней и операций `freeze`/`unfreeze`/`cancel` (`MembershipTypesScreen`, `CreateMembershipTypeScreen`, `ExpiringMembershipsTab`); 3 теста зелёные (`format ✓`, `analyze ✓`, `test ✓`).
+- [x] **B2-05** Доменные модели и REST-репозиторий кассы, заявок и товаров (`SalesAndRequestsRepository`, `RemoteSalesAndRequestsRepository`); 4 теста зелёные (`format ✓`, `analyze ✓`, `test ✓`).
+- [x] **B2-06** UI кассы (`PosCheckoutScreen`), очереди заявок (`MembershipRequestsQueueTab`), истории продаж (`SalesHistoryTab`) и склада товаров (`ProductsScreen`); 3 теста зелёные (`format ✓`, `analyze ✓`, `test ✓`).
+- [x] **B2-07** Карточка клиента 360° (`ClientDetailScreen`) и интеграция экранов `B2` в `BusinessShell` и `UgymBusinessApp`; 62 теста зелёные (`format ✓`, `analyze ✓`, `test ✓`).
+- [x] **B3-01** Доменные модели и REST-репозиторий тренеров и расписания (`TrainersScheduleRepository`, `RemoteTrainersScheduleRepository`); 3 теста зелёные (`format ✓`, `analyze ✓`, `test ✓`).
+- [x] **B3-02** UI тренеров, шаблонов, генерации до 62 дней, отмены с возвратом визитов и записей группы (`TrainersScreen`, `ScheduleTab`, `SessionBookingsScreen`); 3 теста зелёные (`format ✓`, `analyze ✓`, `test ✓`).
+- [x] **B3-03** Доменные модели и REST-репозиторий витрины, фото и штата (`StorefrontAndStaffRepository`, `RemoteStorefrontAndStaffRepository`); 3 теста зелёные (`format ✓`, `analyze ✓`, `test ✓`).
+- [x] **B3-04** UI редактора витрины, статусов модерации, публикации и фотогалереи до 10 фото (`StorefrontEditorScreen`, `GymPhotosManager`); 2 теста зелёные (`format ✓`, `analyze ✓`, `test ✓`).
+- [x] **B3-05** UI штата сотрудников по подтверждённому email с памяткой при `400 BAD_REQUEST` (`StaffManagementScreen`, `owner` only); 1 тест зелёный (`format ✓`, `analyze ✓`, `test ✓`).
+- [x] **B3-06** Доменные модели и REST-репозиторий аналитики, рассылок и подписки (`AnalyticsAndBillingRepository`, `RemoteAnalyticsAndBillingRepository`); 3 теста зелёные (`format ✓`, `analyze ✓`, `test ✓`).
+- [x] **B3-07** UI аналитики владельца, рассылок `push`/`sms` и статуса подписки платформы без IAP (`AnalyticsScreen`, `AnnouncementsScreen`, `BillingStatusScreen`); 3 теста зелёные (`format ✓`, `analyze ✓`, `test ✓`).
+- [x] **B3-08** Интеграция экранов `B3` (`ScheduleTab`, `TrainersScreen`, `AnalyticsScreen`, `StorefrontEditorScreen`, `StaffManagementScreen`, `AnnouncementsScreen`, `BillingStatusScreen`) в `BusinessShell` и `UgymBusinessApp` с RBAC для `owner`/`admin`/`trainer`; 83 теста зелёные (`format ✓`, `analyze ✓`, `test ✓`).
 
 ---
 
-## Этап B1 — Авторизация, Онбординг, Киоск QR и Визиты
+## Текущий этап: `B4` — Полировка UX, Режим чтения, QA и Релиз
 
-**ТЗ:** [uGym_Business_Mobile_TZ.md](specs/uGym_Business_Mobile_TZ.md) (разделы 2.4, 3–5.2, 6.1, 7.1), [identity-auth.yaml](api/identity-auth.yaml), [companies.yaml](api/companies.yaml), [visits-analytics.yaml](api/visits-analytics.yaml)
+**ТЗ:** [uGym_Business_Mobile_TZ.md](specs/uGym_Business_Mobile_TZ.md) (разделы 0.2, 1, 2.1, 3.2, 6, 7), [uCraft_Design_System.md](specs/uCraft_Design_System.md) (разделы 16, 18, 19, 20, 23)
 
-- [x] **B1-06b** Журнал визитов, ручная отметка (в т.ч. задним числом) и отмена за 24 ч с причиной (`VisitsLogScreen`, `ManualCheckInSheet`) + подключение экранов B1 в `BusinessShell` (39 тестов зелёные)
-  - Проверка: widget-тесты журнала, ручной отметки и отмены
-
----
-
-## Текущий этап: `B2` — CRM клиентов, Абонементы и Касса (`PaymentMark`)
-
-- [x] **B2-01** Доменные модели и REST-репозиторий CRM клиентов (`ClientsRepository`, `RemoteClientsRepository`) — 4 теста зелёные
-  - Цель: `GET /business/clients`, `POST /business/clients` (включая маппинг `409 CLIENT_PHONE_EXISTS`), `POST /business/clients/merge`
-  - Проверка: unit-тесты `RemoteClientsRepository` с mock-адаптером Dio
-
-- [x] **B2-02** UI CRM клиентов: список, поиск, быстрая регистрация и слияние дублей (`ClientsListScreen`, `CreateClientSheet`) — 3 теста зелёные
-  - Цель: поиск по имени/телефону/email, бейдж `linked`, подсказка про email-привязку, обработка `409 CLIENT_PHONE_EXISTS`, слияние дублей только для `owner`
-  - Проверка: widget-тесты поиска, создания, `409` и RBAC-ограничения `merge`
-
-- [x] **B2-03** Доменные модели и REST-репозиторий тарифов и абонементов (`MembershipsRepository`, `RemoteMembershipsRepository`) — 4 теста зелёные
-  - Цель: `membership-types` (`GET`/`POST`/`PATCH active`), `clients/{id}/memberships`, `memberships/expiring`, `freeze`/`unfreeze`/`cancel`
-  - Проверка: unit-тесты `RemoteMembershipsRepository`
-
-- [x] **B2-04** UI конструктора тарифов, истекающих за 7 дней и операций заморозки/отмены (`MembershipTypesScreen`, `CreateMembershipTypeScreen`, `ExpiringMembershipsTab`) — 3 теста зелёные
-  - Цель: конструктор тарифов (`owner`), валидация `kind`/`start_mode`/`time_from`+`time_to`, список истекающих, `freeze`/`unfreeze` (`owner`/`admin`), `cancel` с причиной (`owner`)
-  - Проверка: widget-тесты конструктора тарифов, истекающих абонементов и операций
-
-- [x] **B2-05** Доменные модели и REST-репозиторий кассы, заявок и товаров (`SalesAndRequestsRepository`, `RemoteSalesAndRequestsRepository`) — 4 теста зелёные
-  - Цель: `products` (`GET`/`POST`/`PATCH`), `sales` (`GET`/`POST` с `Idempotency-Key`, `refund`, `clients/{id}/sales`), `membership-requests` (`GET`, `pay` с `Idempotency-Key`, `cancel`)
-  - Проверка: unit-тесты `RemoteSalesAndRequestsRepository`
-
-- [x] **B2-06** UI кассы (`PosCheckoutScreen`), очереди заявок (`MembershipRequestsQueueTab`), истории продаж и склада товаров (`ProductsScreen`) — 3 теста зелёные
-  - Цель: подтверждение/отмена заявок (`cash|card_terminal|transfer`, таймер `expires_at`), POS-касса с корзиной и валютой зала, возвраты (`owner`), склад товаров
-  - Проверка: widget-тесты заявок, кассы, возвратов и склада
-
-- [x] **B2-07** Карточка клиента 360° (`ClientDetailScreen`) и интеграция `B2` в `BusinessShell` (62 теста зелёные)
-  - Цель: вкладки Абонементы/Посещения/Чеки + быстрые кнопки в `ClientDetailScreen`; подключение экранов `B2` во вкладки `Клиенты` и `Операции` в `BusinessShell` и `UgymBusinessApp`
-  - Проверка: widget-тесты `ClientDetailScreen` и `BusinessShell` + полный прогон `dart format`, `flutter analyze`, `flutter test`
-
----
-
-## Текущий этап: `B3` — Расписание, Тренеры, Витрина, Штат и Аналитика
-
-- [x] **B3-01** Доменные модели и REST-репозиторий тренеров и расписания (`TrainersScheduleRepository`, `RemoteTrainersScheduleRepository`) — 3 теста зелёные
-  - Цель: `/business/trainers`, `/business/schedule/templates`, `/business/schedule/sessions` (`GET`, `generate`, `cancel`, `bookings`)
-  - Проверка: unit-тесты `RemoteTrainersScheduleRepository`
-
-- [x] **B3-02** UI тренеров, шаблонов, генерации до 62 дней, отмены и записей (`TrainersScreen`, `ScheduleTab`, `SessionBookingsScreen`) — 3 теста зелёные
-  - Цель: CRUD тренеров (`owner`), шаблоны (`weekday`, `HH:MM`, `duration`, `capacity`), мастер генерации (<=62 дн.), отмена с возвратом визитов, просмотр `bookings` (включая `trainer`)
-  - Проверка: widget-тесты шаблонов, генерации, отмены и `bookings`
-
-- [x] **B3-03** Доменные модели и REST-репозиторий витрины, фото и штата (`StorefrontAndStaffRepository`, `RemoteStorefrontAndStaffRepository`) — 3 теста зелёные
-  - Цель: `gyms/{gym}/profile` (`PUT`, `submit`), `publication` (`PATCH`), `photos` (`POST` multipart, `DELETE`), `staff` (`GET`, `POST`, `PATCH`, `DELETE`)
-  - Проверка: unit-тесты `RemoteStorefrontAndStaffRepository`
-
-- [x] **B3-04** UI редактора витрины и фотогалереи до 10 фото (`StorefrontEditorScreen`, `GymPhotosManager`) — 2 теста зелёные
-  - Цель: редактирование профиля, предупреждение `approved -> draft`, блокировка в `pending`, отправка на модерацию, публикация при `approved`, загрузка/удаление до 10 фото
-  - Проверка: widget-тесты статусов модерации, публикации и лимита фото
-
-- [x] **B3-05** UI штата сотрудников по email (`StaffManagementScreen`, `owner` only) — 1 тест зелёный
-  - Цель: список штата, приглашение по email с памяткой при `400 BAD_REQUEST`, смена роли `admin <-> trainer`, удаление
-  - Проверка: widget-тесты приглашения, ошибки `400`, смены роли и удаления
-
-- [x] **B3-06** Доменные модели и REST-репозиторий аналитики, рассылок и подписки (`AnalyticsAndBillingRepository`, `RemoteAnalyticsAndBillingRepository`) — 3 теста зелёные
-  - Цель: `analytics/overview`, `analytics/revenue`, `notifications/announcements` (`202`), `billing/subscription`, `billing/plans`
-  - Проверка: unit-тесты `RemoteAnalyticsAndBillingRepository`
-
-- [x] **B3-07** UI аналитики владельца, рассылок и подписки (`AnalyticsScreen`, `AnnouncementsScreen`, `BillingStatusScreen`) — 3 теста зелёные
-  - Цель: фильтры периода и `inactive_days`, сводка и отчёт выручки (`owner`), рассылка `push`/`sms` (`owner`/`admin`), статус подписки платформы
-  - Проверка: widget-тесты аналитики, рассылок и биллинга
-
-- [ ] **B3-08** Интеграция экранов `B3` в `BusinessShell` и `UgymBusinessApp`
-  - Цель: подключение расписания, аналитики, витрины, штата, рассылок и биллинга в `BusinessShell` / `main.dart` с проверкой RBAC
-  - Проверка: интеграционные widget-тесты `B3` + полный прогон `dart format`, `flutter analyze`, `flutter test`
-
----
-
-## Будущие этапы (эпики — раскрыть перед стартом каждого)
-
-- [ ] **B4 — Полировка UX, Режим чтения, QA и Релиз** (Тесты RBAC и `SUBSCRIPTION_EXPIRED`, устойчивость к потере сети, iPad/tablet адаптация, `PrivacyInfo.xcprivacy`, Data Safety, TestFlight / Google Play)
+- [ ] **B4-01** End-to-end аудит и тесты RBAC (`owner`/`admin`/`trainer`), онбординга/доступа тренера к филиалу и режима «только чтение» (`SUBSCRIPTION_EXPIRED`)
+  - Цель: проверить перехват `403 SUBSCRIPTION_EXPIRED`, блокировку мутаций во всех модулях `B1`–`B3`, переход с баннера чтения в статус подписки и доступ тренера к расписанию
+  - Проверка: unit/widget-тесты RBAC и `SUBSCRIPTION_EXPIRED`
+- [ ] **B4-02** Сетевая устойчивость и строгая идемпотентность (`Idempotency-Key` при повторе, обработка `429 Retry-After` и потери сети)
+  - Цель: проверить и укрепить сохранение `Idempotency-Key` при ретраях кассы (`POST /sales`, `membership-requests/{id}/pay`), ручного чекина и сканера QR, а также отображение `Retry-After`
+  - Проверка: unit/widget-тесты повторных отправок без дублей и сетевых ошибок
+- [ ] **B4-03** Адаптивность iPad/tablet (`>=600dp`, `>=840dp`), Light/Dark темы, ARB-локализация (`ru`/`tg`/`en`) и состояния экранов
+  - Цель: проверить планшетную раскладку киоска/shell, обе темы uCraft, переключение `ru`/`tg`/`en` и состояния `loading`/`empty`/`error`/`permission-denied`
+  - Проверка: widget-тесты на планшетных и компактных размерах, темах и локалях
+- [ ] **B4-04** Релизная подготовка iOS/Android и итоговый приёмочный чек-лист
+  - Цель: проверить/добавить `PrivacyInfo.xcprivacy`, `NSCameraUsageDescription`/`NSPhotoLibraryUsageDescription` в `Info.plist`, разрешения в `AndroidManifest.xml`, подтвердить отсутствие IAP/внешних ссылок оплаты и пройти приёмочный чек-лист (п. 7.2 ТЗ)
+  - Проверка: ревью манифестов/конфигураций + полный прогон `dart format`, `flutter analyze`, `flutter test`

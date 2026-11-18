@@ -10,6 +10,8 @@ import 'core/router/business_shell.dart';
 import 'core/session/business_session_controller.dart';
 import 'core/storage/app_preferences.dart';
 import 'core/theme/theme_controller.dart';
+import 'features/analytics_billing/data/remote_analytics_and_billing_repository.dart';
+import 'features/analytics_billing/domain/analytics_and_billing_models.dart';
 import 'features/auth/data/remote_auth_repository.dart';
 import 'features/auth/presentation/auth_controller.dart';
 import 'features/auth/presentation/auth_flow_screen.dart';
@@ -24,6 +26,10 @@ import 'features/reception_qr/domain/kiosk_security.dart';
 import 'features/reception_qr/domain/reception_visits_models.dart';
 import 'features/sales/data/remote_sales_and_requests_repository.dart';
 import 'features/sales/domain/sales_and_requests_models.dart';
+import 'features/schedule/data/remote_trainers_schedule_repository.dart';
+import 'features/schedule/domain/trainers_schedule_models.dart';
+import 'features/storefront_staff/data/remote_storefront_and_staff_repository.dart';
+import 'features/storefront_staff/domain/storefront_and_staff_models.dart';
 
 void main() {
   const config = AppConfig.dev();
@@ -63,6 +69,15 @@ void main() {
   final salesRepository = RemoteSalesAndRequestsRepository(
     httpClient: apiClient.httpClient,
   );
+  final trainersScheduleRepository = RemoteTrainersScheduleRepository(
+    httpClient: apiClient.httpClient,
+  );
+  final storefrontAndStaffRepository = RemoteStorefrontAndStaffRepository(
+    httpClient: apiClient.httpClient,
+  );
+  final analyticsAndBillingRepository = RemoteAnalyticsAndBillingRepository(
+    httpClient: apiClient.httpClient,
+  );
   const kioskPinGuard = KioskPinGuard(storage: storage);
 
   authController = AuthController(
@@ -93,6 +108,9 @@ void main() {
       clientsRepository: clientsRepository,
       membershipsRepository: membershipsRepository,
       salesRepository: salesRepository,
+      trainersScheduleRepository: trainersScheduleRepository,
+      storefrontAndStaffRepository: storefrontAndStaffRepository,
+      analyticsAndBillingRepository: analyticsAndBillingRepository,
       kioskPinGuard: kioskPinGuard,
     ),
   );
@@ -113,6 +131,9 @@ final class UgymBusinessApp extends StatefulWidget {
     this.clientsRepository,
     this.membershipsRepository,
     this.salesRepository,
+    this.trainersScheduleRepository,
+    this.storefrontAndStaffRepository,
+    this.analyticsAndBillingRepository,
     this.kioskPinGuard,
   });
 
@@ -127,6 +148,9 @@ final class UgymBusinessApp extends StatefulWidget {
   final ClientsRepository? clientsRepository;
   final MembershipsRepository? membershipsRepository;
   final SalesAndRequestsRepository? salesRepository;
+  final TrainersScheduleRepository? trainersScheduleRepository;
+  final StorefrontAndStaffRepository? storefrontAndStaffRepository;
+  final AnalyticsAndBillingRepository? analyticsAndBillingRepository;
   final KioskPinGuard? kioskPinGuard;
 
   @override
@@ -210,6 +234,11 @@ final class _UgymBusinessAppState extends State<UgymBusinessApp> {
                   clientsRepository: widget.clientsRepository,
                   membershipsRepository: widget.membershipsRepository,
                   salesRepository: widget.salesRepository,
+                  trainersScheduleRepository: widget.trainersScheduleRepository,
+                  storefrontAndStaffRepository:
+                      widget.storefrontAndStaffRepository,
+                  analyticsAndBillingRepository:
+                      widget.analyticsAndBillingRepository,
                   kioskPinGuard: widget.kioskPinGuard,
                 ),
         );
