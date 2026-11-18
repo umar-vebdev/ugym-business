@@ -1,18 +1,18 @@
 # HANDOFF — uGym Business
 
 **Текущий этап:** `B4` — Полировка UX, Режим чтения, QA и Релиз  
-**Текущая задача:** `B4-02` — сетевая устойчивость и строгая идемпотентность (`Idempotency-Key`, `429 Retry-After`)  
+**Текущая задача:** `B4-03` — адаптивность iPad/tablet, Light/Dark темы, ARB-локализация и состояния экранов  
 **Репозиторий:** `/home/umar/ugym-mobile/uGym Business` (`main`)
 
 ## Что сделано
-- Этапы `B0` (`B0-01`–`B0-04`), `B1` (`B1-01`–`B1-06b`), `B2` (`B2-01`–`B2-07`) и `B3` (`B3-01`–`B3-08`) завершены полностью.
-- В задаче `B4-01`:
-  - В `SubscriptionReadOnlyBanner` добавлена кнопка `'Подробнее'`, открывающая `BillingStatusScreen` в `BusinessShell`.
-  - В `ClientDetailScreen` добавлен `ListenableBuilder` на `sessionController` и `SubscriptionReadOnlyBanner` для мгновенной блокировки мутаций при `403 SUBSCRIPTION_EXPIRED`.
-  - Для роли `trainer` реализовано восстановление сохранённого филиала в `BusinessSessionController.bootstrapFromApi` и быстрый поиск списка группы по `ID занятия` в `ScheduleTab` (без синхронного `setState` в `initState`).
-  - Добавлены E2E-тесты `test/core/rbac_and_read_only_e2e_test.dart`.
-- Проверки: `dart format --output=none --set-exit-if-changed .`, `flutter analyze` (No issues found), `flutter test` (87 passed).
+- Этапы `B0`–`B3` и задачи `B4-01`, `B4-02` завершены полностью:
+  - В `B4-02` в `ugym_core` добавлен парсинг `Retry-After` и флаг `isRateLimited` в `UgymApiException` (`429 TOO_MANY_REQUESTS`).
+  - В `ReceptionScanController` и `ScanClientQrScreen` сохраняется `Idempotency-Key` при `429`, `5xx` и обрывах сети с отображением `Retry-After`.
+  - В `MembershipRequestsQueueTab` ключи `Idempotency-Key` сохраняются на уровне вкладки для пары `(request_id, payment_method)` даже при закрытии/повторном открытии диалога оплаты.
+  - В `GymQrKioskScreen` при сбое обновления QR текущий код остаётся на экране с предупреждением и восстанавливается на следующем тике.
+  - Добавлены 5 тестов в `test/core/network_resilience_and_idempotency_test.dart`.
+- Проверки: `dart format --output=none --set-exit-if-changed .`, `flutter analyze` (No issues found), `flutter test` (92 passed; в `ugym_core`: 34 passed).
 
 ## Точный следующий шаг
-1. Начать `B4-02`: провести аудит сохранения `Idempotency-Key` при ретраях (`PosCheckoutScreen`, `MembershipRequestsQueueTab`, `ManualCheckInSheet`, `ReceptionScanController`) и обработки `429 TOO_MANY_REQUESTS` (`Retry-After`) и потери сети.
-2. Перевести `B4-02` в `[~]` в `docs/TASKS.md`, согласовать план и добавить тесты.
+1. Начать `B4-03`: проверить планшетную раскладку (`>=600dp`, `>=840dp`), Light/Dark темы, локализацию `ru`/`tg`/`en` (в т.ч. ARB и длинные строки) и состояния `loading`/`empty`/`error`/`permission-denied`.
+2. Перевести `B4-03` в `[~]` в `docs/TASKS.md`, согласовать план с разработчиком и добавить тесты.

@@ -109,6 +109,14 @@ final class _GymQrKioskScreenState extends State<GymQrKioskScreen> {
         _errorMessage = error.message;
         _loading = false;
       });
+    } on Object {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _errorMessage = 'Не удалось обновить QR-код зала.';
+        _loading = false;
+      });
     } finally {
       if (mounted) {
         setState(() {
@@ -310,6 +318,16 @@ final class _GymQrKioskScreenState extends State<GymQrKioskScreen> {
               color: colors.foregroundSecondary,
             ),
           ),
+          if (_errorMessage != null) ...[
+            const SizedBox(height: UcraftSpacing.space3),
+            Text(
+              _errorMessage!,
+              textAlign: TextAlign.center,
+              style: UcraftTypography.caption.copyWith(
+                color: colors.destructive,
+              ),
+            ),
+          ],
         ],
       ),
     );

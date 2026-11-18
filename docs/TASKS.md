@@ -41,6 +41,7 @@
 - [x] **B3-07** UI аналитики владельца, рассылок `push`/`sms` и статуса подписки платформы без IAP (`AnalyticsScreen`, `AnnouncementsScreen`, `BillingStatusScreen`); 3 теста зелёные (`format ✓`, `analyze ✓`, `test ✓`).
 - [x] **B3-08** Интеграция экранов `B3` (`ScheduleTab`, `TrainersScreen`, `AnalyticsScreen`, `StorefrontEditorScreen`, `StaffManagementScreen`, `AnnouncementsScreen`, `BillingStatusScreen`) в `BusinessShell` и `UgymBusinessApp` с RBAC для `owner`/`admin`/`trainer`; 83 теста зелёные (`format ✓`, `analyze ✓`, `test ✓`).
 - [x] **B4-01** Добавлен переход «Подробнее» из `SubscriptionReadOnlyBanner` в `BillingStatusScreen`, реактивное обновление и баннер в `ClientDetailScreen` при `403 SUBSCRIPTION_EXPIRED`, восстановление филиала и поиск группы по `ID` занятия для роли `trainer` в `ScheduleTab` + 4 E2E-теста в `test/core/rbac_and_read_only_e2e_test.dart`; 87 тестов зелёные (`format ✓`, `analyze ✓`, `test ✓`).
+- [x] **B4-02** (заметка: также обновлён `ugym_core` — парсинг `Retry-After` и `isRateLimited` в `UgymApiException`) Реализованы извлечение `Retry-After` при `429`, сохранение `Idempotency-Key` при `429`/`5xx`/сетевых сбоях в `ReceptionScanController` и при закрытии/повторном открытии диалога оплаты в `MembershipRequestsQueueTab`, вывод времени ожидания в `ScanClientQrScreen`, сохранение QR при сбое обновления в `GymQrKioskScreen` + 5 тестов в `test/core/network_resilience_and_idempotency_test.dart`; 92 теста зелёные (`format ✓`, `analyze ✓`, `test ✓`).
 
 ---
 
@@ -48,9 +49,6 @@
 
 **ТЗ:** [uGym_Business_Mobile_TZ.md](specs/uGym_Business_Mobile_TZ.md) (разделы 0.2, 1, 2.1, 3.2, 6, 7), [uCraft_Design_System.md](specs/uCraft_Design_System.md) (разделы 16, 18, 19, 20, 23)
 
-- [ ] **B4-02** Сетевая устойчивость и строгая идемпотентность (`Idempotency-Key` при повторе, обработка `429 Retry-After` и потери сети)
-  - Цель: проверить и укрепить сохранение `Idempotency-Key` при ретраях кассы (`POST /sales`, `membership-requests/{id}/pay`), ручного чекина и сканера QR, а также отображение `Retry-After`
-  - Проверка: unit/widget-тесты повторных отправок без дублей и сетевых ошибок
 - [ ] **B4-03** Адаптивность iPad/tablet (`>=600dp`, `>=840dp`), Light/Dark темы, ARB-локализация (`ru`/`tg`/`en`) и состояния экранов
   - Цель: проверить планшетную раскладку киоска/shell, обе темы uCraft, переключение `ru`/`tg`/`en` и состояния `loading`/`empty`/`error`/`permission-denied`
   - Проверка: widget-тесты на планшетных и компактных размерах, темах и локалях

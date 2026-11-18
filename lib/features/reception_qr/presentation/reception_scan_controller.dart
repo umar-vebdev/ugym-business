@@ -82,13 +82,22 @@ final class ReceptionScanController extends ChangeNotifier {
       _pendingKey = null;
     } on UgymApiException catch (error) {
       _error = error;
-      _phase = error.isNetworkError
-          ? ScanPhase.networkError
-          : ScanPhase.refused;
+      final isTransient =
+          error.isNetworkError ||
+          error.isRateLimited ||
+          (error.statusCode != null && error.statusCode! >= 500);
+      _phase = isTransient ? ScanPhase.networkError : ScanPhase.refused;
       if (_phase == ScanPhase.refused) {
         _pendingToken = null;
         _pendingKey = null;
       }
+    } on Object {
+      _error = const UgymApiException(
+        code: 'NETWORK_ERROR',
+        message: 'Нет связи с сервером.',
+        isNetworkError: true,
+      );
+      _phase = ScanPhase.networkError;
     }
     notifyListeners();
   }

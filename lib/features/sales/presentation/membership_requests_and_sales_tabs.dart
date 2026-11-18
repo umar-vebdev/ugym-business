@@ -34,8 +34,24 @@ final class _MembershipRequestsQueueTabState
   String? _errorMessage;
   int? _busyRequestId;
   List<MembershipRequestRecord> _requests = const <MembershipRequestRecord>[];
+  final Map<String, String> _pendingPayKeys = <String, String>{};
 
   DateTime _nowUtc() => (widget.clock?.call() ?? DateTime.now()).toUtc();
+
+  String _payKeySlot(int requestId, PaymentMethod method) =>
+      '$requestId:${method.apiValue}';
+
+  String _resolvePayKey(int requestId, PaymentMethod method) {
+    final slot = _payKeySlot(requestId, method);
+    return _pendingPayKeys.putIfAbsent(
+      slot,
+      () => widget.idempotencyKeyGenerator?.call() ?? UgymUuid.v4(),
+    );
+  }
+
+  void _clearPayKeysForRequest(int requestId) {
+    _pendingPayKeys.removeWhere((key, _) => key.startsWith('$requestId:'));
+  }
 
   @override
   void initState() {
@@ -85,7 +101,8 @@ final class _MembershipRequestsQueueTabState
       builder: (_) => _PayRequestDialog(
         requestId: request.id,
         repository: widget.repository,
-        idempotencyKeyGenerator: widget.idempotencyKeyGenerator,
+        resolveIdempotencyKey: (method) => _resolvePayKey(request.id, method),
+        onPaidSuccess: () => _clearPayKeysForRequest(request.id),
       ),
     );
     if (paid == true && mounted) {
@@ -341,12 +358,14 @@ final class _PayRequestDialog extends StatefulWidget {
   const _PayRequestDialog({
     required this.requestId,
     required this.repository,
-    this.idempotencyKeyGenerator,
+    required this.resolveIdempotencyKey,
+    required this.onPaidSuccess,
   });
 
   final int requestId;
   final SalesAndRequestsRepository repository;
-  final String Function()? idempotencyKeyGenerator;
+  final String Function(PaymentMethod method) resolveIdempotencyKey;
+  final VoidCallback onPaidSuccess;
 
   @override
   State<_PayRequestDialog> createState() => _PayRequestDialogState();
@@ -356,13 +375,12 @@ final class _PayRequestDialogState extends State<_PayRequestDialog> {
   PaymentMethod _method = PaymentMethod.cash;
   bool _submitting = false;
   String? _errorText;
-  String? _pendingKey;
 
   Future<void> _confirm() async {
     if (_submitting) {
       return;
     }
-    _pendingKey ??= (widget.idempotencyKeyGenerator?.call() ?? UgymUuid.v4());
+    final key = widget.resolveIdempotencyKey(_method);
     setState(() {
       _submitting = true;
       _errorText = null;
@@ -372,12 +390,12 @@ final class _PayRequestDialogState extends State<_PayRequestDialog> {
       await widget.repository.payMembershipRequest(
         requestId: widget.requestId,
         paymentMethod: _method,
-        idempotencyKey: _pendingKey,
+        idempotencyKey: key,
       );
       if (!mounted) {
         return;
       }
-      _pendingKey = null;
+      widget.onPaidSuccess();
       Navigator.of(context).pop(true);
     } on UgymApiException catch (error) {
       if (!mounted) {
@@ -420,7 +438,6 @@ final class _PayRequestDialogState extends State<_PayRequestDialog> {
                   onPressed: _submitting
                       ? null
                       : () {
-                          _pendingKey = null;
                           setState(() {
                             _method = method;
                           });

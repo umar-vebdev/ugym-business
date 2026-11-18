@@ -120,12 +120,17 @@ final class ScanClientQrScreen extends StatelessWidget {
 
   Widget _buildNetworkError(BuildContext context) {
     final colors = context.ucraftColors;
+    final error = controller.error;
+    final lines = <String>[
+      if (error?.retryAfterSeconds != null) error!.message,
+      'Нажмите «Повторить» — дубль посещения не будет создан.',
+    ];
     return _ResultPanel(
       icon: Icons.wifi_off,
       iconColor: colors.warning,
       background: colors.warningBackground,
       title: 'Нет связи с сервером',
-      lines: const ['Нажмите «Повторить» — дубль посещения не будет создан.'],
+      lines: lines,
       actions: [
         UcraftButton(
           label: 'Повторить',
