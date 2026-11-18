@@ -11,10 +11,12 @@ final class SubscriptionReadOnlyBanner extends StatelessWidget {
   const SubscriptionReadOnlyBanner({
     super.key,
     required this.controller,
+    this.message = 'Подписка истекла — доступен только просмотр',
     this.onOpenDetails,
   });
 
   final BusinessSessionController controller;
+  final String message;
   final VoidCallback? onOpenDetails;
 
   @override
@@ -50,7 +52,7 @@ final class SubscriptionReadOnlyBanner extends StatelessWidget {
                 const SizedBox(width: UcraftSpacing.iconLabelGap),
                 Expanded(
                   child: Text(
-                    'Подписка истекла — доступен только просмотр',
+                    message,
                     style: UcraftTypography.bodyMedium.copyWith(
                       color: colors.warningForeground,
                     ),

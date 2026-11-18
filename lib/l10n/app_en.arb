@@ -11,6 +11,8 @@
   "healthError": "Server unavailable",
   "checkHealth": "Check health",
   "switchTheme": "Switch theme",
-  "selectBranch": "Select branch"
+  "selectBranch": "Select branch",
+  "themeLightLabel": "Light theme",
+  "themeDarkLabel": "Dark theme",
+  "signOutLabel": "Sign out"
 }
-

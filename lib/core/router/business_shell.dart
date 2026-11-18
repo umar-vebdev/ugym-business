@@ -176,58 +176,65 @@ final class _BusinessShellState extends State<BusinessShell> {
         return LayoutBuilder(
           builder: (context, constraints) {
             final bool useRail = constraints.maxWidth >= 600;
+            final bool isExpanded = constraints.maxWidth >= 840;
 
             final Widget content = SafeArea(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(
                   UcraftSpacing.screenHorizontalPadding,
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    SubscriptionReadOnlyBanner(
-                      controller: widget.sessionController,
-                      onOpenDetails:
-                          widget.analyticsAndBillingRepository != null &&
-                              widget.sessionController.canView(
-                                BusinessPermission.viewBilling,
-                              )
-                          ? () => setState(() {
-                              _selected = BusinessDestination.more;
-                              _moreTab = _MoreSubTab.billing;
-                            })
-                          : null,
-                    ),
-                    if (widget.sessionController.isReadOnly)
-                      const SizedBox(height: UcraftSpacing.space4),
-                    Wrap(
-                      spacing: UcraftSpacing.space3,
-                      runSpacing: UcraftSpacing.space2,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      alignment: WrapAlignment.spaceBetween,
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 1040),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Text(
-                          _labelFor(activeDestination, strings),
-                          style: UcraftTypography.headline.copyWith(
-                            color: colors.foreground,
-                          ),
+                        SubscriptionReadOnlyBanner(
+                          controller: widget.sessionController,
+                          message: strings.readOnlyBanner,
+                          onOpenDetails:
+                              widget.analyticsAndBillingRepository != null &&
+                                  widget.sessionController.canView(
+                                    BusinessPermission.viewBilling,
+                                  )
+                              ? () => setState(() {
+                                  _selected = BusinessDestination.more;
+                                  _moreTab = _MoreSubTab.billing;
+                                })
+                              : null,
                         ),
-                        if (widget.sessionController.canView(
-                          BusinessPermission.viewGyms,
-                        ))
-                          GymBranchSelector(
-                            controller: widget.sessionController,
-                          ),
+                        if (widget.sessionController.isReadOnly)
+                          const SizedBox(height: UcraftSpacing.space4),
+                        Wrap(
+                          spacing: UcraftSpacing.space3,
+                          runSpacing: UcraftSpacing.space2,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          alignment: WrapAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              _labelFor(activeDestination, strings),
+                              style: UcraftTypography.headline.copyWith(
+                                color: colors.foreground,
+                              ),
+                            ),
+                            if (widget.sessionController.canView(
+                              BusinessPermission.viewGyms,
+                            ))
+                              GymBranchSelector(
+                                controller: widget.sessionController,
+                              ),
+                          ],
+                        ),
+                        const SizedBox(height: UcraftSpacing.space4),
+                        _buildDestinationBody(
+                          context,
+                          activeDestination,
+                          strings,
+                          isDark,
+                        ),
                       ],
                     ),
-                    const SizedBox(height: UcraftSpacing.space4),
-                    _buildDestinationBody(
-                      context,
-                      activeDestination,
-                      strings,
-                      isDark,
-                    ),
-                  ],
+                  ),
                 ),
               ),
             );
@@ -239,7 +246,10 @@ final class _BusinessShellState extends State<BusinessShell> {
                     NavigationRail(
                       backgroundColor: colors.surface,
                       selectedIndex: selectedIndex,
-                      labelType: NavigationRailLabelType.all,
+                      extended: isExpanded,
+                      labelType: isExpanded
+                          ? NavigationRailLabelType.none
+                          : NavigationRailLabelType.all,
                       onDestinationSelected: (index) {
                         setState(() {
                           _selected = destinations[index];
@@ -887,7 +897,7 @@ final class _BusinessShellState extends State<BusinessShell> {
                     if (widget.authController != null) ...[
                       const SizedBox(height: UcraftSpacing.space3),
                       UcraftButton(
-                        label: 'Выйти',
+                        label: strings.signOutLabel,
                         variant: UcraftButtonVariant.destructive,
                         fullWidth: true,
                         isLoading: widget.authController!.isSubmitting,

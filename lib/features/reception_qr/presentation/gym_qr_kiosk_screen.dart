@@ -202,41 +202,57 @@ final class _GymQrKioskScreenState extends State<GymQrKioskScreen> {
       canPop: !_isLocked,
       child: Scaffold(
         body: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(
-                UcraftSpacing.screenHorizontalPadding,
-              ),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 480),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final bool isWide = constraints.maxWidth >= 840;
+              return Center(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(
+                    UcraftSpacing.screenHorizontalPadding,
+                  ),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(maxWidth: isWide ? 880 : 480),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Text(
-                          'uGym',
-                          style: UcraftTypography.titleLarge.copyWith(
-                            color: colors.primary,
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'uGym',
+                              style: UcraftTypography.titleLarge.copyWith(
+                                color: colors.primary,
+                              ),
+                            ),
+                            Text(
+                              _isLocked ? 'Киоск заблокирован' : 'Режим стойки',
+                              style: UcraftTypography.label.copyWith(
+                                color: colors.foregroundSecondary,
+                              ),
+                            ),
+                          ],
                         ),
-                        Text(
-                          _isLocked ? 'Киоск заблокирован' : 'Режим стойки',
-                          style: UcraftTypography.label.copyWith(
-                            color: colors.foregroundSecondary,
-                          ),
-                        ),
+                        const SizedBox(height: UcraftSpacing.space4),
+                        if (isWide)
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(flex: 3, child: _buildQrContent(colors)),
+                              const SizedBox(width: UcraftSpacing.space6),
+                              Expanded(flex: 2, child: _buildPinControls()),
+                            ],
+                          )
+                        else ...[
+                          _buildQrContent(colors),
+                          const SizedBox(height: UcraftSpacing.space4),
+                          _buildPinControls(),
+                        ],
                       ],
                     ),
-                    const SizedBox(height: UcraftSpacing.space4),
-                    _buildQrContent(colors),
-                    const SizedBox(height: UcraftSpacing.space4),
-                    _buildPinControls(),
-                  ],
+                  ),
                 ),
-              ),
-            ),
+              );
+            },
           ),
         ),
       ),

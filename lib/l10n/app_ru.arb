@@ -11,6 +11,8 @@
   "healthError": "Сервер недоступен",
   "checkHealth": "Проверить связь",
   "switchTheme": "Сменить тему",
-  "selectBranch": "Выбор филиала"
+  "selectBranch": "Выбор филиала",
+  "themeLightLabel": "Светлая тема",
+  "themeDarkLabel": "Тёмная тема",
+  "signOutLabel": "Выйти"
 }
-

@@ -40,6 +40,7 @@ final class BusinessStrings {
     required this.selectBranch,
     required this.themeLightLabel,
     required this.themeDarkLabel,
+    required this.signOutLabel,
   });
 
   final String appTitle;
@@ -56,6 +57,7 @@ final class BusinessStrings {
   final String selectBranch;
   final String themeLightLabel;
   final String themeDarkLabel;
+  final String signOutLabel;
 
   static const BusinessStrings ru = BusinessStrings._(
     appTitle: 'uGym Business',
@@ -72,6 +74,7 @@ final class BusinessStrings {
     selectBranch: 'Выбор филиала',
     themeLightLabel: 'Светлая тема',
     themeDarkLabel: 'Тёмная тема',
+    signOutLabel: 'Выйти',
   );
 
   static const BusinessStrings tg = BusinessStrings._(
@@ -89,6 +92,7 @@ final class BusinessStrings {
     selectBranch: 'Интихоби филиал',
     themeLightLabel: 'Мавзӯи равшан',
     themeDarkLabel: 'Мавзӯи торик',
+    signOutLabel: 'Баромадан',
   );
 
   static const BusinessStrings en = BusinessStrings._(
@@ -106,6 +110,7 @@ final class BusinessStrings {
     selectBranch: 'Select branch',
     themeLightLabel: 'Light theme',
     themeDarkLabel: 'Dark theme',
+    signOutLabel: 'Sign out',
   );
 
   static BusinessStrings of(AppLocale locale) {

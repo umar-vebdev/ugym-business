@@ -11,6 +11,8 @@
   "healthError": "Сервер дастнорас аст",
   "checkHealth": "Санҷиши пайваст",
   "switchTheme": "Иваз кардани мавзӯъ",
-  "selectBranch": "Интихоби филиал"
+  "selectBranch": "Интихоби филиал",
+  "themeLightLabel": "Мавзӯи равшан",
+  "themeDarkLabel": "Мавзӯи торик",
+  "signOutLabel": "Баромадан"
 }
-
