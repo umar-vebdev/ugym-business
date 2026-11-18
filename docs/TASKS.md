@@ -1,6 +1,6 @@
 # uGym Business — чек-лист задач
 
-**Текущий этап:** B4 — Полировка UX, Режим чтения, QA и Релиз
+**Текущий этап:** Все этапы (`B0`–`B4`) завершены ✓
 **Статусы:** `[ ]` не начата · `[~]` в работе · `[x]` готова · `[!]` заблокирована (причина в заметках)
 
 ## Правила ведения файла
@@ -43,13 +43,10 @@
 - [x] **B4-01** Добавлен переход «Подробнее» из `SubscriptionReadOnlyBanner` в `BillingStatusScreen`, реактивное обновление и баннер в `ClientDetailScreen` при `403 SUBSCRIPTION_EXPIRED`, восстановление филиала и поиск группы по `ID` занятия для роли `trainer` в `ScheduleTab` + 4 E2E-теста в `test/core/rbac_and_read_only_e2e_test.dart`; 87 тестов зелёные (`format ✓`, `analyze ✓`, `test ✓`).
 - [x] **B4-02** (заметка: также обновлён `ugym_core` — парсинг `Retry-After` и `isRateLimited` в `UgymApiException`) Реализованы извлечение `Retry-After` при `429`, сохранение `Idempotency-Key` при `429`/`5xx`/сетевых сбоях в `ReceptionScanController` и при закрытии/повторном открытии диалога оплаты в `MembershipRequestsQueueTab`, вывод времени ожидания в `ScanClientQrScreen`, сохранение QR при сбое обновления в `GymQrKioskScreen` + 5 тестов в `test/core/network_resilience_and_idempotency_test.dart`; 92 теста зелёные (`format ✓`, `analyze ✓`, `test ✓`).
 - [x] **B4-03** Добавлены расширенный `NavigationRail` (`extended: true`) и ограничение ширины `1040dp` в `BusinessShell` для `>=840dp`, двухколоночная раскладка киоска в `GymQrKioskScreen`, синхронизированы ключи `app_{ru,tg,en}.arb` (`themeLightLabel`, `themeDarkLabel`, `signOutLabel`) и перевод баннера/выхода в `BusinessStrings` + 5 тестов в `test/core/responsive_theme_and_l10n_test.dart`; 97 тестов зелёные (`format ✓`, `analyze ✓`, `test ✓`).
+- [x] **B4-04** Обновлён `ios/Runner/Info.plist` (`NSCameraUsageDescription`, `NSPhotoLibraryUsageDescription`), создан `ios/Runner/PrivacyInfo.xcprivacy` (`NSPrivacyTracking: false`, `CA92.1`), добавлены `INTERNET` и `hardware.camera (required=false)` в `android/app/src/main/AndroidManifest.xml`, подтверждено отсутствие IAP/ссылок оплаты и пройдены тесты релизной готовности и п. 7.2 ТЗ (`test/core/release_readiness_and_acceptance_test.dart`); 100 тестов зелёные (`format ✓`, `analyze ✓`, `test ✓`).
 
 ---
 
-## Текущий этап: `B4` — Полировка UX, Режим чтения, QA и Релиз
+## Текущий этап: `B4` — Полировка UX, Режим чтения, QA и Релиз (Завершён)
 
-**ТЗ:** [uGym_Business_Mobile_TZ.md](specs/uGym_Business_Mobile_TZ.md) (разделы 0.2, 1, 2.1, 3.2, 6, 7), [uCraft_Design_System.md](specs/uCraft_Design_System.md) (разделы 16, 18, 19, 20, 23)
-
-- [ ] **B4-04** Релизная подготовка iOS/Android и итоговый приёмочный чек-лист
-  - Цель: проверить/добавить `PrivacyInfo.xcprivacy`, `NSCameraUsageDescription`/`NSPhotoLibraryUsageDescription` в `Info.plist`, разрешения в `AndroidManifest.xml`, подтвердить отсутствие IAP/внешних ссылок оплаты и пройти приёмочный чек-лист (п. 7.2 ТЗ)
-  - Проверка: ревью манифестов/конфигураций + полный прогон `dart format`, `flutter analyze`, `flutter test`
+Все задачи этапов `B0`–`B4` выполнены и проверены (`dart format`, `flutter analyze`, `flutter test`).

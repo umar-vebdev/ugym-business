@@ -1,17 +1,17 @@
 # HANDOFF — uGym Business
 
-**Текущий этап:** `B4` — Полировка UX, Режим чтения, QA и Релиз  
-**Текущая задача:** `B4-04` — релизная подготовка iOS/Android и итоговый приёмочный чек-лист  
+**Текущий этап:** Все этапы (`B0`–`B4`) завершены  
+**Текущая задача:** Задачи дорожной карты `B0`–`B4` выполнены полностью  
 **Репозиторий:** `/home/umar/ugym-mobile/uGym Business` (`main`)
 
 ## Что сделано
-- Этапы `B0`–`B3` и задачи `B4-01`, `B4-02`, `B4-03` завершены полностью:
-  - В `B4-03` в `BusinessShell` поддержан брейкпоинт `>=840dp` (`NavigationRail(extended: true)` и `maxWidth: 1040`).
-  - В `GymQrKioskScreen` добавлена двухколоночная альбомная раскладка при ширине `>=840dp`.
-  - В `lib/l10n/app_{ru,tg,en}.arb` и `BusinessStrings` синхронизированы все ключи, а `SubscriptionReadOnlyBanner` и кнопка «Выйти» переведены через `BusinessStrings`.
-  - Добавлены 5 тестов в `test/core/responsive_theme_and_l10n_test.dart`.
-- Проверки: `dart format --output=none --set-exit-if-changed .`, `flutter analyze` (No issues found), `flutter test` (97 passed).
+- **Этап `B0` (`B0-01`–`B0-04`):** инициализация `tj.ugym.business`, подключение `ugym_core` (uCraft Design System 1.0 Midnight & Cobalt), RBAC (`owner`/`admin`/`trainer`/`noCompany`), перехват `SUBSCRIPTION_EXPIRED`, ARB-словари `ru`/`tg`/`en`, адаптивный `BusinessShell`.
+- **Этап `B1` (`B1-01`–`B1-06b`):** аутентификация (Email/Телефон, OTP, сброс пароля), онбординг компании (14-дневный триал), филиалы и геозона, киоск QR зала (`60с`, WakeLock, PIN), сканер QR клиента, журнал визитов, ручной чекин и отмена за 24 ч.
+- **Этап `B2` (`B2-01`–`B2-07`):** CRM клиентов, карточка 360°, слияние дублей, конструктор тарифов, заморозка/отмена абонементов, касса `PaymentMark`, очередь заявок, история продаж, возвраты и склад товаров.
+- **Этап `B3` (`B3-01`–`B3-08`):** тренеры, шаблоны и генерация расписания (до 62 дней), отмена с возвратом визитов, записи группы, витрина и до 10 фото, штат по email, аналитика, рассылки `push`/`sms` и статус подписки платформы.
+- **Этап `B4` (`B4-01`–`B4-04`):** E2E-проверки RBAC и `SUBSCRIPTION_EXPIRED`, поддержка `429 Retry-After` и устойчивость `Idempotency-Key`, планшетные раскладки (`>=600dp`, `>=840dp`) и синхронизация ARB, а также релизная конфигурация iOS (`Info.plist`, `PrivacyInfo.xcprivacy`) и Android (`AndroidManifest.xml`), отсутствие IAP и приёмочные тесты.
+- **Итоговые проверки:** `dart format --output=none --set-exit-if-changed .`, `flutter analyze` (No issues found), `flutter test` (100 passed).
 
-## Точный следующий шаг
-1. Начать `B4-04`: проверить `ios/Runner/Info.plist`, `PrivacyInfo.xcprivacy`, `android/app/src/main/AndroidManifest.xml`, отсутствие IAP и внешних ссылок оплаты, а также пройти итоговый приёмочный чек-лист (п. 7.2 ТЗ).
-2. Перевести `B4-04` в `[~]` в `docs/TASKS.md` и согласовать план с разработчиком.
+## Следующие шаги перед публикацией в магазины
+1. Настроить релизные ключи подписи Android (`signingConfig`) и профили Apple Developer / TestFlight, а также убедиться в Xcode, что `ios/Runner/PrivacyInfo.xcprivacy` включён в `Copy Bundle Resources`.
+2. Подключить реальный стенд `staging` / `prod` и провести ручную приёмку на физических устройствах iOS/iPad и Android с камерой и реальной сетью.
