@@ -31,10 +31,12 @@ final class ScheduleTab extends StatefulWidget {
 final class _ScheduleTabState extends State<ScheduleTab> {
   late final TextEditingController _fromController;
   late final TextEditingController _toController;
+  final _sessionIdController = TextEditingController();
 
   _ScheduleSubView _view = _ScheduleSubView.sessions;
   bool _loading = true;
   String? _errorMessage;
+  String? _trainerLookupError;
   int? _loadedGymId;
   int? _cancellingSessionId;
 
@@ -54,7 +56,11 @@ final class _ScheduleTabState extends State<ScheduleTab> {
       text: widget.initialToDate ?? _formatDate(weekEnd),
     );
     widget.sessionController.addListener(_onSessionChanged);
-    unawaited(_load());
+    if (widget.sessionController.selectedGym != null) {
+      unawaited(_load());
+    } else {
+      _loading = false;
+    }
   }
 
   @override
@@ -62,6 +68,7 @@ final class _ScheduleTabState extends State<ScheduleTab> {
     widget.sessionController.removeListener(_onSessionChanged);
     _fromController.dispose();
     _toController.dispose();
+    _sessionIdController.dispose();
     super.dispose();
   }
 
@@ -259,6 +266,74 @@ final class _ScheduleTabState extends State<ScheduleTab> {
     );
   }
 
+  Future<void> _openTrainerSessionById() async {
+    final sessionId = int.tryParse(_sessionIdController.text.trim());
+    if (sessionId == null || sessionId <= 0) {
+      setState(() {
+        _trainerLookupError = 'Введите корректный ID занятия.';
+      });
+      return;
+    }
+
+    setState(() {
+      _trainerLookupError = null;
+    });
+
+    final now = DateTime.now().toUtc();
+    final placeholder = ClassSession(
+      id: sessionId,
+      publicId: '',
+      gymId: 0,
+      templateId: 0,
+      trainerId: 0,
+      title: 'Занятие №$sessionId',
+      capacity: 0,
+      bookedCount: 0,
+      availableSeats: 0,
+      startsAt: now,
+      endsAt: now,
+      status: ClassSessionStatus.scheduled,
+    );
+    await _openBookings(placeholder);
+  }
+
+  Widget _buildTrainerSessionLookup(BuildContext context) {
+    final colors = context.ucraftColors;
+    return UcraftCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            'Список группы по занятию',
+            style: UcraftTypography.title.copyWith(color: colors.foreground),
+          ),
+          const SizedBox(height: UcraftSpacing.space1),
+          Text(
+            'Укажите ID занятия, чтобы просмотреть записавшихся клиентов.',
+            style: UcraftTypography.caption.copyWith(
+              color: colors.foregroundSecondary,
+            ),
+          ),
+          const SizedBox(height: UcraftSpacing.space3),
+          UcraftTextField(
+            key: const ValueKey<String>('trainer_session_id_input'),
+            controller: _sessionIdController,
+            label: 'ID занятия',
+            hintText: 'Например, 101',
+            keyboardType: TextInputType.number,
+            errorText: _trainerLookupError,
+          ),
+          const SizedBox(height: UcraftSpacing.space3),
+          UcraftButton(
+            label: 'Открыть список группы',
+            fullWidth: true,
+            onPressed: () => unawaited(_openTrainerSessionById()),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
@@ -267,6 +342,9 @@ final class _ScheduleTabState extends State<ScheduleTab> {
         final colors = context.ucraftColors;
         final gym = widget.sessionController.selectedGym;
         if (gym == null) {
+          if (widget.sessionController.role == BusinessRole.trainer) {
+            return _buildTrainerSessionLookup(context);
+          }
           return const UcraftEmptyState(
             title: 'Филиал не выбран',
             description: 'Выберите зал, чтобы работать с расписанием.',
@@ -558,7 +636,9 @@ final class _SessionBookingsScreenState extends State<SessionBookingsScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                'Занято мест: ${widget.session.bookedCount} / ${widget.session.capacity}',
+                widget.session.capacity > 0
+                    ? 'Занято мест: ${widget.session.bookedCount} / ${widget.session.capacity}'
+                    : 'Записей в списке: ${_bookings.length}',
                 style: UcraftTypography.bodyMedium.copyWith(
                   color: colors.foreground,
                 ),

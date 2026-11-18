@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:material_ui/material_ui.dart';
 import 'package:ugym_core/ugym_core.dart';
 
+import '../../../core/router/role_guard_and_banners.dart';
 import '../../../core/session/business_role.dart';
 import '../../../core/session/business_session_controller.dart';
 import '../../memberships/domain/memberships_models.dart';
@@ -187,132 +188,144 @@ final class _ClientDetailScreenState extends State<ClientDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.ucraftColors;
-    final canSell = widget.sessionController.canMutate(
-      BusinessPermission.manageMembershipRequestsAndSales,
-    );
-    final canFreeze = widget.sessionController.canMutate(
-      BusinessPermission.viewExpiringAndFreezeMemberships,
-    );
-    final canManualVisit =
-        widget.sessionController.selectedGym != null &&
-        widget.sessionController.canMutate(
-          BusinessPermission.manageReceptionQrAndVisits,
+    return ListenableBuilder(
+      listenable: widget.sessionController,
+      builder: (context, _) {
+        final colors = context.ucraftColors;
+        final canSell = widget.sessionController.canMutate(
+          BusinessPermission.manageMembershipRequestsAndSales,
         );
+        final canFreeze = widget.sessionController.canMutate(
+          BusinessPermission.viewExpiringAndFreezeMemberships,
+        );
+        final canManualVisit =
+            widget.sessionController.selectedGym != null &&
+            widget.sessionController.canMutate(
+              BusinessPermission.manageReceptionQrAndVisits,
+            );
 
-    return Scaffold(
-      appBar: AppBar(title: Text(widget.client.name)),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(UcraftSpacing.space4),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              UcraftCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Row(
+        return Scaffold(
+          appBar: AppBar(title: Text(widget.client.name)),
+          body: SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(UcraftSpacing.space4),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  SubscriptionReadOnlyBanner(
+                    controller: widget.sessionController,
+                  ),
+                  if (widget.sessionController.isReadOnly)
+                    const SizedBox(height: UcraftSpacing.space3),
+                  UcraftCard(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Expanded(
-                          child: Text(
-                            '${widget.client.name} (#${widget.client.id})',
-                            style: UcraftTypography.title.copyWith(
-                              color: colors.foreground,
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                '${widget.client.name} (#${widget.client.id})',
+                                style: UcraftTypography.title.copyWith(
+                                  color: colors.foreground,
+                                ),
+                              ),
                             ),
-                          ),
+                            Text(
+                              widget.client.linked
+                                  ? 'Привязан к uGym'
+                                  : 'Оффлайн-карточка',
+                              style: UcraftTypography.caption.copyWith(
+                                color: widget.client.linked
+                                    ? colors.success
+                                    : colors.foregroundSecondary,
+                              ),
+                            ),
+                          ],
                         ),
+                        const SizedBox(height: UcraftSpacing.space1),
                         Text(
-                          widget.client.linked
-                              ? 'Привязан к uGym'
-                              : 'Оффлайн-карточка',
-                          style: UcraftTypography.caption.copyWith(
-                            color: widget.client.linked
-                                ? colors.success
-                                : colors.foregroundSecondary,
+                          widget.client.email != null
+                              ? '${widget.client.phone} • ${widget.client.email}'
+                              : widget.client.phone,
+                          style: UcraftTypography.body.copyWith(
+                            color: colors.foregroundSecondary,
                           ),
                         ),
+                        if (canSell) ...[
+                          const SizedBox(height: UcraftSpacing.space3),
+                          UcraftButton(
+                            label: 'Продать абонемент / товар',
+                            fullWidth: true,
+                            onPressed: () => unawaited(_openPosCheckout()),
+                          ),
+                        ],
                       ],
                     ),
-                    const SizedBox(height: UcraftSpacing.space1),
-                    Text(
-                      widget.client.email != null
-                          ? '${widget.client.phone} • ${widget.client.email}'
-                          : widget.client.phone,
-                      style: UcraftTypography.body.copyWith(
-                        color: colors.foregroundSecondary,
-                      ),
-                    ),
-                    if (canSell) ...[
-                      const SizedBox(height: UcraftSpacing.space3),
+                  ),
+                  const SizedBox(height: UcraftSpacing.space3),
+                  Wrap(
+                    spacing: UcraftSpacing.space2,
+                    runSpacing: UcraftSpacing.space2,
+                    children: [
                       UcraftButton(
-                        label: 'Продать абонемент / товар',
-                        fullWidth: true,
-                        onPressed: () => unawaited(_openPosCheckout()),
+                        label: 'Абонементы',
+                        variant: _tab == _ClientDetailTab.memberships
+                            ? UcraftButtonVariant.primary
+                            : UcraftButtonVariant.secondary,
+                        onPressed: () =>
+                            setState(() => _tab = _ClientDetailTab.memberships),
+                      ),
+                      UcraftButton(
+                        label: 'Посещения',
+                        variant: _tab == _ClientDetailTab.visits
+                            ? UcraftButtonVariant.primary
+                            : UcraftButtonVariant.secondary,
+                        onPressed: () =>
+                            setState(() => _tab = _ClientDetailTab.visits),
+                      ),
+                      UcraftButton(
+                        label: 'Покупки/Чеки',
+                        variant: _tab == _ClientDetailTab.sales
+                            ? UcraftButtonVariant.primary
+                            : UcraftButtonVariant.secondary,
+                        onPressed: () =>
+                            setState(() => _tab = _ClientDetailTab.sales),
                       ),
                     ],
+                  ),
+                  const SizedBox(height: UcraftSpacing.space3),
+                  if (_errorMessage != null) ...[
+                    Text(
+                      _errorMessage!,
+                      style: UcraftTypography.bodyMedium.copyWith(
+                        color: colors.destructive,
+                      ),
+                    ),
+                    const SizedBox(height: UcraftSpacing.space3),
                   ],
-                ),
-              ),
-              const SizedBox(height: UcraftSpacing.space3),
-              Wrap(
-                spacing: UcraftSpacing.space2,
-                runSpacing: UcraftSpacing.space2,
-                children: [
-                  UcraftButton(
-                    label: 'Абонементы',
-                    variant: _tab == _ClientDetailTab.memberships
-                        ? UcraftButtonVariant.primary
-                        : UcraftButtonVariant.secondary,
-                    onPressed: () =>
-                        setState(() => _tab = _ClientDetailTab.memberships),
-                  ),
-                  UcraftButton(
-                    label: 'Посещения',
-                    variant: _tab == _ClientDetailTab.visits
-                        ? UcraftButtonVariant.primary
-                        : UcraftButtonVariant.secondary,
-                    onPressed: () =>
-                        setState(() => _tab = _ClientDetailTab.visits),
-                  ),
-                  UcraftButton(
-                    label: 'Покупки/Чеки',
-                    variant: _tab == _ClientDetailTab.sales
-                        ? UcraftButtonVariant.primary
-                        : UcraftButtonVariant.secondary,
-                    onPressed: () =>
-                        setState(() => _tab = _ClientDetailTab.sales),
-                  ),
+                  if (_loading)
+                    const UcraftLoadingState(
+                      message: 'Загружаем данные клиента...',
+                    )
+                  else
+                    switch (_tab) {
+                      _ClientDetailTab.memberships => _buildMembershipsTab(
+                        context,
+                        canFreeze,
+                      ),
+                      _ClientDetailTab.visits => _buildVisitsTab(
+                        context,
+                        canManualVisit,
+                      ),
+                      _ClientDetailTab.sales => _buildSalesTab(context),
+                    },
                 ],
               ),
-              const SizedBox(height: UcraftSpacing.space3),
-              if (_errorMessage != null) ...[
-                Text(
-                  _errorMessage!,
-                  style: UcraftTypography.bodyMedium.copyWith(
-                    color: colors.destructive,
-                  ),
-                ),
-                const SizedBox(height: UcraftSpacing.space3),
-              ],
-              if (_loading)
-                const UcraftLoadingState(message: 'Загружаем данные клиента...')
-              else
-                switch (_tab) {
-                  _ClientDetailTab.memberships => _buildMembershipsTab(
-                    context,
-                    canFreeze,
-                  ),
-                  _ClientDetailTab.visits => _buildVisitsTab(
-                    context,
-                    canManualVisit,
-                  ),
-                  _ClientDetailTab.sales => _buildSalesTab(context),
-                },
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 

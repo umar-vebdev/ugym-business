@@ -187,6 +187,16 @@ final class _BusinessShellState extends State<BusinessShell> {
                   children: [
                     SubscriptionReadOnlyBanner(
                       controller: widget.sessionController,
+                      onOpenDetails:
+                          widget.analyticsAndBillingRepository != null &&
+                              widget.sessionController.canView(
+                                BusinessPermission.viewBilling,
+                              )
+                          ? () => setState(() {
+                              _selected = BusinessDestination.more;
+                              _moreTab = _MoreSubTab.billing;
+                            })
+                          : null,
                     ),
                     if (widget.sessionController.isReadOnly)
                       const SizedBox(height: UcraftSpacing.space4),

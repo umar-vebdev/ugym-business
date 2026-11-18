@@ -8,9 +8,14 @@ import '../session/business_session_controller.dart';
 
 /// Global read-only banner shown when company trial/subscription is expired.
 final class SubscriptionReadOnlyBanner extends StatelessWidget {
-  const SubscriptionReadOnlyBanner({super.key, required this.controller});
+  const SubscriptionReadOnlyBanner({
+    super.key,
+    required this.controller,
+    this.onOpenDetails,
+  });
 
   final BusinessSessionController controller;
+  final VoidCallback? onOpenDetails;
 
   @override
   Widget build(BuildContext context) {
@@ -51,6 +56,14 @@ final class SubscriptionReadOnlyBanner extends StatelessWidget {
                     ),
                   ),
                 ),
+                if (onOpenDetails != null) ...[
+                  const SizedBox(width: UcraftSpacing.space2),
+                  UcraftButton(
+                    label: 'Подробнее',
+                    variant: UcraftButtonVariant.secondary,
+                    onPressed: onOpenDetails,
+                  ),
+                ],
               ],
             ),
           ),

@@ -128,8 +128,25 @@ final class BusinessSessionController extends ChangeNotifier {
     }
 
     _role = isTrainerHint ? BusinessRole.trainer : BusinessRole.noCompany;
-    _gyms = const <GymSummary>[];
-    _selectedGym = null;
+    if (isTrainerHint) {
+      final savedGymId = await preferences.readSelectedGymId();
+      if (savedGymId != null) {
+        final timezone = await preferences.readSelectedGymTimezone();
+        final restored = GymSummary(
+          id: savedGymId,
+          name: 'Филиал #$savedGymId',
+          timezone: timezone,
+        );
+        _gyms = <GymSummary>[restored];
+        _selectedGym = restored;
+      } else {
+        _gyms = const <GymSummary>[];
+        _selectedGym = null;
+      }
+    } else {
+      _gyms = const <GymSummary>[];
+      _selectedGym = null;
+    }
     notifyListeners();
     return _role!;
   }
