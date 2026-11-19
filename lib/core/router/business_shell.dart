@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:ugym_core/ugym_core.dart';
 
@@ -906,9 +907,9 @@ final class _BusinessShellState extends State<BusinessShell> {
                           children: [
                             Icon(
                               _healthOk!
-                                  ? Icons.check_circle_outline
-                                  : Icons.error_outline,
-                              size: 18,
+                                  ? LucideIcons.circleCheck
+                                  : LucideIcons.circleAlert,
+                              size: 20,
                               color: _healthOk!
                                   ? colors.success
                                   : colors.destructive,
@@ -1047,15 +1048,11 @@ final class _BusinessShellState extends State<BusinessShell> {
 
   IconData _iconFor(BusinessDestination destination, {required bool selected}) {
     return switch (destination) {
-      BusinessDestination.overview =>
-        selected ? Icons.dashboard : Icons.dashboard_outlined,
-      BusinessDestination.members =>
-        selected ? Icons.people : Icons.people_outline,
-      BusinessDestination.operations =>
-        selected ? Icons.qr_code_scanner : Icons.qr_code_scanner_outlined,
-      BusinessDestination.analytics =>
-        selected ? Icons.bar_chart : Icons.bar_chart_outlined,
-      BusinessDestination.more => selected ? Icons.menu : Icons.menu_outlined,
+      BusinessDestination.overview => LucideIcons.layoutDashboard,
+      BusinessDestination.members => LucideIcons.users,
+      BusinessDestination.operations => LucideIcons.qrCode,
+      BusinessDestination.analytics => LucideIcons.chartColumn,
+      BusinessDestination.more => LucideIcons.menu,
     };
   }
 }

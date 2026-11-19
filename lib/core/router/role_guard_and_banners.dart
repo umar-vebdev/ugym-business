@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:ugym_core/ugym_core.dart';
 
@@ -45,7 +46,7 @@ final class SubscriptionReadOnlyBanner extends StatelessWidget {
             child: Row(
               children: [
                 Icon(
-                  Icons.lock_outline,
+                  LucideIcons.lock,
                   size: 20,
                   color: colors.warningForeground,
                 ),
@@ -146,7 +147,7 @@ final class RoleGuard extends StatelessWidget {
 
         if (!controller.canView(permission)) {
           return const UcraftEmptyState(
-            icon: Icons.lock_outline,
+            icon: LucideIcons.lock,
             title: 'Недостаточно прав для доступа к разделу',
             description: 'Доступ ограничен вашей текущей ролью в компании.',
           );
@@ -191,11 +192,7 @@ final class GymBranchSelector extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                Icons.fitness_center_outlined,
-                size: 16,
-                color: colors.primary,
-              ),
+              Icon(LucideIcons.dumbbell, size: 16, color: colors.primary),
               const SizedBox(width: UcraftSpacing.iconLabelGap),
               Flexible(
                 child: Text(
@@ -210,7 +207,7 @@ final class GymBranchSelector extends StatelessWidget {
               if (gyms.length > 1) ...[
                 const SizedBox(width: UcraftSpacing.space1),
                 Icon(
-                  Icons.keyboard_arrow_down,
+                  LucideIcons.chevronDown,
                   size: 20,
                   color: colors.foregroundSecondary,
                 ),

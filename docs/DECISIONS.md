@@ -67,4 +67,16 @@
 - Статус: принято
 
 
+### D-007 — Иконки Lucide (`lucide_icons_flutter`) и офлайн-шрифты `Inter` / `Geist Mono`
+- Дата: 2026-11-19
+- Тип: решение
+- Решение:
+  1) В `pubspec.yaml` добавлен пакет `lucide_icons_flutter` как единый источник контурных иконок приложения.
+  2) Официальные OFL-вариативные шрифты `Inter` (`assets/fonts/Inter-Variable.ttf`) и `Geist Mono` (`assets/fonts/GeistMono-Variable.ttf`) включены локально в ассеты и зарегистрированы под именами семейств `Inter` и `GeistMono` (совпадающими с `UcraftTypography` из `ugym_core`).
+- Причина: прямое требование `uCraft_Design_System.md` (§5 Typography, §9 Iconography, §22 rule 18) и требование офлайн-надёжности без загрузки шрифтов по сети при старте приложения.
+- Затронутые разделы ТЗ: `uCraft_Design_System.md` (разделы 5, 9, 22), `B6-02a`, `B6-02b`
+- Статус: принято
+
+
+
 
