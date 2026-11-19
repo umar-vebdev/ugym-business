@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:material_ui/material_ui.dart';
 import 'package:ugym_core/ugym_core.dart';
 
+import '../../../core/l10n/business_localizations.dart';
 import '../../../core/session/business_role.dart';
 import '../../../core/session/business_session_controller.dart';
 import '../domain/memberships_models.dart';
@@ -126,6 +127,7 @@ final class _MembershipTypesScreenState extends State<MembershipTypesScreen> {
       listenable: widget.sessionController,
       builder: (context, _) {
         final colors = context.ucraftColors;
+        final strings = BusinessStringsScope.of(context);
         final canManage = widget.sessionController.canMutate(
           BusinessPermission.manageMembershipTypesAndCancel,
         );
@@ -140,7 +142,7 @@ final class _MembershipTypesScreenState extends State<MembershipTypesScreen> {
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 Text(
-                  'Тарифы абонементов',
+                  strings.plansTitle,
                   style: UcraftTypography.title.copyWith(
                     color: colors.foreground,
                   ),
@@ -149,7 +151,9 @@ final class _MembershipTypesScreenState extends State<MembershipTypesScreen> {
                   spacing: UcraftSpacing.space2,
                   children: [
                     UcraftButton(
-                      label: _onlyActive ? 'Показать все' : 'Только активные',
+                      label: _onlyActive
+                          ? strings.plansShowAllButton
+                          : strings.plansOnlyActiveButton,
                       variant: UcraftButtonVariant.secondary,
                       onPressed: () {
                         setState(() {
@@ -160,7 +164,7 @@ final class _MembershipTypesScreenState extends State<MembershipTypesScreen> {
                     ),
                     if (canManage)
                       UcraftButton(
-                        label: 'Создать тариф',
+                        label: strings.plansCreateButton,
                         onPressed: () => unawaited(_openCreate()),
                       ),
                   ],
@@ -178,17 +182,18 @@ final class _MembershipTypesScreenState extends State<MembershipTypesScreen> {
             ],
             const SizedBox(height: UcraftSpacing.space3),
             if (_loading)
-              const UcraftLoadingState(message: 'Загружаем тарифы...')
+              UcraftLoadingState(message: strings.plansLoading)
             else if (_errorMessage != null && _types.isEmpty)
               UcraftErrorState(
-                title: 'Ошибка загрузки',
+                title: strings.posLoadErrorTitle,
                 message: _errorMessage!,
+                retryLabel: strings.retryLabel,
                 onRetry: () => unawaited(_loadTypes()),
               )
             else if (_types.isEmpty)
-              const UcraftEmptyState(
-                title: 'Тарифов пока нет',
-                description: 'Создайте первый тариф, чтобы продавать абонементы на кассе и в приложении.',
+              UcraftEmptyState(
+                title: strings.plansEmptyTitle,
+                description: strings.plansEmptyDesc,
               )
             else
               Column(
@@ -228,9 +233,10 @@ final class _MembershipTypeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.ucraftColors;
+    final strings = BusinessStringsScope.of(context);
     final priceText = (type.priceMinor / 100).toStringAsFixed(2);
     final details = <String>[
-      _kindLabel(type.kind),
+      _kindLabel(type.kind, strings),
       if (type.durationDays != null) '${type.durationDays} дн.',
       if (type.visitsCount != null) '${type.visitsCount} визитов',
       if (type.validityDays != null) 'срок ${type.validityDays} дн.',
@@ -260,7 +266,7 @@ final class _MembershipTypeCard extends StatelessWidget {
           ),
           const SizedBox(height: UcraftSpacing.space1),
           Text(
-            '$details • ${type.isActive ? 'Активен' : 'В архиве'}',
+            '$details • ${type.isActive ? strings.planStatusActive : strings.planStatusArchived}',
             style: UcraftTypography.caption.copyWith(
               color: colors.foregroundSecondary,
             ),
@@ -270,7 +276,9 @@ final class _MembershipTypeCard extends StatelessWidget {
             Align(
               alignment: Alignment.centerRight,
               child: UcraftButton(
-                label: type.isActive ? 'В архив' : 'Активировать',
+                label: type.isActive
+                    ? strings.planArchiveButton
+                    : strings.planActivateButton,
                 variant: UcraftButtonVariant.secondary,
                 isLoading: isToggling,
                 onPressed: isToggling ? null : onToggleActive,
@@ -282,11 +290,11 @@ final class _MembershipTypeCard extends StatelessWidget {
     );
   }
 
-  String _kindLabel(MembershipKind kind) {
+  String _kindLabel(MembershipKind kind, BusinessStrings strings) {
     return switch (kind) {
-      MembershipKind.unlimitedTime => 'Безлимит',
-      MembershipKind.visitsPack => 'Пакет визитов',
-      MembershipKind.mixed => 'Визиты + срок',
+      MembershipKind.unlimitedTime => strings.planKindUnlimited,
+      MembershipKind.visitsPack => strings.planKindVisitsPack,
+      MembershipKind.mixed => strings.planKindMixed,
     };
   }
 }
@@ -446,9 +454,10 @@ final class _CreateMembershipTypeScreenState
   @override
   Widget build(BuildContext context) {
     final colors = context.ucraftColors;
+    final strings = BusinessStringsScope.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Новый тариф')),
+      appBar: AppBar(title: Text(strings.planNewTitle)),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(UcraftSpacing.space4),
@@ -457,13 +466,12 @@ final class _CreateMembershipTypeScreenState
             children: [
               UcraftTextField(
                 controller: _nameController,
-                label: 'Название',
-                hintText: 'Например, Безлимит 30 дней',
+                label: strings.planNameLabel,
               ),
               const SizedBox(height: UcraftSpacing.space3),
               UcraftTextField(
                 controller: _priceController,
-                label: 'Цена в валюте зала',
+                label: strings.planPriceInCurrencyLabel,
                 hintText: '250',
                 keyboardType: const TextInputType.numberWithOptions(
                   decimal: true,
@@ -471,7 +479,7 @@ final class _CreateMembershipTypeScreenState
               ),
               const SizedBox(height: UcraftSpacing.space3),
               Text(
-                'Тип тарифа',
+                strings.planKindSectionLabel,
                 style: UcraftTypography.bodyMedium.copyWith(
                   color: colors.foreground,
                 ),
@@ -483,7 +491,7 @@ final class _CreateMembershipTypeScreenState
                 children: [
                   for (final kind in MembershipKind.values)
                     UcraftButton(
-                      label: _kindLabel(kind),
+                      label: _kindLabel(kind, strings),
                       variant: _kind == kind
                           ? UcraftButtonVariant.primary
                           : UcraftButtonVariant.secondary,
@@ -498,7 +506,7 @@ final class _CreateMembershipTypeScreenState
               ),
               const SizedBox(height: UcraftSpacing.space3),
               Text(
-                'Начало действия',
+                strings.planStartModeSectionLabel,
                 style: UcraftTypography.bodyMedium.copyWith(
                   color: colors.foreground,
                 ),
@@ -509,7 +517,7 @@ final class _CreateMembershipTypeScreenState
                 runSpacing: UcraftSpacing.space2,
                 children: [
                   UcraftButton(
-                    label: 'С момента покупки',
+                    label: strings.planStartOnPurchase,
                     variant: _startMode == MembershipStartMode.onPurchase
                         ? UcraftButtonVariant.primary
                         : UcraftButtonVariant.secondary,
@@ -520,7 +528,7 @@ final class _CreateMembershipTypeScreenState
                     },
                   ),
                   UcraftButton(
-                    label: 'С первого визита',
+                    label: strings.planStartOnFirstVisit,
                     variant: _startMode == MembershipStartMode.onFirstVisit
                         ? UcraftButtonVariant.primary
                         : UcraftButtonVariant.secondary,
@@ -536,7 +544,7 @@ final class _CreateMembershipTypeScreenState
                 const SizedBox(height: UcraftSpacing.space3),
                 UcraftTextField(
                   controller: _durationController,
-                  label: 'Длительность (дней)',
+                  label: strings.planDurationDaysLabel,
                   keyboardType: TextInputType.number,
                 ),
               ],
@@ -544,7 +552,7 @@ final class _CreateMembershipTypeScreenState
                 const SizedBox(height: UcraftSpacing.space3),
                 UcraftTextField(
                   controller: _visitsController,
-                  label: 'Количество визитов',
+                  label: strings.planVisitsCountLabel,
                   keyboardType: TextInputType.number,
                 ),
               ],
@@ -552,14 +560,14 @@ final class _CreateMembershipTypeScreenState
                 const SizedBox(height: UcraftSpacing.space3),
                 UcraftTextField(
                   controller: _validityController,
-                  label: 'Срок годности пакета (дней, опционально)',
+                  label: strings.planValidityDaysLabel,
                   keyboardType: TextInputType.number,
                 ),
               ],
               const SizedBox(height: UcraftSpacing.space3),
               UcraftTextField(
                 controller: _dailyLimitController,
-                label: 'Лимит визитов в день (1–100)',
+                label: strings.planDailyLimitLabel,
                 keyboardType: TextInputType.number,
               ),
               const SizedBox(height: UcraftSpacing.space3),
@@ -568,7 +576,7 @@ final class _CreateMembershipTypeScreenState
                   Expanded(
                     child: UcraftTextField(
                       controller: _timeFromController,
-                      label: 'Окно с (ЧЧ:ММ)',
+                      label: strings.planTimeFromLabel,
                       hintText: '08:00',
                     ),
                   ),
@@ -576,7 +584,7 @@ final class _CreateMembershipTypeScreenState
                   Expanded(
                     child: UcraftTextField(
                       controller: _timeToController,
-                      label: 'Окно до (ЧЧ:ММ)',
+                      label: strings.planTimeToLabel,
                       hintText: '16:00',
                     ),
                   ),
@@ -588,7 +596,7 @@ final class _CreateMembershipTypeScreenState
                   Expanded(
                     child: UcraftTextField(
                       controller: _freezeDaysController,
-                      label: 'Заморозка (дней)',
+                      label: strings.planFreezeDaysLabel,
                       keyboardType: TextInputType.number,
                     ),
                   ),
@@ -596,7 +604,7 @@ final class _CreateMembershipTypeScreenState
                   Expanded(
                     child: UcraftTextField(
                       controller: _freezeTimesController,
-                      label: 'Заморозок (раз)',
+                      label: strings.planFreezeTimesLabel,
                       keyboardType: TextInputType.number,
                     ),
                   ),
@@ -613,7 +621,7 @@ final class _CreateMembershipTypeScreenState
               ],
               const SizedBox(height: UcraftSpacing.space4),
               UcraftButton(
-                label: 'Сохранить тариф',
+                label: strings.planSaveButton,
                 fullWidth: true,
                 isLoading: _submitting,
                 onPressed: _submitting ? null : () => unawaited(_submit()),
@@ -625,11 +633,11 @@ final class _CreateMembershipTypeScreenState
     );
   }
 
-  String _kindLabel(MembershipKind kind) {
+  String _kindLabel(MembershipKind kind, BusinessStrings strings) {
     return switch (kind) {
-      MembershipKind.unlimitedTime => 'Безлимит',
-      MembershipKind.visitsPack => 'Пакет визитов',
-      MembershipKind.mixed => 'Визиты + срок',
+      MembershipKind.unlimitedTime => strings.planKindUnlimited,
+      MembershipKind.visitsPack => strings.planKindVisitsPack,
+      MembershipKind.mixed => strings.planKindMixed,
     };
   }
 }
@@ -820,6 +828,7 @@ final class _ExpiringMembershipsTabState extends State<ExpiringMembershipsTab> {
       listenable: widget.sessionController,
       builder: (context, _) {
         final colors = context.ucraftColors;
+        final strings = BusinessStringsScope.of(context);
         final canFreeze = widget.sessionController.canMutate(
           BusinessPermission.viewExpiringAndFreezeMemberships,
         );
@@ -834,14 +843,14 @@ final class _ExpiringMembershipsTabState extends State<ExpiringMembershipsTab> {
               children: [
                 Expanded(
                   child: Text(
-                    'Истекают за 7 дней',
+                    strings.expiringSoonTitle,
                     style: UcraftTypography.title.copyWith(
                       color: colors.foreground,
                     ),
                   ),
                 ),
                 UcraftButton(
-                  label: 'Обновить',
+                  label: strings.refreshLabel,
                   variant: UcraftButtonVariant.secondary,
                   onPressed: _loading ? null : () => unawaited(_load()),
                 ),
@@ -858,17 +867,18 @@ final class _ExpiringMembershipsTabState extends State<ExpiringMembershipsTab> {
             ],
             const SizedBox(height: UcraftSpacing.space3),
             if (_loading)
-              const UcraftLoadingState(message: 'Загружаем абонементы...')
+              UcraftLoadingState(message: strings.expiringLoading)
             else if (_errorMessage != null && _items.isEmpty)
               UcraftErrorState(
-                title: 'Ошибка загрузки',
+                title: strings.posLoadErrorTitle,
                 message: _errorMessage!,
+                retryLabel: strings.retryLabel,
                 onRetry: () => unawaited(_load()),
               )
             else if (_items.isEmpty)
-              const UcraftEmptyState(
-                title: 'Нет истекающих абонементов',
-                description: 'В ближайшие 7 дней ни у одного клиента абонемент не заканчивается.',
+              UcraftEmptyState(
+                title: strings.expiringEmptyTitle,
+                description: strings.expiringEmptyDesc,
               )
             else
               Column(
@@ -914,12 +924,13 @@ final class _ExpiringMembershipCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.ucraftColors;
+    final strings = BusinessStringsScope.of(context);
     final endsText = item.endsAt != null
         ? DateFormatter.formatDateTime(
             item.endsAt!,
             offset: DateFormatter.dushanbeOffset,
           )
-        : 'без срока';
+        : '—';
     final isFrozen = item.status == MembershipStatus.frozen;
     final isCancelled = item.status == MembershipStatus.cancelled;
 
@@ -931,7 +942,7 @@ final class _ExpiringMembershipCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  'Абонемент №${item.id} • Клиент №${item.clientId}',
+                  '${strings.scannerMembershipPrefix}${item.id} • Клиент №${item.clientId}',
                   style: UcraftTypography.bodyMedium.copyWith(
                     color: colors.foreground,
                   ),
@@ -949,7 +960,7 @@ final class _ExpiringMembershipCard extends StatelessWidget {
           ),
           const SizedBox(height: UcraftSpacing.space1),
           Text(
-            'До: $endsText${item.remainingVisits != null ? ' • Осталось визитов: ${item.remainingVisits}' : ''}',
+            'До: $endsText${item.remainingVisits != null ? ' • ${strings.scannerRemainingVisitsPrefix}${item.remainingVisits}' : ''}',
             style: UcraftTypography.caption.copyWith(
               color: colors.foregroundSecondary,
             ),
@@ -963,14 +974,16 @@ final class _ExpiringMembershipCard extends StatelessWidget {
               children: [
                 if (canFreeze)
                   UcraftButton(
-                    label: isFrozen ? 'Разморозить' : 'Заморозить',
+                    label: isFrozen
+                        ? strings.clientUnfreezeButton
+                        : strings.clientFreezeButton,
                     variant: UcraftButtonVariant.secondary,
                     isLoading: isBusy,
                     onPressed: isBusy ? null : onToggleFreeze,
                   ),
                 if (canCancel)
                   UcraftButton(
-                    label: 'Отменить',
+                    label: strings.membershipCancelButton,
                     variant: UcraftButtonVariant.destructive,
                     isLoading: isBusy,
                     onPressed: isBusy ? null : onCancel,
@@ -1007,18 +1020,18 @@ final class _CancelMembershipDialogState
 
   @override
   Widget build(BuildContext context) {
+    final strings = BusinessStringsScope.of(context);
     return AlertDialog(
-      title: const Text('Отменить абонемент'),
+      title: Text(strings.membershipCancelDialogTitle),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('Абонемент №${widget.membershipId}'),
+          Text('${strings.scannerMembershipPrefix}${widget.membershipId}'),
           const SizedBox(height: UcraftSpacing.space3),
           UcraftTextField(
             controller: _reasonController,
-            label: 'Причина отмены',
-            hintText: 'До 500 символов',
+            label: strings.visitCancelReasonLabel,
             errorText: _errorText,
             maxLines: 2,
           ),
@@ -1027,10 +1040,10 @@ final class _CancelMembershipDialogState
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Назад'),
+          child: Text(strings.backLabel),
         ),
         UcraftButton(
-          label: 'Подтвердить отмену',
+          label: strings.visitConfirmCancelButton,
           variant: UcraftButtonVariant.destructive,
           onPressed: () {
             final reason = _reasonController.text.trim();

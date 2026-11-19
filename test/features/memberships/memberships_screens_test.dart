@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:ugym_business/core/l10n/business_localizations.dart';
 import 'package:ugym_business/core/session/business_role.dart';
 import 'package:ugym_business/core/session/business_session_controller.dart';
 import 'package:ugym_business/core/storage/app_preferences.dart';
@@ -278,6 +279,57 @@ void main() {
 
       expect(repo.lastCancelled, (id: 51, reason: 'Клиент уехал'));
       expect(find.text('cancelled'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'MembershipTypesScreen and ExpiringMembershipsTab render localized labels in tg and en',
+    (tester) async {
+      final repo = _FakeMembershipsRepository();
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: UcraftTheme.light(),
+          home: BusinessStringsScope(
+            strings: BusinessStrings.tg,
+            child: Scaffold(
+              body: SingleChildScrollView(
+                child: MembershipTypesScreen(
+                  repository: repo,
+                  sessionController: _session(BusinessRole.owner),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Тарифҳои обуна'), findsOneWidget);
+      expect(find.text('Сохтани тариф'), findsOneWidget);
+      expect(find.text('Ба бойгонӣ'), findsOneWidget);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: UcraftTheme.light(),
+          home: BusinessStringsScope(
+            strings: BusinessStrings.en,
+            child: Scaffold(
+              body: SingleChildScrollView(
+                child: ExpiringMembershipsTab(
+                  repository: repo,
+                  sessionController: _session(BusinessRole.owner),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Expiring in 7 days'), findsOneWidget);
+      expect(find.text('Freeze'), findsOneWidget);
+      expect(find.text('Cancel'), findsOneWidget);
     },
   );
 }

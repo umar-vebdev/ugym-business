@@ -162,6 +162,7 @@ final class _MembershipRequestsQueueTabState
       listenable: widget.sessionController,
       builder: (context, _) {
         final colors = context.ucraftColors;
+        final strings = BusinessStringsScope.of(context);
         final canMutate = widget.sessionController.canMutate(
           BusinessPermission.manageMembershipRequestsAndSales,
         );
@@ -177,13 +178,13 @@ final class _MembershipRequestsQueueTabState
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 Text(
-                  'Заявки на абонементы',
+                  strings.requestsTitle,
                   style: UcraftTypography.title.copyWith(
                     color: colors.foreground,
                   ),
                 ),
                 UcraftButton(
-                  label: 'Обновить',
+                  label: strings.refreshLabel,
                   variant: UcraftButtonVariant.secondary,
                   onPressed: _loading ? null : () => unawaited(_load()),
                 ),
@@ -196,7 +197,7 @@ final class _MembershipRequestsQueueTabState
               children: [
                 for (final status in MembershipRequestStatus.values)
                   UcraftButton(
-                    label: _statusLabel(status),
+                    label: _statusLabel(status, strings),
                     variant: _filterStatus == status
                         ? UcraftButtonVariant.primary
                         : UcraftButtonVariant.secondary,
@@ -220,17 +221,18 @@ final class _MembershipRequestsQueueTabState
             ],
             const SizedBox(height: UcraftSpacing.space3),
             if (_loading)
-              const UcraftLoadingState(message: 'Загружаем заявки...')
+              UcraftLoadingState(message: strings.requestsLoading)
             else if (_errorMessage != null && _requests.isEmpty)
               UcraftErrorState(
-                title: 'Ошибка загрузки',
+                title: strings.posLoadErrorTitle,
                 message: _errorMessage!,
+                retryLabel: strings.retryLabel,
                 onRetry: () => unawaited(_load()),
               )
             else if (_requests.isEmpty)
-              const UcraftEmptyState(
-                title: 'Заявок нет',
-                description: 'Новые заявки из приложения uGym появятся здесь.',
+              UcraftEmptyState(
+                title: strings.requestsEmptyTitle,
+                description: strings.requestsEmptyDesc,
               )
             else
               Column(
@@ -257,12 +259,12 @@ final class _MembershipRequestsQueueTabState
     );
   }
 
-  String _statusLabel(MembershipRequestStatus status) {
+  String _statusLabel(MembershipRequestStatus status, BusinessStrings strings) {
     return switch (status) {
-      MembershipRequestStatus.pending => 'Ожидают',
-      MembershipRequestStatus.paid => 'Оплачены',
-      MembershipRequestStatus.cancelled => 'Отменены',
-      MembershipRequestStatus.expired => 'Истекли',
+      MembershipRequestStatus.pending => strings.requestStatusPending,
+      MembershipRequestStatus.paid => strings.requestStatusPaid,
+      MembershipRequestStatus.cancelled => strings.requestStatusCancelled,
+      MembershipRequestStatus.expired => strings.requestStatusExpired,
     };
   }
 
@@ -297,6 +299,7 @@ final class _RequestCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.ucraftColors;
+    final strings = BusinessStringsScope.of(context);
     return UcraftCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -336,13 +339,13 @@ final class _RequestCard extends StatelessWidget {
               alignment: WrapAlignment.end,
               children: [
                 UcraftButton(
-                  label: 'Отменить заявку',
+                  label: strings.requestCancelButton,
                   variant: UcraftButtonVariant.secondary,
                   isLoading: isBusy,
                   onPressed: isBusy ? null : onCancel,
                 ),
                 UcraftButton(
-                  label: 'Принять оплату',
+                  label: strings.scannerAcceptPaymentButton,
                   isLoading: isBusy,
                   onPressed: isBusy ? null : onPay,
                 ),
@@ -420,6 +423,7 @@ final class _PayRequestDialogState extends State<_PayRequestDialog> {
   @override
   Widget build(BuildContext context) {
     final colors = context.ucraftColors;
+    final strings = BusinessStringsScope.of(context);
     return AlertDialog(
       title: Text('Оплата заявки №${widget.requestId}'),
       content: Column(
@@ -432,7 +436,7 @@ final class _PayRequestDialogState extends State<_PayRequestDialog> {
             children: [
               for (final method in PaymentMethod.values)
                 UcraftButton(
-                  label: paymentMethodLabel(method),
+                  label: paymentMethodLabel(method, strings: strings),
                   variant: _method == method
                       ? UcraftButtonVariant.primary
                       : UcraftButtonVariant.secondary,
@@ -462,10 +466,10 @@ final class _PayRequestDialogState extends State<_PayRequestDialog> {
           onPressed: _submitting
               ? null
               : () => Navigator.of(context).pop(false),
-          child: const Text('Назад'),
+          child: Text(strings.backLabel),
         ),
         UcraftButton(
-          label: 'Подтвердить оплату',
+          label: strings.requestConfirmPaymentButton,
           isLoading: _submitting,
           onPressed: _submitting ? null : () => unawaited(_confirm()),
         ),
@@ -494,20 +498,20 @@ final class _CancelRequestDialogState extends State<_CancelRequestDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = BusinessStringsScope.of(context);
     return AlertDialog(
-      title: Text('Отменить заявку №${widget.requestId}'),
+      title: Text('${strings.requestCancelButton} №${widget.requestId}'),
       content: UcraftTextField(
         controller: _reasonController,
-        label: 'Причина (необязательно)',
-        hintText: 'До 255 символов',
+        label: strings.reasonOptionalLabel,
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Назад'),
+          child: Text(strings.backLabel),
         ),
         UcraftButton(
-          label: 'Подтвердить',
+          label: strings.confirmLabel,
           variant: UcraftButtonVariant.destructive,
           onPressed: () =>
               Navigator.of(context).pop(_reasonController.text.trim()),
@@ -631,6 +635,7 @@ final class _SalesHistoryTabState extends State<SalesHistoryTab> {
       listenable: widget.sessionController,
       builder: (context, _) {
         final colors = context.ucraftColors;
+        final strings = BusinessStringsScope.of(context);
         final canRefund = widget.sessionController.canMutate(
           BusinessPermission.refundSalesAndManageProducts,
         );
@@ -642,14 +647,14 @@ final class _SalesHistoryTabState extends State<SalesHistoryTab> {
               children: [
                 Expanded(
                   child: Text(
-                    'История продаж',
+                    strings.salesHistoryTitle,
                     style: UcraftTypography.title.copyWith(
                       color: colors.foreground,
                     ),
                   ),
                 ),
                 UcraftButton(
-                  label: 'Обновить',
+                  label: strings.refreshLabel,
                   variant: UcraftButtonVariant.secondary,
                   onPressed: _loading ? null : () => unawaited(_load()),
                 ),
@@ -666,17 +671,18 @@ final class _SalesHistoryTabState extends State<SalesHistoryTab> {
             ],
             const SizedBox(height: UcraftSpacing.space3),
             if (_loading)
-              const UcraftLoadingState(message: 'Загружаем продажи...')
+              UcraftLoadingState(message: strings.salesLoading)
             else if (_errorMessage != null && _sales.isEmpty)
               UcraftErrorState(
-                title: 'Ошибка загрузки',
+                title: strings.posLoadErrorTitle,
                 message: _errorMessage!,
+                retryLabel: strings.retryLabel,
                 onRetry: () => unawaited(_load()),
               )
             else if (_sales.isEmpty)
-              const UcraftEmptyState(
-                title: 'Продаж пока нет',
-                description: 'Оформленные чеки кассы и оплаченные заявки появятся здесь.',
+              UcraftEmptyState(
+                title: strings.salesEmptyTitle,
+                description: strings.salesEmptyDesc,
               )
             else
               Column(
@@ -716,6 +722,7 @@ final class _SaleCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.ucraftColors;
+    final strings = BusinessStringsScope.of(context);
     final total = (sale.totalMinor / 100).toStringAsFixed(2);
     final isRefunded = sale.status == SaleStatus.refunded;
     final dateText = DateFormatter.formatDateTime(
@@ -738,7 +745,7 @@ final class _SaleCard extends StatelessWidget {
                 ),
               ),
               Text(
-                isRefunded ? 'Возврат' : 'Оплачен',
+                isRefunded ? strings.saleRefundButton : strings.saleStatusPaid,
                 style: UcraftTypography.caption.copyWith(
                   color: isRefunded ? colors.destructive : colors.success,
                 ),
@@ -747,7 +754,7 @@ final class _SaleCard extends StatelessWidget {
           ),
           const SizedBox(height: UcraftSpacing.space1),
           Text(
-            '${paymentMethodLabel(sale.paymentMethod)} • $dateText${sale.clientId != null ? ' • Клиент №${sale.clientId}' : ''}',
+            '${paymentMethodLabel(sale.paymentMethod, strings: strings)} • $dateText${sale.clientId != null ? ' • Клиент №${sale.clientId}' : ''}',
             style: UcraftTypography.caption.copyWith(
               color: colors.foregroundSecondary,
             ),
@@ -755,7 +762,7 @@ final class _SaleCard extends StatelessWidget {
           if (isRefunded && sale.refundReason != null) ...[
             const SizedBox(height: UcraftSpacing.space2),
             Text(
-              'Причина возврата: ${sale.refundReason}',
+              '${strings.saleRefundReasonLabel}: ${sale.refundReason}',
               style: UcraftTypography.caption.copyWith(
                 color: colors.destructiveForeground,
               ),
@@ -766,7 +773,7 @@ final class _SaleCard extends StatelessWidget {
             Align(
               alignment: Alignment.centerRight,
               child: UcraftButton(
-                label: 'Возврат',
+                label: strings.saleRefundButton,
                 variant: UcraftButtonVariant.destructive,
                 isLoading: isRefunding,
                 onPressed: isRefunding ? null : onRefund,
@@ -800,22 +807,22 @@ final class _RefundSaleDialogState extends State<_RefundSaleDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = BusinessStringsScope.of(context);
     return AlertDialog(
-      title: Text('Возврат чека №${widget.saleId}'),
+      title: Text('${strings.saleRefundButton} #${widget.saleId}'),
       content: UcraftTextField(
         controller: _reasonController,
-        label: 'Причина возврата',
-        hintText: 'До 500 символов',
+        label: strings.saleRefundReasonLabel,
         errorText: _errorText,
         maxLines: 2,
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Назад'),
+          child: Text(strings.backLabel),
         ),
         UcraftButton(
-          label: 'Подтвердить возврат',
+          label: strings.saleConfirmRefundButton,
           variant: UcraftButtonVariant.destructive,
           onPressed: () {
             final reason = _reasonController.text.trim();

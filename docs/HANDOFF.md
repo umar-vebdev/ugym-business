@@ -1,13 +1,14 @@
 # HANDOFF — uGym Business
 
 **Текущий этап:** `B7` — Полная локализация модулей (`ru`/`tg`/`en`) и релизная сборка Android  
-**Следующая задача:** `B7-02` — Локализация тарифов, истекающих абонементов, заявок, продаж и склада (`ru`/`tg`/`en`)  
+**Следующая задача:** `B7-03` — Локализация тренеров, расписания, витрины и штата (`ru`/`tg`/`en`)  
 **Репозиторий:** `/home/umar/ugym-mobile/uGym Business` (`main`)
 
 ## Что сделано
 - **Этапы `B0`–`B6`:** завершены полностью.
-- **B7-01:** локализованы `CompanyOnboardingCard`, `CompanyBranchesAndCurrencyCard`, `VisitsLogScreen`, `ManualCheckInSheet`, `ClientsListScreen`, `CreateClientSheet`, `ClientDetailScreen`; 233 ключа ARB с 100% паритетом `ru`/`tg`/`en`; 122 теста зелёные.
+- **B7-01:** локализованы онбординг, журнал визитов и CRM клиентов (233 ключа ARB).
+- **B7-02:** локализованы тарифы, истекающие абонементы, заявки, история продаж и склад товаров (300 ключей ARB, 123 теста зелёные).
 
-## Следующий шаг (`B7-02`)
-1. Перевести `memberships_screens.dart`, `membership_requests_and_sales_tabs.dart` и `ProductsScreen` в `pos_and_products_screens.dart`.
-2. Синхронизировать новые ключи в `BusinessStrings` и `app_{ru,tg,en}.arb`, добавить тесты и закоммитить `B7-02`.
+## Следующий шаг (`B7-03`)
+1. Перевести `trainers_screen.dart`, `schedule_tab.dart`, `storefront_editor_screen.dart` и `staff_management_screen.dart`.
+2. Синхронизировать ключи в `BusinessStrings` и `app_{ru,tg,en}.arb`, добавить тесты и закоммитить `B7-03`.

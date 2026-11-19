@@ -524,6 +524,7 @@ final class _ProductsScreenState extends State<ProductsScreen> {
       listenable: widget.sessionController,
       builder: (context, _) {
         final colors = context.ucraftColors;
+        final strings = BusinessStringsScope.of(context);
         final canManage = widget.sessionController.canMutate(
           BusinessPermission.refundSalesAndManageProducts,
         );
@@ -538,32 +539,32 @@ final class _ProductsScreenState extends State<ProductsScreen> {
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 Text(
-                  'Склад товаров',
+                  strings.productsTitle,
                   style: UcraftTypography.title.copyWith(
                     color: colors.foreground,
                   ),
                 ),
                 if (canManage)
                   UcraftButton(
-                    label: 'Добавить товар',
+                    label: strings.productsAddButton,
                     onPressed: () => unawaited(_openCreateProduct()),
                   ),
               ],
             ),
             const SizedBox(height: UcraftSpacing.space3),
             if (_loading)
-              const UcraftLoadingState(message: 'Загружаем товары...')
+              UcraftLoadingState(message: strings.productsLoading)
             else if (_errorMessage != null && _products.isEmpty)
               UcraftErrorState(
-                title: 'Ошибка загрузки',
+                title: strings.posLoadErrorTitle,
                 message: _errorMessage!,
+                retryLabel: strings.retryLabel,
                 onRetry: () => unawaited(_load()),
               )
             else if (_products.isEmpty)
-              const UcraftEmptyState(
-                title: 'Товаров нет',
-                description:
-                    'Добавьте воду, коктейли или экипировку для кассы.',
+              UcraftEmptyState(
+                title: strings.productsEmptyTitle,
+                description: strings.productsEmptyDesc,
               )
             else
               Column(
@@ -585,7 +586,7 @@ final class _ProductsScreenState extends State<ProductsScreen> {
                                 ),
                                 const SizedBox(height: UcraftSpacing.space1),
                                 Text(
-                                  '${(product.priceMinor / 100).toStringAsFixed(2)} ${product.currency} • Остаток: ${product.stockQuantity ?? 0} • ${product.isActive ? 'Активен' : 'Архив'}',
+                                  '${(product.priceMinor / 100).toStringAsFixed(2)} ${product.currency} • ${strings.productStockLabel}: ${product.stockQuantity ?? 0} • ${product.isActive ? strings.planStatusActive : strings.planStatusArchived}',
                                   style: UcraftTypography.caption.copyWith(
                                     color: colors.foregroundSecondary,
                                   ),
@@ -595,7 +596,7 @@ final class _ProductsScreenState extends State<ProductsScreen> {
                           ),
                           if (canManage)
                             UcraftButton(
-                              label: 'Изменить',
+                              label: strings.productEditButton,
                               variant: UcraftButtonVariant.secondary,
                               onPressed: () =>
                                   unawaited(_openEditProduct(product)),
@@ -693,23 +694,27 @@ final class _CreateProductDialogState extends State<_CreateProductDialog> {
   @override
   Widget build(BuildContext context) {
     final colors = context.ucraftColors;
+    final strings = BusinessStringsScope.of(context);
     return AlertDialog(
-      title: const Text('Новый товар'),
+      title: Text(strings.productNewTitle),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          UcraftTextField(controller: _nameController, label: 'Название'),
+          UcraftTextField(
+            controller: _nameController,
+            label: strings.planNameLabel,
+          ),
           const SizedBox(height: UcraftSpacing.space2),
           UcraftTextField(
             controller: _priceController,
-            label: 'Цена',
+            label: strings.productPriceLabel,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
           ),
           const SizedBox(height: UcraftSpacing.space2),
           UcraftTextField(
             controller: _stockController,
-            label: 'Остаток',
+            label: strings.productStockLabel,
             keyboardType: TextInputType.number,
           ),
           if (_errorText != null) ...[
@@ -728,10 +733,10 @@ final class _CreateProductDialogState extends State<_CreateProductDialog> {
           onPressed: _submitting
               ? null
               : () => Navigator.of(context).pop(false),
-          child: const Text('Отмена'),
+          child: Text(strings.cancelLabel),
         ),
         UcraftButton(
-          label: 'Создать',
+          label: strings.productCreateButton,
           isLoading: _submitting,
           onPressed: _submitting ? null : () => unawaited(_submit()),
         ),
@@ -817,6 +822,7 @@ final class _EditProductDialogState extends State<_EditProductDialog> {
   @override
   Widget build(BuildContext context) {
     final colors = context.ucraftColors;
+    final strings = BusinessStringsScope.of(context);
     return AlertDialog(
       title: Text(widget.product.name),
       content: Column(
@@ -825,13 +831,13 @@ final class _EditProductDialogState extends State<_EditProductDialog> {
         children: [
           UcraftTextField(
             controller: _stockController,
-            label: 'Остаток',
+            label: strings.productStockLabel,
             keyboardType: TextInputType.number,
           ),
           CheckboxListTile(
             value: _isActive,
             contentPadding: EdgeInsets.zero,
-            title: const Text('Активен на кассе'),
+            title: Text(strings.productActiveAtPosCheckbox),
             onChanged: (value) {
               setState(() {
                 _isActive = value ?? true;
@@ -852,10 +858,10 @@ final class _EditProductDialogState extends State<_EditProductDialog> {
           onPressed: _submitting
               ? null
               : () => Navigator.of(context).pop(false),
-          child: const Text('Отмена'),
+          child: Text(strings.cancelLabel),
         ),
         UcraftButton(
-          label: 'Сохранить',
+          label: strings.saveLabel,
           isLoading: _submitting,
           onPressed: _submitting ? null : () => unawaited(_save()),
         ),

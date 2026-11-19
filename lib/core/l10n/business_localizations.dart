@@ -259,6 +259,73 @@ final class BusinessStrings {
     required this.clientNoVisitsDesc,
     required this.clientNoSalesTitle,
     required this.clientNoSalesDesc,
+    required this.plansTitle,
+    required this.plansShowAllButton,
+    required this.plansOnlyActiveButton,
+    required this.plansCreateButton,
+    required this.plansLoading,
+    required this.plansEmptyTitle,
+    required this.plansEmptyDesc,
+    required this.planStatusActive,
+    required this.planStatusArchived,
+    required this.planArchiveButton,
+    required this.planActivateButton,
+    required this.planKindUnlimited,
+    required this.planKindVisitsPack,
+    required this.planKindMixed,
+    required this.planNewTitle,
+    required this.planNameLabel,
+    required this.planPriceInCurrencyLabel,
+    required this.planKindSectionLabel,
+    required this.planStartModeSectionLabel,
+    required this.planStartOnPurchase,
+    required this.planStartOnFirstVisit,
+    required this.planDurationDaysLabel,
+    required this.planVisitsCountLabel,
+    required this.planValidityDaysLabel,
+    required this.planDailyLimitLabel,
+    required this.planTimeFromLabel,
+    required this.planTimeToLabel,
+    required this.planFreezeDaysLabel,
+    required this.planFreezeTimesLabel,
+    required this.planSaveButton,
+    required this.expiringLoading,
+    required this.expiringEmptyTitle,
+    required this.expiringEmptyDesc,
+    required this.membershipCancelButton,
+    required this.membershipCancelDialogTitle,
+    required this.requestsTitle,
+    required this.requestStatusPending,
+    required this.requestStatusPaid,
+    required this.requestStatusCancelled,
+    required this.requestStatusExpired,
+    required this.requestsLoading,
+    required this.requestsEmptyTitle,
+    required this.requestsEmptyDesc,
+    required this.requestCancelButton,
+    required this.requestConfirmPaymentButton,
+    required this.reasonOptionalLabel,
+    required this.confirmLabel,
+    required this.salesHistoryTitle,
+    required this.salesLoading,
+    required this.salesEmptyTitle,
+    required this.salesEmptyDesc,
+    required this.saleStatusPaid,
+    required this.saleRefundButton,
+    required this.saleRefundReasonLabel,
+    required this.saleConfirmRefundButton,
+    required this.productsTitle,
+    required this.productsAddButton,
+    required this.productsLoading,
+    required this.productsEmptyTitle,
+    required this.productsEmptyDesc,
+    required this.productEditButton,
+    required this.productNewTitle,
+    required this.productPriceLabel,
+    required this.productStockLabel,
+    required this.productCreateButton,
+    required this.productActiveAtPosCheckbox,
+    required this.saveLabel,
   });
 
   final String appTitle;
@@ -494,6 +561,73 @@ final class BusinessStrings {
   final String clientNoVisitsDesc;
   final String clientNoSalesTitle;
   final String clientNoSalesDesc;
+  final String plansTitle;
+  final String plansShowAllButton;
+  final String plansOnlyActiveButton;
+  final String plansCreateButton;
+  final String plansLoading;
+  final String plansEmptyTitle;
+  final String plansEmptyDesc;
+  final String planStatusActive;
+  final String planStatusArchived;
+  final String planArchiveButton;
+  final String planActivateButton;
+  final String planKindUnlimited;
+  final String planKindVisitsPack;
+  final String planKindMixed;
+  final String planNewTitle;
+  final String planNameLabel;
+  final String planPriceInCurrencyLabel;
+  final String planKindSectionLabel;
+  final String planStartModeSectionLabel;
+  final String planStartOnPurchase;
+  final String planStartOnFirstVisit;
+  final String planDurationDaysLabel;
+  final String planVisitsCountLabel;
+  final String planValidityDaysLabel;
+  final String planDailyLimitLabel;
+  final String planTimeFromLabel;
+  final String planTimeToLabel;
+  final String planFreezeDaysLabel;
+  final String planFreezeTimesLabel;
+  final String planSaveButton;
+  final String expiringLoading;
+  final String expiringEmptyTitle;
+  final String expiringEmptyDesc;
+  final String membershipCancelButton;
+  final String membershipCancelDialogTitle;
+  final String requestsTitle;
+  final String requestStatusPending;
+  final String requestStatusPaid;
+  final String requestStatusCancelled;
+  final String requestStatusExpired;
+  final String requestsLoading;
+  final String requestsEmptyTitle;
+  final String requestsEmptyDesc;
+  final String requestCancelButton;
+  final String requestConfirmPaymentButton;
+  final String reasonOptionalLabel;
+  final String confirmLabel;
+  final String salesHistoryTitle;
+  final String salesLoading;
+  final String salesEmptyTitle;
+  final String salesEmptyDesc;
+  final String saleStatusPaid;
+  final String saleRefundButton;
+  final String saleRefundReasonLabel;
+  final String saleConfirmRefundButton;
+  final String productsTitle;
+  final String productsAddButton;
+  final String productsLoading;
+  final String productsEmptyTitle;
+  final String productsEmptyDesc;
+  final String productEditButton;
+  final String productNewTitle;
+  final String productPriceLabel;
+  final String productStockLabel;
+  final String productCreateButton;
+  final String productActiveAtPosCheckbox;
+  final String saveLabel;
 
   static const BusinessStrings ru = BusinessStrings._(
     appTitle: 'uGym Business',
@@ -737,6 +871,75 @@ final class BusinessStrings {
     clientNoVisitsDesc: 'Клиент ещё не отмечался в зале.',
     clientNoSalesTitle: 'Покупок нет',
     clientNoSalesDesc: 'У этого клиента пока нет чеков.',
+    plansTitle: 'Тарифы абонементов',
+    plansShowAllButton: 'Показать все',
+    plansOnlyActiveButton: 'Только активные',
+    plansCreateButton: 'Создать тариф',
+    plansLoading: 'Загружаем тарифы...',
+    plansEmptyTitle: 'Тарифов пока нет',
+    plansEmptyDesc: 'Создайте первый тариф, чтобы продавать абонементы на кассе и в приложении.',
+    planStatusActive: 'Активен',
+    planStatusArchived: 'В архиве',
+    planArchiveButton: 'В архив',
+    planActivateButton: 'Активировать',
+    planKindUnlimited: 'Безлимит',
+    planKindVisitsPack: 'Пакет визитов',
+    planKindMixed: 'Визиты + срок',
+    planNewTitle: 'Новый тариф',
+    planNameLabel: 'Название',
+    planPriceInCurrencyLabel: 'Цена в валюте зала',
+    planKindSectionLabel: 'Тип тарифа',
+    planStartModeSectionLabel: 'Начало действия',
+    planStartOnPurchase: 'С момента покупки',
+    planStartOnFirstVisit: 'С первого визита',
+    planDurationDaysLabel: 'Длительность (дней)',
+    planVisitsCountLabel: 'Количество визитов',
+    planValidityDaysLabel: 'Срок годности пакета (дней, опционально)',
+    planDailyLimitLabel: 'Лимит визитов в день (1–100)',
+    planTimeFromLabel: 'Окно с (ЧЧ:ММ)',
+    planTimeToLabel: 'Окно до (ЧЧ:ММ)',
+    planFreezeDaysLabel: 'Заморозка (дней)',
+    planFreezeTimesLabel: 'Заморозок (раз)',
+    planSaveButton: 'Сохранить тариф',
+    expiringLoading: 'Загружаем абонементы...',
+    expiringEmptyTitle: 'Нет истекающих абонементов',
+    expiringEmptyDesc:
+        'В ближайшие 7 дней ни у одного клиента абонемент не заканчивается.',
+    membershipCancelButton: 'Отменить',
+    membershipCancelDialogTitle: 'Отменить абонемент',
+    requestsTitle: 'Заявки на абонементы',
+    requestStatusPending: 'Ожидают',
+    requestStatusPaid: 'Оплачены',
+    requestStatusCancelled: 'Отменены',
+    requestStatusExpired: 'Истекли',
+    requestsLoading: 'Загружаем заявки...',
+    requestsEmptyTitle: 'Заявок нет',
+    requestsEmptyDesc: 'Новые заявки из приложения uGym появятся здесь.',
+    requestCancelButton: 'Отменить заявку',
+    requestConfirmPaymentButton: 'Подтвердить оплату',
+    reasonOptionalLabel: 'Причина (необязательно)',
+    confirmLabel: 'Подтвердить',
+    salesHistoryTitle: 'История продаж',
+    salesLoading: 'Загружаем продажи...',
+    salesEmptyTitle: 'Продаж пока нет',
+    salesEmptyDesc:
+        'Оформленные чеки кассы и оплаченные заявки появятся здесь.',
+    saleStatusPaid: 'Оплачен',
+    saleRefundButton: 'Возврат',
+    saleRefundReasonLabel: 'Причина возврата',
+    saleConfirmRefundButton: 'Подтвердить возврат',
+    productsTitle: 'Склад товаров',
+    productsAddButton: 'Добавить товар',
+    productsLoading: 'Загружаем товары...',
+    productsEmptyTitle: 'Товаров нет',
+    productsEmptyDesc: 'Добавьте воду, коктейли или экипировку для кассы.',
+    productEditButton: 'Изменить',
+    productNewTitle: 'Новый товар',
+    productPriceLabel: 'Цена',
+    productStockLabel: 'Остаток',
+    productCreateButton: 'Создать',
+    productActiveAtPosCheckbox: 'Активен на кассе',
+    saveLabel: 'Сохранить',
   );
 
   static const BusinessStrings tg = BusinessStrings._(
@@ -980,6 +1183,76 @@ final class BusinessStrings {
     clientNoVisitsDesc: 'Мизоҷ ҳоло дар толор сабт нашудааст.',
     clientNoSalesTitle: 'Харид нест',
     clientNoSalesDesc: 'Ин мизоҷ ҳоло чек надорад.',
+    plansTitle: 'Тарифҳои обуна',
+    plansShowAllButton: 'Ҳамаро нишон додан',
+    plansOnlyActiveButton: 'Танҳо фаъолҳо',
+    plansCreateButton: 'Сохтани тариф',
+    plansLoading: 'Тарифҳо бор мешаванд...',
+    plansEmptyTitle: 'Ҳоло тариф нест',
+    plansEmptyDesc:
+        'Тарифи аввалро созед, то обунаҳоро дар хазина ва барнома фурӯшед.',
+    planStatusActive: 'Фаъол',
+    planStatusArchived: 'Дар бойгонӣ',
+    planArchiveButton: 'Ба бойгонӣ',
+    planActivateButton: 'Фаъол кардан',
+    planKindUnlimited: 'Белимит',
+    planKindVisitsPack: 'Бастаи ташрифҳо',
+    planKindMixed: 'Ташрифҳо + муҳлат',
+    planNewTitle: 'Тарифи нав',
+    planNameLabel: 'Ном',
+    planPriceInCurrencyLabel: 'Нарх бо асъори толор',
+    planKindSectionLabel: 'Навъи тариф',
+    planStartModeSectionLabel: 'Оғози амал',
+    planStartOnPurchase: 'Аз лаҳзаи харид',
+    planStartOnFirstVisit: 'Аз ташрифи аввал',
+    planDurationDaysLabel: 'Давомнокӣ (рӯз)',
+    planVisitsCountLabel: 'Шумораи ташрифҳо',
+    planValidityDaysLabel: 'Муҳлати баста (рӯз, ихтиёрӣ)',
+    planDailyLimitLabel: 'Лимити ташриф дар рӯз (1–100)',
+    planTimeFromLabel: 'Вақт аз (СС:ДД)',
+    planTimeToLabel: 'Вақт то (СС:ДД)',
+    planFreezeDaysLabel: 'Яхбандӣ (рӯз)',
+    planFreezeTimesLabel: 'Яхбандӣ (бор)',
+    planSaveButton: 'Нигоҳ доштани тариф',
+    expiringLoading: 'Обунаҳо бор мешаванд...',
+    expiringEmptyTitle: 'Обунаҳои анҷомёбанда нестанд',
+    expiringEmptyDesc: 'Дар 7 рӯзи оянда обунаи ягон мизоҷ ба охир намерасад.',
+    membershipCancelButton: 'Бекор кардан',
+    membershipCancelDialogTitle: 'Бекор кардани обуна',
+    requestsTitle: 'Дархостҳо барои обуна',
+    requestStatusPending: 'Интизор',
+    requestStatusPaid: 'Пардохтшуда',
+    requestStatusCancelled: 'Бекоршуда',
+    requestStatusExpired: 'Муҳлат гузашта',
+    requestsLoading: 'Дархостҳо бор мешаванд...',
+    requestsEmptyTitle: 'Дархост нест',
+    requestsEmptyDesc:
+        'Дархостҳои нав аз барномаи uGym дар ин ҷо пайдо мешаванд.',
+    requestCancelButton: 'Бекор кардани дархост',
+    requestConfirmPaymentButton: 'Тасдиқи пардохт',
+    reasonOptionalLabel: 'Сабаб (ихтиёрӣ)',
+    confirmLabel: 'Тасдиқ',
+    salesHistoryTitle: 'Таърихи фурӯш',
+    salesLoading: 'Фурӯшҳо бор мешаванд...',
+    salesEmptyTitle: 'Ҳоло фурӯш нест',
+    salesEmptyDesc:
+        'Чекҳои хазина ва дархостҳои пардохтшуда дар ин ҷо пайдо мешаванд.',
+    saleStatusPaid: 'Пардохт шуд',
+    saleRefundButton: 'Бозгашт',
+    saleRefundReasonLabel: 'Сабаби бозгашт',
+    saleConfirmRefundButton: 'Тасдиқи бозгашт',
+    productsTitle: 'Анбори молҳо',
+    productsAddButton: 'Иловаи мол',
+    productsLoading: 'Молҳо бор мешаванд...',
+    productsEmptyTitle: 'Мол нест',
+    productsEmptyDesc: 'Об, нӯшокиҳо ё лавозимотро барои хазина илова кунед.',
+    productEditButton: 'Таҳрир',
+    productNewTitle: 'Моли нав',
+    productPriceLabel: 'Нарх',
+    productStockLabel: 'Боқимонда',
+    productCreateButton: 'Сохтан',
+    productActiveAtPosCheckbox: 'Дар хазина фаъол',
+    saveLabel: 'Нигоҳ доштан',
   );
 
   static const BusinessStrings en = BusinessStrings._(
@@ -1222,6 +1495,75 @@ final class BusinessStrings {
     clientNoVisitsDesc: 'The client has not checked in yet.',
     clientNoSalesTitle: 'No purchases',
     clientNoSalesDesc: 'This client has no receipts yet.',
+    plansTitle: 'Membership plans',
+    plansShowAllButton: 'Show all',
+    plansOnlyActiveButton: 'Active only',
+    plansCreateButton: 'Create plan',
+    plansLoading: 'Loading plans...',
+    plansEmptyTitle: 'No plans yet',
+    plansEmptyDesc:
+        'Create your first plan to sell memberships at POS and in the app.',
+    planStatusActive: 'Active',
+    planStatusArchived: 'Archived',
+    planArchiveButton: 'Archive',
+    planActivateButton: 'Activate',
+    planKindUnlimited: 'Unlimited',
+    planKindVisitsPack: 'Visits pack',
+    planKindMixed: 'Visits + duration',
+    planNewTitle: 'New plan',
+    planNameLabel: 'Name',
+    planPriceInCurrencyLabel: 'Price in gym currency',
+    planKindSectionLabel: 'Plan type',
+    planStartModeSectionLabel: 'Start mode',
+    planStartOnPurchase: 'On purchase',
+    planStartOnFirstVisit: 'On first visit',
+    planDurationDaysLabel: 'Duration (days)',
+    planVisitsCountLabel: 'Number of visits',
+    planValidityDaysLabel: 'Pack validity (days, optional)',
+    planDailyLimitLabel: 'Daily visits limit (1–100)',
+    planTimeFromLabel: 'Window from (HH:MM)',
+    planTimeToLabel: 'Window to (HH:MM)',
+    planFreezeDaysLabel: 'Freeze (days)',
+    planFreezeTimesLabel: 'Freezes (count)',
+    planSaveButton: 'Save plan',
+    expiringLoading: 'Loading memberships...',
+    expiringEmptyTitle: 'No expiring memberships',
+    expiringEmptyDesc:
+        'No client memberships are expiring within the next 7 days.',
+    membershipCancelButton: 'Cancel',
+    membershipCancelDialogTitle: 'Cancel membership',
+    requestsTitle: 'Membership requests',
+    requestStatusPending: 'Pending',
+    requestStatusPaid: 'Paid',
+    requestStatusCancelled: 'Cancelled',
+    requestStatusExpired: 'Expired',
+    requestsLoading: 'Loading requests...',
+    requestsEmptyTitle: 'No requests',
+    requestsEmptyDesc: 'New requests from the uGym app will appear here.',
+    requestCancelButton: 'Cancel request',
+    requestConfirmPaymentButton: 'Confirm payment',
+    reasonOptionalLabel: 'Reason (optional)',
+    confirmLabel: 'Confirm',
+    salesHistoryTitle: 'Sales history',
+    salesLoading: 'Loading sales...',
+    salesEmptyTitle: 'No sales yet',
+    salesEmptyDesc: 'POS receipts and paid requests will appear here.',
+    saleStatusPaid: 'Paid',
+    saleRefundButton: 'Refund',
+    saleRefundReasonLabel: 'Refund reason',
+    saleConfirmRefundButton: 'Confirm refund',
+    productsTitle: 'Product inventory',
+    productsAddButton: 'Add product',
+    productsLoading: 'Loading products...',
+    productsEmptyTitle: 'No products',
+    productsEmptyDesc: 'Add water, shakes, or gear for POS.',
+    productEditButton: 'Edit',
+    productNewTitle: 'New product',
+    productPriceLabel: 'Price',
+    productStockLabel: 'Stock',
+    productCreateButton: 'Create',
+    productActiveAtPosCheckbox: 'Active at POS',
+    saveLabel: 'Save',
   );
 
   static BusinessStrings of(AppLocale locale) {
