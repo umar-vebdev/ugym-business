@@ -78,5 +78,18 @@
 - Статус: принято
 
 
+### D-008 — Обновление дизайн-системы до uCraft Design System 1.1 (UX and Layout Addendum)
+- Дата: 2026-11-19
+- Тип: решение
+- Решение:
+  1) Официальное дополнение **uCraft Design System 1.1 (разделы 25–33)** добавлено в `docs/specs/uCraft_Design_System.md` с сохранением всех токенов v1.0 (разделы 1–24).
+  2) В общий пакет `../ugym_core` добавлены канонические компоненты композиции v1.1 (`UcraftStatusPill`, `UcraftProgressBar`, `UcraftSectionHeader`, `UcraftListRow`, `UcraftListSection`, `UcraftSegmentedTabs`), обновлены `UcraftCardVariant.highlight` (без внешней рамки) и темы `NavigationBarThemeData` / `NavigationRailThemeData`.
+  3) Во всех экранах `uGym Business` действует правило одного hero-элемента, одной основной кнопки (`Primary`), переключения вкладок/фильтров через `UcraftSegmentedTabs`, повторяющихся списков в виде строк `UcraftListSection` с 1dp разделителями и скелетонов загрузки.
+- Причина: единый строгий визуальный ритм, чёткая иерархия внимания и устранение визуального шума от повторяющихся рамочных карточек и множества синих кнопок на одном экране.
+- Затронутые разделы ТЗ: `uCraft_Design_System.md` (разделы 25–33), `B8-01`–`B8-05`
+- Статус: принято
+
+
+
 
 

@@ -1,6 +1,6 @@
 # uGym Business — чек-лист задач
 
-**Текущий этап:** `B7` завершён (все этапы `B0`–`B7` выполнены; готов к релизной сборке на машине с Android SDK / Xcode)
+**Текущий этап:** `B8` — Переход на uCraft Design System 1.1 (UX and Layout Addendum)
 **Статусы:** `[ ]` не начата · `[~]` в работе · `[x]` готова · `[!]` заблокирована (причина в заметках)
 
 ## Правила ведения файла
@@ -58,9 +58,14 @@
 - [x] **B7-02** Расширены `BusinessStrings` и синхронизированы `app_{ru,tg,en}.arb` (+67 ключей, всего 300), локализованы `MembershipTypesScreen`, `CreateMembershipTypeScreen`, `ExpiringMembershipsTab`, `MembershipRequestsQueueTab`, `SalesHistoryTab` и `ProductsScreen` на `ru`/`tg`/`en` + тест в `test/features/memberships/memberships_screens_test.dart`; 123 теста зелёные (`format ✓`, `analyze ✓`, `test ✓`).
 - [x] **B7-03** Расширены `BusinessStrings` и синхронизированы `app_{ru,tg,en}.arb` (+80 ключей, всего 380, 100% паритет), локализованы `TrainersScreen`, `ScheduleTab`, `SessionBookingsScreen`, `StorefrontEditorScreen`, `GymPhotosManager` и `StaffManagementScreen` на `ru`/`tg`/`en` + тест в `test/features/storefront_staff/staff_management_screen_test.dart`; 124 теста зелёные (`format ✓`, `analyze ✓`, `test ✓`).
 - [x] **B7-04** (заметка: на текущей Linux-машине отсутствует Android SDK в `ANDROID_HOME=/home/umar/Android/Sdk`, поэтому запуск `flutter build apk/appbundle` выполняется после установки Android SDK или в CI) Настроена релизная подпись Android в `android/app/build.gradle.kts` (`signingConfigs.create("release")` через `android/key.properties` с безопасным fallback на `debug`), создан шаблон `android/key.properties.example`, добавлены `android/key.properties`, `*.jks`, `*.keystore` в `.gitignore` + тест в `test/core/release_readiness_and_acceptance_test.dart`; 125 тестов зелёные (`format ✓`, `analyze ✓`, `test ✓`).
+- [x] **B8-01** Документация обновлена до **uCraft Design System 1.1**: разделы 25–33 (UX and Layout Addendum) добавлены в `docs/specs/uCraft_Design_System.md`, решение `D-008` записано в `docs/DECISIONS.md`.
 
 ---
 
-## Текущий этап: все запланированные задачи `B0`–`B7` выполнены
+## Текущий этап: `B8` — Переход на **uCraft Design System 1.1**
 
-Все модули ТЗ, дизайн-система uCraft 1.0 (шрифты Inter / Geist Mono, иконки Lucide, Light/Dark, адаптивность), полная локализация (`ru`/`tg`/`en`, 380 ключей ARB) и конфигурация релизной подписи Android завершены.
+- [ ] **B8-02** Реализация общих компонентов и тем v1.1 в `../ugym_core` (`UcraftStatusPill`, `UcraftProgressBar`, `UcraftSectionHeader`, `UcraftListRow`, `UcraftListSection`, `UcraftSegmentedTabs`, обновление `UcraftCardVariant.highlight` и `NavigationBarThemeData`) + тесты в `../ugym_core`.
+- [ ] **B8-03** Применение v1.1 к `BusinessShell` (разделитель нижней панели, `UcraftSegmentedTabs`), `RoleGuard` (`highlight`), `OverviewDashboardView` (единый hero KPI + одна основная CTA + `UcraftListSection`) и `AuthFlowScreen` + тесты.
+- [ ] **B8-04a** Применение v1.1 к CRM клиентов (`ClientsListScreen`, `ClientDetailScreen`) и журналу визитов (`VisitsLogScreen`): строки списка `UcraftListRow`, статусы-пилюли `UcraftStatusPill`, единая основная кнопка, скелетоны.
+- [ ] **B8-04b** Применение v1.1 к тарифам/истекающим (`memberships_screens.dart`), заявкам/продажам (`membership_requests_and_sales_tabs.dart`) и кассе/складу (`pos_and_products_screens.dart`).
+- [ ] **B8-05** Применение v1.1 к тренерам/расписанию (`trainers_screen.dart`, `schedule_tab.dart`), витрине/штату (`storefront_editor_screen.dart`, `staff_management_screen.dart`), аналитике/рассылкам/подписке (`analytics_and_billing_screens.dart`) + пересборка Wi-Fi APK.

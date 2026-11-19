@@ -1,16 +1,13 @@
 # HANDOFF — uGym Business
 
-**Статус:** Этапы `B0`–`B7` полностью завершены (`format ✓`, `analyze ✓`, `test ✓` — **125 тестов**)  
+**Текущий этап:** `B8` — Переход на **uCraft Design System 1.1** (UX and Layout Addendum)  
+**Следующая задача:** `B8-02` — Общие компоненты композиции v1.1 и темы в `../ugym_core`  
 **Репозиторий:** `/home/umar/ugym-mobile/uGym Business` (`main`)
 
 ## Что сделано
-- **B0–B6:** полный функционал по ТЗ (`owner`/`admin`/`trainer`, RBAC, `SUBSCRIPTION_EXPIRED` read-only, идемпотентность, киоск QR + WakeLock + PIN, сканер QR, CRM, тарифы/абонементы, касса `PaymentMark`, расписание/тренеры, витрина + фотогалерея с `image_picker`, аналитика с графиками uCraft, офлайн-шрифты `Inter`/`GeistMono`, иконки `LucideIcons`, адаптивность `<600dp` / `600–839dp` / `>=840dp`).
-- **B7-01, B7-02, B7-03:** полная локализация всех экранов приложения (`ru`/`tg`/`en`) через `BusinessStringsScope` и синхронизированные `app_{ru,tg,en}.arb` (**380 ключей**, 100% паритет).
-- **B7-04:** настроена релизная подпись Android (`android/app/build.gradle.kts` читает `android/key.properties` с безопасным fallback на `debug`, добавлен шаблон `android/key.properties.example`, секреты `android/key.properties`, `*.jks`, `*.keystore` защищены в `.gitignore`).
+- **B0–B7:** завершены полностью (125 тестов зелёные, 380 ключей ARB, Android SDK установлен локально, APK проверен на телефоне по Wi-Fi).
+- **B8-01:** добавлено дополнение uCraft Design System 1.1 (разделы 25–33) в `docs/specs/uCraft_Design_System.md` и решение `D-008` в `docs/DECISIONS.md`.
 
-## Что нужно для финальной сборки релиза
-1. Установить Android SDK (`ANDROID_HOME=/home/umar/Android/Sdk`) или запустить в CI.
-2. Скопировать `android/key.properties.example` → `android/key.properties`, указать keystore и выполнить:
-   - `flutter build appbundle --release --dart-define=FLAVOR=prod` (для Google Play)
-   - `flutter build apk --release --dart-define=FLAVOR=prod` (для прямой установки)
-3. При необходимости отправить локальные коммиты в `origin/main` (`git push`) и аналогично в `../ugym_core`.
+## Следующий шаг (`B8-02`)
+1. Добавить в `../ugym_core` компоненты v1.1 (`UcraftStatusPill`, `UcraftProgressBar`, `UcraftSectionHeader`, `UcraftListRow`, `UcraftListSection`, `UcraftSegmentedTabs`), обновить `UcraftCardVariant.highlight` и `NavigationBarThemeData`.
+2. Написать тесты в `../ugym_core`, прогнать `format`/`analyze`/`test` и закоммитить в `../ugym_core`.
