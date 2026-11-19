@@ -46,6 +46,8 @@ enum _OperationsSubTab { visits, requests, sales, products, schedule, trainers }
 
 enum _MoreSubTab { settings, storefront, staff, announcements, billing }
 
+enum _ScanNavigationAction { openPayments, openClients }
+
 /// Adaptive role-aware navigation shell (BottomBar on phones, Rail on tablets).
 final class BusinessShell extends StatefulWidget {
   const BusinessShell({
@@ -706,6 +708,7 @@ final class _BusinessShellState extends State<BusinessShell> {
         builder: (_) => PosCheckoutScreen(
           salesRepository: salesRepo,
           membershipsRepository: membershipsRepo,
+          sessionController: widget.sessionController,
         ),
       ),
     );
@@ -950,21 +953,60 @@ final class _BusinessShellState extends State<BusinessShell> {
     ReceptionVisitsRepository visitsRepo,
     int gymId,
   ) async {
+    final salesRepo = widget.salesRepository;
+    final membershipsRepo = widget.membershipsRepository;
+    final bool canOpenPayments =
+        salesRepo != null &&
+        membershipsRepo != null &&
+        widget.sessionController.canMutate(
+          BusinessPermission.manageMembershipRequestsAndSales,
+        );
+    final bool canOpenClients =
+        widget.clientsRepository != null &&
+        widget.sessionController.canView(BusinessPermission.manageClientsCrm);
+
     final scanController = ReceptionScanController(
       repository: visitsRepo,
       gymId: gymId,
     );
+    _ScanNavigationAction? action;
     try {
-      await Navigator.of(context).push<void>(
-        MaterialPageRoute<void>(
-          builder: (_) => ScanClientQrScreen(
+      action = await Navigator.of(context).push<_ScanNavigationAction>(
+        MaterialPageRoute<_ScanNavigationAction>(
+          builder: (scannerContext) => ScanClientQrScreen(
             controller: scanController,
             scannerBuilder: widget.qrScannerBuilder,
+            onOpenPayments: canOpenPayments
+                ? () =>
+                      Navigator.of(scannerContext)
+                          .pop(_ScanNavigationAction.openPayments)
+                : null,
+            onOpenClients: canOpenClients
+                ? () =>
+                      Navigator.of(scannerContext)
+                          .pop(_ScanNavigationAction.openClients)
+                : null,
           ),
         ),
       );
     } finally {
       scanController.dispose();
+    }
+
+    if (!context.mounted || !mounted || action == null) {
+      return;
+    }
+
+    switch (action) {
+      case _ScanNavigationAction.openPayments:
+        if (salesRepo != null && membershipsRepo != null) {
+          await _openPosCheckout(context, salesRepo, membershipsRepo);
+        }
+      case _ScanNavigationAction.openClients:
+        setState(() {
+          _selected = BusinessDestination.members;
+          _membersTab = _MembersSubTab.clients;
+        });
     }
   }
 

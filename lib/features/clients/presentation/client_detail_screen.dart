@@ -107,6 +107,7 @@ final class _ClientDetailScreenState extends State<ClientDetailScreen> {
         builder: (_) => PosCheckoutScreen(
           salesRepository: widget.salesRepository,
           membershipsRepository: widget.membershipsRepository,
+          sessionController: widget.sessionController,
           initialClientId: widget.client.id,
         ),
       ),

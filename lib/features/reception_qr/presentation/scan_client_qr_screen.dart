@@ -13,12 +13,14 @@ final class ScanClientQrScreen extends StatelessWidget {
     required this.controller,
     this.scannerBuilder = buildMobileQrScanner,
     this.onOpenClient,
+    this.onOpenClients,
     this.onOpenPayments,
   });
 
   final ReceptionScanController controller;
   final QrScannerBuilder scannerBuilder;
   final void Function(int clientId)? onOpenClient;
+  final VoidCallback? onOpenClients;
   final VoidCallback? onOpenPayments;
 
   @override
@@ -95,6 +97,11 @@ final class ScanClientQrScreen extends StatelessWidget {
     final colors = context.ucraftColors;
     final error = controller.error!;
     final bool needsPayment = error.code == 'NO_ACTIVE_MEMBERSHIP';
+    final bool isMembershipRefusal =
+        error.code == 'NO_ACTIVE_MEMBERSHIP' ||
+        error.code == 'MEMBERSHIP_FROZEN' ||
+        error.code == 'DAILY_LIMIT_EXCEEDED' ||
+        error.code == 'OUTSIDE_ALLOWED_TIME';
     return _ResultPanel(
       icon: Icons.block,
       iconColor: colors.destructive,
@@ -107,6 +114,13 @@ final class ScanClientQrScreen extends StatelessWidget {
             label: 'Принять оплату',
             fullWidth: true,
             onPressed: onOpenPayments,
+          ),
+        if (isMembershipRefusal && onOpenClients != null)
+          UcraftButton(
+            label: 'Открыть клиентов',
+            variant: UcraftButtonVariant.secondary,
+            fullWidth: true,
+            onPressed: onOpenClients,
           ),
         UcraftButton(
           label: 'Сканировать следующего',

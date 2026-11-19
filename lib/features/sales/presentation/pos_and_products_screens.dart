@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:material_ui/material_ui.dart';
 import 'package:ugym_core/ugym_core.dart';
 
+import '../../../core/router/role_guard_and_banners.dart';
 import '../../../core/session/business_role.dart';
 import '../../../core/session/business_session_controller.dart';
 import '../../memberships/domain/memberships_models.dart';
@@ -15,6 +16,7 @@ final class PosCheckoutScreen extends StatefulWidget {
     super.key,
     required this.salesRepository,
     required this.membershipsRepository,
+    this.sessionController,
     this.initialClientId,
     this.idempotencyKeyGenerator,
     this.onSaleCompleted,
@@ -22,6 +24,7 @@ final class PosCheckoutScreen extends StatefulWidget {
 
   final SalesAndRequestsRepository salesRepository;
   final MembershipsRepository membershipsRepository;
+  final BusinessSessionController? sessionController;
   final int? initialClientId;
   final String Function()? idempotencyKeyGenerator;
   final void Function(SaleRecord sale)? onSaleCompleted;
@@ -126,8 +129,10 @@ final class _PosCheckoutScreenState extends State<PosCheckoutScreen> {
     return 'TJS';
   }
 
+  bool get _isReadOnly => widget.sessionController?.isReadOnly ?? false;
+
   Future<void> _submit() async {
-    if (_submitting) {
+    if (_submitting || _isReadOnly) {
       return;
     }
 
@@ -208,9 +213,22 @@ final class _PosCheckoutScreenState extends State<PosCheckoutScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final session = widget.sessionController;
+    if (session != null) {
+      return ListenableBuilder(
+        listenable: session,
+        builder: (context, _) => _buildScaffold(context),
+      );
+    }
+    return _buildScaffold(context);
+  }
+
+  Widget _buildScaffold(BuildContext context) {
     final colors = context.ucraftColors;
     final totalFormatted = (_totalMinor() / 100).toStringAsFixed(2);
     final currency = _currencyLabel();
+    final session = widget.sessionController;
+    final isReadOnly = _isReadOnly;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Касса')),
@@ -228,11 +246,17 @@ final class _PosCheckoutScreenState extends State<PosCheckoutScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    if (session != null) ...[
+                      SubscriptionReadOnlyBanner(controller: session),
+                      if (isReadOnly)
+                        const SizedBox(height: UcraftSpacing.space3),
+                    ],
                     UcraftTextField(
                       controller: _clientIdController,
                       label: 'ID клиента (обязателен для абонемента)',
                       hintText: 'Например, 11',
                       keyboardType: TextInputType.number,
+                      enabled: !isReadOnly && !_submitting,
                       onChanged: (_) => _pendingKey = null,
                     ),
                     const SizedBox(height: UcraftSpacing.space4),
@@ -395,7 +419,7 @@ final class _PosCheckoutScreenState extends State<PosCheckoutScreen> {
                       label: 'Провести продажу',
                       fullWidth: true,
                       isLoading: _submitting,
-                      onPressed: _submitting
+                      onPressed: _submitting || isReadOnly
                           ? null
                           : () => unawaited(_submit()),
                     ),
