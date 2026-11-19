@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:ugym_business/core/l10n/business_localizations.dart';
 import 'package:ugym_business/core/session/business_role.dart';
 import 'package:ugym_business/core/session/business_session_controller.dart';
 import 'package:ugym_business/core/storage/app_preferences.dart';
@@ -198,6 +199,66 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(openedExisting?.id, 1);
+    },
+  );
+
+  testWidgets(
+    'ClientsListScreen and CreateClientSheet render localized labels in tg and en',
+    (tester) async {
+      final repo = _FakeClientsRepository();
+      final session = BusinessSessionController(
+        preferences: AppPreferences(storage: InMemoryTokenStorage()),
+        initialRole: BusinessRole.owner,
+      );
+      addTearDown(session.dispose);
+
+      // Tajik
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: UcraftTheme.light(),
+          home: BusinessStringsScope(
+            strings: BusinessStrings.tg,
+            child: Scaffold(
+              body: SingleChildScrollView(
+                child: ClientsListScreen(
+                  repository: repo,
+                  sessionController: session,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Иловаи мизоҷ'), findsOneWidget);
+      expect(find.text('Муттаҳид кардани такрорҳо'), findsOneWidget);
+      expect(find.text('Ба uGym пайваст'), findsOneWidget);
+      expect(find.text('Корти офлайн'), findsOneWidget);
+
+      // English
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: UcraftTheme.light(),
+          home: BusinessStringsScope(
+            strings: BusinessStrings.en,
+            child: Scaffold(
+              body: SingleChildScrollView(
+                child: ClientsListScreen(
+                  repository: repo,
+                  sessionController: session,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Add client'), findsOneWidget);
+      expect(find.text('Merge duplicates'), findsOneWidget);
+      expect(find.text('Linked to uGym'), findsOneWidget);
+      expect(find.text('Offline profile'), findsOneWidget);
     },
   );
 }

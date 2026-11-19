@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:material_ui/material_ui.dart';
 import 'package:ugym_core/ugym_core.dart';
 
+import '../../../core/l10n/business_localizations.dart';
 import '../../../core/session/business_role.dart';
 import '../../../core/session/business_session_controller.dart';
 import '../domain/clients_models.dart';
@@ -138,6 +139,7 @@ final class _ClientsListScreenState extends State<ClientsListScreen> {
       listenable: widget.sessionController,
       builder: (context, _) {
         final colors = context.ucraftColors;
+        final strings = BusinessStringsScope.of(context);
         final canMutate = widget.sessionController.canMutate(
           BusinessPermission.manageClientsCrm,
         );
@@ -155,7 +157,7 @@ final class _ClientsListScreenState extends State<ClientsListScreen> {
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 Text(
-                  'Клиенты',
+                  strings.subTabClients,
                   style: UcraftTypography.title.copyWith(
                     color: colors.foreground,
                   ),
@@ -165,12 +167,12 @@ final class _ClientsListScreenState extends State<ClientsListScreen> {
                   children: [
                     if (canMerge)
                       UcraftButton(
-                        label: 'Объединить дубли',
+                        label: strings.clientsMergeDuplicatesButton,
                         variant: UcraftButtonVariant.secondary,
                         onPressed: () => unawaited(_openMergeDialog()),
                       ),
                     UcraftButton(
-                      label: 'Добавить клиента',
+                      label: strings.clientsAddButton,
                       onPressed: canMutate
                           ? () => unawaited(_openCreateClient())
                           : null,
@@ -185,14 +187,14 @@ final class _ClientsListScreenState extends State<ClientsListScreen> {
                 Expanded(
                   child: UcraftTextField(
                     controller: _searchController,
-                    label: 'Поиск',
-                    hintText: 'Имя, телефон или email',
+                    label: strings.clientsSearchLabel,
+                    hintText: strings.clientsSearchHint,
                     onSubmitted: (_) => unawaited(_loadClients(reset: true)),
                   ),
                 ),
                 const SizedBox(width: UcraftSpacing.space2),
                 UcraftButton(
-                  label: 'Найти',
+                  label: strings.clientsFindButton,
                   variant: UcraftButtonVariant.secondary,
                   onPressed: _loading
                       ? null
@@ -202,17 +204,18 @@ final class _ClientsListScreenState extends State<ClientsListScreen> {
             ),
             const SizedBox(height: UcraftSpacing.space3),
             if (_loading)
-              const UcraftLoadingState(message: 'Загружаем клиентов...')
+              UcraftLoadingState(message: strings.clientsLoading)
             else if (_errorMessage != null && _clients.isEmpty)
               UcraftErrorState(
-                title: 'Ошибка загрузки',
+                title: strings.posLoadErrorTitle,
                 message: _errorMessage!,
+                retryLabel: strings.retryLabel,
                 onRetry: () => unawaited(_loadClients(reset: true)),
               )
             else if (_clients.isEmpty)
-              const UcraftEmptyState(
-                title: 'Клиенты не найдены',
-                description: 'Измените запрос поиска или зарегистрируйте нового клиента.',
+              UcraftEmptyState(
+                title: strings.clientsEmptyTitle,
+                description: strings.clientsEmptyDesc,
               )
             else
               Column(
@@ -229,7 +232,7 @@ final class _ClientsListScreenState extends State<ClientsListScreen> {
                   ],
                   if (_hasMore)
                     UcraftButton(
-                      label: 'Показать ещё',
+                      label: strings.clientsShowMoreButton,
                       variant: UcraftButtonVariant.secondary,
                       isLoading: _loadingMore,
                       fullWidth: true,
@@ -255,6 +258,7 @@ final class _ClientCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.ucraftColors;
+    final strings = BusinessStringsScope.of(context);
     return UcraftCard(
       child: InkWell(
         onTap: onTap,
@@ -272,7 +276,9 @@ final class _ClientCard extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  client.linked ? 'Привязан к uGym' : 'Оффлайн-карточка',
+                  client.linked
+                      ? strings.clientLinkedBadge
+                      : strings.clientOfflineBadge,
                   style: UcraftTypography.caption.copyWith(
                     color: client.linked
                         ? colors.success
@@ -449,6 +455,7 @@ final class _CreateClientSheetState extends State<CreateClientSheet> {
   @override
   Widget build(BuildContext context) {
     final colors = context.ucraftColors;
+    final strings = BusinessStringsScope.of(context);
 
     return SafeArea(
       child: SingleChildScrollView(
@@ -458,20 +465,19 @@ final class _CreateClientSheetState extends State<CreateClientSheet> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              'Новый клиент',
+              strings.clientNewSheetTitle,
               style: UcraftTypography.title.copyWith(color: colors.foreground),
             ),
             const SizedBox(height: UcraftSpacing.space4),
             UcraftTextField(
               controller: _nameController,
-              label: 'Имя',
-              hintText: 'Например, Фарход',
+              label: strings.clientNameLabel,
               errorText: _nameError,
             ),
             const SizedBox(height: UcraftSpacing.space3),
             UcraftTextField(
               controller: _phoneController,
-              label: 'Телефон',
+              label: strings.clientPhoneLabel,
               hintText: '+992900001122',
               keyboardType: TextInputType.phone,
               errorText: _phoneError,
@@ -479,13 +485,13 @@ final class _CreateClientSheetState extends State<CreateClientSheet> {
             const SizedBox(height: UcraftSpacing.space3),
             UcraftTextField(
               controller: _emailController,
-              label: 'Email (необязательно)',
+              label: strings.clientEmailOptionalLabel,
               hintText: 'client@example.com',
               keyboardType: TextInputType.emailAddress,
             ),
             const SizedBox(height: UcraftSpacing.space2),
             Text(
-              'Если клиент подтвердит этот email в приложении uGym, карточка и абонемент привяжутся автоматически.',
+              strings.clientAutoLinkHint,
               style: UcraftTypography.caption.copyWith(
                 color: colors.foregroundSecondary,
               ),
@@ -502,7 +508,7 @@ final class _CreateClientSheetState extends State<CreateClientSheet> {
             if (_phoneConflict && widget.onOpenExistingClient != null) ...[
               const SizedBox(height: UcraftSpacing.space3),
               UcraftButton(
-                label: 'Открыть существующую карточку',
+                label: strings.clientOpenExistingButton,
                 variant: UcraftButtonVariant.secondary,
                 fullWidth: true,
                 isLoading: _openingExisting,
@@ -513,7 +519,7 @@ final class _CreateClientSheetState extends State<CreateClientSheet> {
             ],
             const SizedBox(height: UcraftSpacing.space4),
             UcraftButton(
-              label: 'Создать клиента',
+              label: strings.clientCreateButton,
               fullWidth: true,
               isLoading: _submitting,
               onPressed: _submitting ? null : () => unawaited(_submit()),
@@ -598,25 +604,24 @@ final class _MergeClientsDialogState extends State<_MergeClientsDialog> {
   @override
   Widget build(BuildContext context) {
     final colors = context.ucraftColors;
+    final strings = BusinessStringsScope.of(context);
     return AlertDialog(
-      title: const Text('Объединить дубли'),
+      title: Text(strings.clientsMergeDuplicatesButton),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text(
-            'Абонементы, визиты и чеки исходного клиента будут перенесены в целевую карточку.',
-          ),
+          Text(strings.clientMergeDesc),
           const SizedBox(height: UcraftSpacing.space3),
           UcraftTextField(
             controller: _sourceController,
-            label: 'ID дубля (source_id)',
+            label: 'ID (source_id)',
             keyboardType: TextInputType.number,
           ),
           const SizedBox(height: UcraftSpacing.space3),
           UcraftTextField(
             controller: _targetController,
-            label: 'ID основной карточки (target_id)',
+            label: 'ID (target_id)',
             keyboardType: TextInputType.number,
           ),
           if (_errorText != null) ...[
@@ -635,10 +640,10 @@ final class _MergeClientsDialogState extends State<_MergeClientsDialog> {
           onPressed: _submitting
               ? null
               : () => Navigator.of(context).pop(false),
-          child: const Text('Отмена'),
+          child: Text(strings.cancelLabel),
         ),
         UcraftButton(
-          label: 'Подтвердить слияние',
+          label: strings.clientMergeConfirmButton,
           variant: UcraftButtonVariant.destructive,
           isLoading: _submitting,
           onPressed: _submitting ? null : () => unawaited(_confirmAndMerge()),

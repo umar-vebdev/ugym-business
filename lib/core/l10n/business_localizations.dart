@@ -193,6 +193,72 @@ final class BusinessStrings {
     required this.billingStatusTrial,
     required this.billingStatusActive,
     required this.billingStatusExpired,
+    required this.onboardingTitle,
+    required this.onboardingSubtitle,
+    required this.onboardingCompanyNameLabel,
+    required this.onboardingGymNameLabel,
+    required this.onboardingGymAddressLabel,
+    required this.branchesAddTitle,
+    required this.branchesEditTitle,
+    required this.branchesNameLabel,
+    required this.branchesAddressLabel,
+    required this.branchesGeoCheckSwitch,
+    required this.branchesGeoRadiusLabel,
+    required this.branchesNoGeofence,
+    required this.branchesSaveChangesButton,
+    required this.companyCurrencyTitle,
+    required this.visitsLogTitle,
+    required this.visitsManualButton,
+    required this.visitsSelectBranchHint,
+    required this.visitsLoading,
+    required this.visitsEmptyTitle,
+    required this.visitsEmptyDesc,
+    required this.visitStatusCancelled,
+    required this.visitStatusCompleted,
+    required this.visitCancelButton,
+    required this.visitMethodGymQr,
+    required this.visitMethodClientQr,
+    required this.visitManualSheetTitle,
+    required this.visitClientIdLabel,
+    required this.visitBackdatedCheckbox,
+    required this.visitDateTimeLabel,
+    required this.visitSubmitButton,
+    required this.visitCancelReasonLabel,
+    required this.visitConfirmCancelButton,
+    required this.backLabel,
+    required this.clientsMergeDuplicatesButton,
+    required this.clientsAddButton,
+    required this.clientsSearchLabel,
+    required this.clientsSearchHint,
+    required this.clientsFindButton,
+    required this.clientsLoading,
+    required this.clientsEmptyTitle,
+    required this.clientsEmptyDesc,
+    required this.clientsShowMoreButton,
+    required this.clientLinkedBadge,
+    required this.clientOfflineBadge,
+    required this.clientNewSheetTitle,
+    required this.clientNameLabel,
+    required this.clientPhoneLabel,
+    required this.clientEmailOptionalLabel,
+    required this.clientAutoLinkHint,
+    required this.clientOpenExistingButton,
+    required this.clientCreateButton,
+    required this.clientMergeDesc,
+    required this.clientMergeConfirmButton,
+    required this.clientSellCta,
+    required this.clientTabVisits,
+    required this.clientTabSales,
+    required this.clientDetailLoading,
+    required this.clientNoMembershipsTitle,
+    required this.clientNoMembershipsDesc,
+    required this.clientFreezeButton,
+    required this.clientUnfreezeButton,
+    required this.clientManualCheckInButton,
+    required this.clientNoVisitsTitle,
+    required this.clientNoVisitsDesc,
+    required this.clientNoSalesTitle,
+    required this.clientNoSalesDesc,
   });
 
   final String appTitle;
@@ -362,6 +428,72 @@ final class BusinessStrings {
   final String billingStatusTrial;
   final String billingStatusActive;
   final String billingStatusExpired;
+  final String onboardingTitle;
+  final String onboardingSubtitle;
+  final String onboardingCompanyNameLabel;
+  final String onboardingGymNameLabel;
+  final String onboardingGymAddressLabel;
+  final String branchesAddTitle;
+  final String branchesEditTitle;
+  final String branchesNameLabel;
+  final String branchesAddressLabel;
+  final String branchesGeoCheckSwitch;
+  final String branchesGeoRadiusLabel;
+  final String branchesNoGeofence;
+  final String branchesSaveChangesButton;
+  final String companyCurrencyTitle;
+  final String visitsLogTitle;
+  final String visitsManualButton;
+  final String visitsSelectBranchHint;
+  final String visitsLoading;
+  final String visitsEmptyTitle;
+  final String visitsEmptyDesc;
+  final String visitStatusCancelled;
+  final String visitStatusCompleted;
+  final String visitCancelButton;
+  final String visitMethodGymQr;
+  final String visitMethodClientQr;
+  final String visitManualSheetTitle;
+  final String visitClientIdLabel;
+  final String visitBackdatedCheckbox;
+  final String visitDateTimeLabel;
+  final String visitSubmitButton;
+  final String visitCancelReasonLabel;
+  final String visitConfirmCancelButton;
+  final String backLabel;
+  final String clientsMergeDuplicatesButton;
+  final String clientsAddButton;
+  final String clientsSearchLabel;
+  final String clientsSearchHint;
+  final String clientsFindButton;
+  final String clientsLoading;
+  final String clientsEmptyTitle;
+  final String clientsEmptyDesc;
+  final String clientsShowMoreButton;
+  final String clientLinkedBadge;
+  final String clientOfflineBadge;
+  final String clientNewSheetTitle;
+  final String clientNameLabel;
+  final String clientPhoneLabel;
+  final String clientEmailOptionalLabel;
+  final String clientAutoLinkHint;
+  final String clientOpenExistingButton;
+  final String clientCreateButton;
+  final String clientMergeDesc;
+  final String clientMergeConfirmButton;
+  final String clientSellCta;
+  final String clientTabVisits;
+  final String clientTabSales;
+  final String clientDetailLoading;
+  final String clientNoMembershipsTitle;
+  final String clientNoMembershipsDesc;
+  final String clientFreezeButton;
+  final String clientUnfreezeButton;
+  final String clientManualCheckInButton;
+  final String clientNoVisitsTitle;
+  final String clientNoVisitsDesc;
+  final String clientNoSalesTitle;
+  final String clientNoSalesDesc;
 
   static const BusinessStrings ru = BusinessStrings._(
     appTitle: 'uGym Business',
@@ -536,6 +668,75 @@ final class BusinessStrings {
     billingStatusTrial: 'Пробный период (trial)',
     billingStatusActive: 'Активна (active)',
     billingStatusExpired: 'Истекла (expired)',
+    onboardingTitle: 'Создание компании (14 дней бесплатно)',
+    onboardingSubtitle: 'Укажите название компании и первого филиала — пробный период активируется автоматически.',
+    onboardingCompanyNameLabel: 'Название компании',
+    onboardingGymNameLabel: 'Название первого зала',
+    onboardingGymAddressLabel: 'Адрес зала (необязательно)',
+    branchesAddTitle: 'Добавить филиал',
+    branchesEditTitle: 'Редактировать зал',
+    branchesNameLabel: 'Название филиала',
+    branchesAddressLabel: 'Адрес филиала',
+    branchesGeoCheckSwitch: 'Проверять геозону при чекине',
+    branchesGeoRadiusLabel: 'Радиус геозоны (50–5000 м)',
+    branchesNoGeofence: 'Без геозоны',
+    branchesSaveChangesButton: 'Сохранить изменения',
+    companyCurrencyTitle: 'Валюта компании',
+    visitsLogTitle: 'Журнал визитов',
+    visitsManualButton: 'Ручная отметка',
+    visitsSelectBranchHint: 'Выберите филиал для ручной отметки посещения.',
+    visitsLoading: 'Загружаем визиты...',
+    visitsEmptyTitle: 'Визитов пока нет',
+    visitsEmptyDesc:
+        'Отметки по QR-коду и ручные визиты появятся в этом списке.',
+    visitStatusCancelled: 'Отменён',
+    visitStatusCompleted: 'Завершён',
+    visitCancelButton: 'Отменить визит',
+    visitMethodGymQr: 'QR зала',
+    visitMethodClientQr: 'QR клиента',
+    visitManualSheetTitle: 'Ручная отметка визита',
+    visitClientIdLabel: 'ID клиента',
+    visitBackdatedCheckbox: 'Отметить задним числом',
+    visitDateTimeLabel: 'Дата и время визита (+05:00)',
+    visitSubmitButton: 'Отметить посещение',
+    visitCancelReasonLabel: 'Причина отмены',
+    visitConfirmCancelButton: 'Подтвердить отмену',
+    backLabel: 'Назад',
+    clientsMergeDuplicatesButton: 'Объединить дубли',
+    clientsAddButton: 'Добавить клиента',
+    clientsSearchLabel: 'Поиск',
+    clientsSearchHint: 'Имя, телефон или email',
+    clientsFindButton: 'Найти',
+    clientsLoading: 'Загружаем клиентов...',
+    clientsEmptyTitle: 'Клиенты не найдены',
+    clientsEmptyDesc:
+        'Измените запрос поиска или зарегистрируйте нового клиента.',
+    clientsShowMoreButton: 'Показать ещё',
+    clientLinkedBadge: 'Привязан к uGym',
+    clientOfflineBadge: 'Оффлайн-карточка',
+    clientNewSheetTitle: 'Новый клиент',
+    clientNameLabel: 'Имя',
+    clientPhoneLabel: 'Телефон',
+    clientEmailOptionalLabel: 'Email (необязательно)',
+    clientAutoLinkHint: 'Если клиент подтвердит этот email в приложении uGym, карточка и абонемент привяжутся автоматически.',
+    clientOpenExistingButton: 'Открыть существующую карточку',
+    clientCreateButton: 'Создать клиента',
+    clientMergeDesc: 'Абонементы, визиты и чеки исходного клиента будут перенесены в целевую карточку.',
+    clientMergeConfirmButton: 'Подтвердить слияние',
+    clientSellCta: 'Продать абонемент / товар',
+    clientTabVisits: 'Посещения',
+    clientTabSales: 'Покупки/Чеки',
+    clientDetailLoading: 'Загружаем данные клиента...',
+    clientNoMembershipsTitle: 'Абонементов нет',
+    clientNoMembershipsDesc:
+        'У этого клиента пока нет оформленных абонементов.',
+    clientFreezeButton: 'Заморозить',
+    clientUnfreezeButton: 'Разморозить',
+    clientManualCheckInButton: 'Отметить вручную',
+    clientNoVisitsTitle: 'Посещений нет',
+    clientNoVisitsDesc: 'Клиент ещё не отмечался в зале.',
+    clientNoSalesTitle: 'Покупок нет',
+    clientNoSalesDesc: 'У этого клиента пока нет чеков.',
   );
 
   static const BusinessStrings tg = BusinessStrings._(
@@ -711,6 +912,74 @@ final class BusinessStrings {
     billingStatusTrial: 'Давраи озмоишӣ (trial)',
     billingStatusActive: 'Фаъол (active)',
     billingStatusExpired: 'Ба охир расид (expired)',
+    onboardingTitle: 'Сохтани ширкат (14 рӯз ройгон)',
+    onboardingSubtitle: 'Номи ширкат ва филиали аввалро ворид кунед — давраи озмоишӣ худкор фаъол мешавад.',
+    onboardingCompanyNameLabel: 'Номи ширкат',
+    onboardingGymNameLabel: 'Номи толори аввал',
+    onboardingGymAddressLabel: 'Суроғаи толор (ихтиёрӣ)',
+    branchesAddTitle: 'Иловаи филиал',
+    branchesEditTitle: 'Таҳрири толор',
+    branchesNameLabel: 'Номи филиал',
+    branchesAddressLabel: 'Суроғаи филиал',
+    branchesGeoCheckSwitch: 'Санҷиши минтақаи GPS ҳангоми вуруд',
+    branchesGeoRadiusLabel: 'Радиуси минтақа (50–5000 м)',
+    branchesNoGeofence: 'Бе минтақа',
+    branchesSaveChangesButton: 'Нигоҳ доштани тағйирот',
+    companyCurrencyTitle: 'Асъори ширкат',
+    visitsLogTitle: 'Рӯйхати ташрифҳо',
+    visitsManualButton: 'Сабти дастӣ',
+    visitsSelectBranchHint: 'Барои сабти дастии ташриф филиалро интихоб кунед.',
+    visitsLoading: 'Ташрифҳо бор мешаванд...',
+    visitsEmptyTitle: 'Ҳоло ташриф нест',
+    visitsEmptyDesc: 'Ташрифҳои QR ва дастӣ дар ин рӯйхат пайдо мешаванд.',
+    visitStatusCancelled: 'Бекор шуд',
+    visitStatusCompleted: 'Анҷом ёфт',
+    visitCancelButton: 'Бекор кардани ташриф',
+    visitMethodGymQr: 'QR толор',
+    visitMethodClientQr: 'QR мизоҷ',
+    visitManualSheetTitle: 'Сабти дастии ташриф',
+    visitClientIdLabel: 'ID мизоҷ',
+    visitBackdatedCheckbox: 'Бо санаи гузашта сабт кардан',
+    visitDateTimeLabel: 'Сана ва вақти ташриф (+05:00)',
+    visitSubmitButton: 'Сабти ташриф',
+    visitCancelReasonLabel: 'Сабаби бекоркунӣ',
+    visitConfirmCancelButton: 'Тасдиқи бекоркунӣ',
+    backLabel: 'Бозгашт',
+    clientsMergeDuplicatesButton: 'Муттаҳид кардани такрорҳо',
+    clientsAddButton: 'Иловаи мизоҷ',
+    clientsSearchLabel: 'Ҷустуҷӯ',
+    clientsSearchHint: 'Ном, телефон ё email',
+    clientsFindButton: 'Ёфтан',
+    clientsLoading: 'Мизоҷон бор мешаванд...',
+    clientsEmptyTitle: 'Мизоҷон ёфт нашуданд',
+    clientsEmptyDesc:
+        'Дархости ҷустуҷӯро тағйир диҳед ё мизоҷи нав сабт кунед.',
+    clientsShowMoreButton: 'Бештар нишон додан',
+    clientLinkedBadge: 'Ба uGym пайваст',
+    clientOfflineBadge: 'Корти офлайн',
+    clientNewSheetTitle: 'Мизоҷи нав',
+    clientNameLabel: 'Ном',
+    clientPhoneLabel: 'Телефон',
+    clientEmailOptionalLabel: 'Email (ихтиёрӣ)',
+    clientAutoLinkHint: 'Агар мизоҷ ин email-ро дар барномаи uGym тасдиқ кунад, корт ва обуна худкор пайваст мешаванд.',
+    clientOpenExistingButton: 'Кушодани корти мавҷуда',
+    clientCreateButton: 'Сохтани мизоҷ',
+    clientMergeDesc:
+        'Обунаҳо, ташрифҳо ва чекҳои мизоҷи аввал ба корти асосӣ мегузаранд.',
+    clientMergeConfirmButton: 'Тасдиқи муттаҳидкунӣ',
+    clientSellCta: 'Фурӯши обуна / мол',
+    clientTabVisits: 'Ташрифҳо',
+    clientTabSales: 'Харидҳо/Чекҳо',
+    clientDetailLoading: 'Маълумоти мизоҷ бор мешавад...',
+    clientNoMembershipsTitle: 'Обуна нест',
+    clientNoMembershipsDesc: 'Ин мизоҷ ҳоло обунаи фаъол надорад.',
+    clientFreezeButton: 'Яхбандӣ',
+    clientUnfreezeButton: 'Кушодан',
+    clientManualCheckInButton: 'Сабти дастӣ',
+    clientNoVisitsTitle: 'Ташриф нест',
+    clientNoVisitsDesc: 'Мизоҷ ҳоло дар толор сабт нашудааст.',
+    clientNoSalesTitle: 'Харид нест',
+    clientNoSalesDesc: 'Ин мизоҷ ҳоло чек надорад.',
   );
 
   static const BusinessStrings en = BusinessStrings._(
@@ -887,6 +1156,72 @@ final class BusinessStrings {
     billingStatusTrial: 'Trial period (trial)',
     billingStatusActive: 'Active (active)',
     billingStatusExpired: 'Expired (expired)',
+    onboardingTitle: 'Create company (14-day free trial)',
+    onboardingSubtitle: 'Enter your company and first gym name — the 14-day trial starts automatically.',
+    onboardingCompanyNameLabel: 'Company name',
+    onboardingGymNameLabel: 'First gym name',
+    onboardingGymAddressLabel: 'Gym address (optional)',
+    branchesAddTitle: 'Add branch',
+    branchesEditTitle: 'Edit branch',
+    branchesNameLabel: 'Branch name',
+    branchesAddressLabel: 'Branch address',
+    branchesGeoCheckSwitch: 'Check geofence on check-in',
+    branchesGeoRadiusLabel: 'Geofence radius (50–5000 m)',
+    branchesNoGeofence: 'No geofence',
+    branchesSaveChangesButton: 'Save changes',
+    companyCurrencyTitle: 'Company currency',
+    visitsLogTitle: 'Visits log',
+    visitsManualButton: 'Manual check-in',
+    visitsSelectBranchHint: 'Select a branch for manual check-in.',
+    visitsLoading: 'Loading visits...',
+    visitsEmptyTitle: 'No visits yet',
+    visitsEmptyDesc: 'QR and manual check-ins will appear here.',
+    visitStatusCancelled: 'Cancelled',
+    visitStatusCompleted: 'Completed',
+    visitCancelButton: 'Cancel visit',
+    visitMethodGymQr: 'Gym QR',
+    visitMethodClientQr: 'Client QR',
+    visitManualSheetTitle: 'Manual visit check-in',
+    visitClientIdLabel: 'Client ID',
+    visitBackdatedCheckbox: 'Backdate visit',
+    visitDateTimeLabel: 'Visit date & time (+05:00)',
+    visitSubmitButton: 'Record visit',
+    visitCancelReasonLabel: 'Cancellation reason',
+    visitConfirmCancelButton: 'Confirm cancellation',
+    backLabel: 'Back',
+    clientsMergeDuplicatesButton: 'Merge duplicates',
+    clientsAddButton: 'Add client',
+    clientsSearchLabel: 'Search',
+    clientsSearchHint: 'Name, phone or email',
+    clientsFindButton: 'Find',
+    clientsLoading: 'Loading clients...',
+    clientsEmptyTitle: 'No clients found',
+    clientsEmptyDesc: 'Adjust your search or register a new client.',
+    clientsShowMoreButton: 'Load more',
+    clientLinkedBadge: 'Linked to uGym',
+    clientOfflineBadge: 'Offline profile',
+    clientNewSheetTitle: 'New client',
+    clientNameLabel: 'Name',
+    clientPhoneLabel: 'Phone',
+    clientEmailOptionalLabel: 'Email (optional)',
+    clientAutoLinkHint: 'If the client verifies this email in uGym, their profile and membership link automatically.',
+    clientOpenExistingButton: 'Open existing profile',
+    clientCreateButton: 'Create client',
+    clientMergeDesc: 'Memberships, visits, and receipts from the source client will move to the target profile.',
+    clientMergeConfirmButton: 'Confirm merge',
+    clientSellCta: 'Sell membership / product',
+    clientTabVisits: 'Visits',
+    clientTabSales: 'Sales / Receipts',
+    clientDetailLoading: 'Loading client data...',
+    clientNoMembershipsTitle: 'No memberships',
+    clientNoMembershipsDesc: 'This client has no memberships yet.',
+    clientFreezeButton: 'Freeze',
+    clientUnfreezeButton: 'Unfreeze',
+    clientManualCheckInButton: 'Manual check-in',
+    clientNoVisitsTitle: 'No visits',
+    clientNoVisitsDesc: 'The client has not checked in yet.',
+    clientNoSalesTitle: 'No purchases',
+    clientNoSalesDesc: 'This client has no receipts yet.',
   );
 
   static BusinessStrings of(AppLocale locale) {

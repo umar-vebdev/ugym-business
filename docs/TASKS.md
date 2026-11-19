@@ -1,6 +1,6 @@
 # uGym Business — чек-лист задач
 
-**Текущий этап:** Все этапы (`B0`–`B6`) завершены ✓
+**Текущий этап:** `B7` — Полная локализация модулей (`ru`/`tg`/`en`) и релизная сборка Android
 **Статусы:** `[ ]` не начата · `[~]` в работе · `[x]` готова · `[!]` заблокирована (причина в заметках)
 
 ## Правила ведения файла
@@ -54,9 +54,12 @@
 - [x] **B6-03** Реализован `BusinessStringsScope` (`InheritedWidget`) с пробросом через `MaterialApp.builder` и `BusinessShell`, расширены и синхронизированы `app_ru.arb`/`app_tg.arb`/`app_en.arb` (64 ключа), переведены `BusinessShell` (подвкладки и панель ресепшна), `RoleGuard`, `SubscriptionReadOnlyBanner`, `GymBranchSelector` и `OverviewDashboardView` + тест в `test/core/responsive_theme_and_l10n_test.dart`; 119 тестов зелёные (`format ✓`, `analyze ✓`, `test ✓`).
 - [x] **B6-04a** Расширены `BusinessStrings` и синхронизированы `app_{ru,tg,en}.arb` (+52 ключа), локализованы экраны `AuthFlowScreen`, `ScanClientQrScreen` и `GymQrKioskScreen` на `ru`/`tg`/`en` + тест в `test/core/responsive_theme_and_l10n_test.dart`; 120 тестов зелёные (`format ✓`, `analyze ✓`, `test ✓`).
 - [x] **B6-04b** Расширены `BusinessStrings` и синхронизированы `app_{ru,tg,en}.arb` (всего 167 ключей, 100% паритет), локализованы `PosCheckoutScreen`, `paymentMethodLabel`, `AnalyticsScreen`, `VisitsByDayBarChart`, `RevenuePaymentMixBar`, `AnnouncementsScreen` и `BillingStatusScreen` на `ru`/`tg`/`en` + тест в `test/features/analytics_billing/analytics_charts_test.dart`; 121 тест зелёный (`format ✓`, `analyze ✓`, `test ✓`).
+- [x] **B7-01** Расширены `BusinessStrings` и синхронизированы `app_{ru,tg,en}.arb` (+66 ключей, всего 233), локализованы `CompanyOnboardingCard`, `CompanyBranchesAndCurrencyCard`, `VisitsLogScreen`, `ManualCheckInSheet`, `ClientsListScreen`, `CreateClientSheet` и `ClientDetailScreen` на `ru`/`tg`/`en` + тест в `test/features/clients/clients_list_screen_test.dart`; 122 теста зелёные (`format ✓`, `analyze ✓`, `test ✓`).
 
 ---
 
-## Текущий этап: `B6` — Локализация (`ru`/`tg`/`en`) и полировка по uCraft Design System 1.0 (Завершён)
+## Текущий этап: `B7` — Полная локализация модулей (`ru`/`tg`/`en`) и релизная сборка Android
 
-Все задачи этапов `B0`–`B6` выполнены и проверены (`dart format`, `flutter analyze`, `flutter test`).
+- [ ] **B7-02** Локализация (`ru`/`tg`/`en`) экранов тарифов, истекающих абонементов, очереди заявок, истории продаж и склада товаров (`memberships_screens.dart`, `membership_requests_and_sales_tabs.dart`, `ProductsScreen`) с синхронизацией `app_{ru,tg,en}.arb`.
+- [ ] **B7-03** Локализация (`ru`/`tg`/`en`) экранов тренеров, расписания, витрины и штата (`TrainersScreen`, `ScheduleTab`, `StorefrontEditorScreen`, `StaffManagementScreen`) с синхронизацией `app_{ru,tg,en}.arb`.
+- [ ] **B7-04** Настройка релизной подписи Android (`signingConfig` через `android/key.properties` + `android/key.properties.example`, защита `.gitignore`), тест конфигурации и проверка релизной сборки `APK`/`AAB` (`--dart-define=FLAVOR=prod`).

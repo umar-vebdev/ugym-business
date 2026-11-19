@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:material_ui/material_ui.dart';
 import 'package:ugym_core/ugym_core.dart';
 
+import '../../../core/l10n/business_localizations.dart';
 import '../../../core/router/role_guard_and_banners.dart';
 import '../../../core/session/business_role.dart';
 import '../../../core/session/business_session_controller.dart';
@@ -193,6 +194,7 @@ final class _ClientDetailScreenState extends State<ClientDetailScreen> {
       listenable: widget.sessionController,
       builder: (context, _) {
         final colors = context.ucraftColors;
+        final strings = BusinessStringsScope.of(context);
         final canSell = widget.sessionController.canMutate(
           BusinessPermission.manageMembershipRequestsAndSales,
         );
@@ -234,8 +236,8 @@ final class _ClientDetailScreenState extends State<ClientDetailScreen> {
                             ),
                             Text(
                               widget.client.linked
-                                  ? 'Привязан к uGym'
-                                  : 'Оффлайн-карточка',
+                                  ? strings.clientLinkedBadge
+                                  : strings.clientOfflineBadge,
                               style: UcraftTypography.caption.copyWith(
                                 color: widget.client.linked
                                     ? colors.success
@@ -256,7 +258,7 @@ final class _ClientDetailScreenState extends State<ClientDetailScreen> {
                         if (canSell) ...[
                           const SizedBox(height: UcraftSpacing.space3),
                           UcraftButton(
-                            label: 'Продать абонемент / товар',
+                            label: strings.clientSellCta,
                             fullWidth: true,
                             onPressed: () => unawaited(_openPosCheckout()),
                           ),
@@ -270,7 +272,7 @@ final class _ClientDetailScreenState extends State<ClientDetailScreen> {
                     runSpacing: UcraftSpacing.space2,
                     children: [
                       UcraftButton(
-                        label: 'Абонементы',
+                        label: strings.membershipsLabel,
                         variant: _tab == _ClientDetailTab.memberships
                             ? UcraftButtonVariant.primary
                             : UcraftButtonVariant.secondary,
@@ -278,7 +280,7 @@ final class _ClientDetailScreenState extends State<ClientDetailScreen> {
                             setState(() => _tab = _ClientDetailTab.memberships),
                       ),
                       UcraftButton(
-                        label: 'Посещения',
+                        label: strings.clientTabVisits,
                         variant: _tab == _ClientDetailTab.visits
                             ? UcraftButtonVariant.primary
                             : UcraftButtonVariant.secondary,
@@ -286,7 +288,7 @@ final class _ClientDetailScreenState extends State<ClientDetailScreen> {
                             setState(() => _tab = _ClientDetailTab.visits),
                       ),
                       UcraftButton(
-                        label: 'Покупки/Чеки',
+                        label: strings.clientTabSales,
                         variant: _tab == _ClientDetailTab.sales
                             ? UcraftButtonVariant.primary
                             : UcraftButtonVariant.secondary,
@@ -306,9 +308,7 @@ final class _ClientDetailScreenState extends State<ClientDetailScreen> {
                     const SizedBox(height: UcraftSpacing.space3),
                   ],
                   if (_loading)
-                    const UcraftLoadingState(
-                      message: 'Загружаем данные клиента...',
-                    )
+                    UcraftLoadingState(message: strings.clientDetailLoading)
                   else
                     switch (_tab) {
                       _ClientDetailTab.memberships => _buildMembershipsTab(
@@ -332,10 +332,11 @@ final class _ClientDetailScreenState extends State<ClientDetailScreen> {
 
   Widget _buildMembershipsTab(BuildContext context, bool canFreeze) {
     final colors = context.ucraftColors;
+    final strings = BusinessStringsScope.of(context);
     if (_memberships.isEmpty) {
-      return const UcraftEmptyState(
-        title: 'Абонементов нет',
-        description: 'У этого клиента пока нет оформленных абонементов.',
+      return UcraftEmptyState(
+        title: strings.clientNoMembershipsTitle,
+        description: strings.clientNoMembershipsDesc,
       );
     }
 
@@ -348,14 +349,14 @@ final class _ClientDetailScreenState extends State<ClientDetailScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  'Абонемент №${item.id} • ${item.status.apiValue}',
+                  '${strings.scannerMembershipPrefix}${item.id} • ${item.status.apiValue}',
                   style: UcraftTypography.bodyMedium.copyWith(
                     color: colors.foreground,
                   ),
                 ),
                 if (item.remainingVisits != null)
                   Text(
-                    'Осталось визитов: ${item.remainingVisits}',
+                    '${strings.scannerRemainingVisitsPrefix}${item.remainingVisits}',
                     style: UcraftTypography.caption.copyWith(
                       color: colors.foregroundSecondary,
                     ),
@@ -368,8 +369,8 @@ final class _ClientDetailScreenState extends State<ClientDetailScreen> {
                     alignment: Alignment.centerRight,
                     child: UcraftButton(
                       label: item.status == MembershipStatus.frozen
-                          ? 'Разморозить'
-                          : 'Заморозить',
+                          ? strings.clientUnfreezeButton
+                          : strings.clientFreezeButton,
                       variant: UcraftButtonVariant.secondary,
                       isLoading: _busyMembershipId == item.id,
                       onPressed: _busyMembershipId == item.id
@@ -389,21 +390,22 @@ final class _ClientDetailScreenState extends State<ClientDetailScreen> {
 
   Widget _buildVisitsTab(BuildContext context, bool canManualVisit) {
     final colors = context.ucraftColors;
+    final strings = BusinessStringsScope.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (canManualVisit) ...[
           UcraftButton(
-            label: 'Отметить вручную',
+            label: strings.clientManualCheckInButton,
             variant: UcraftButtonVariant.secondary,
             onPressed: () => unawaited(_openManualVisit()),
           ),
           const SizedBox(height: UcraftSpacing.space3),
         ],
         if (_visits.isEmpty)
-          const UcraftEmptyState(
-            title: 'Посещений нет',
-            description: 'Клиент ещё не отмечался в зале.',
+          UcraftEmptyState(
+            title: strings.clientNoVisitsTitle,
+            description: strings.clientNoVisitsDesc,
           )
         else
           for (final visit in _visits) ...[
@@ -437,10 +439,11 @@ final class _ClientDetailScreenState extends State<ClientDetailScreen> {
 
   Widget _buildSalesTab(BuildContext context) {
     final colors = context.ucraftColors;
+    final strings = BusinessStringsScope.of(context);
     if (_sales.isEmpty) {
-      return const UcraftEmptyState(
-        title: 'Покупок нет',
-        description: 'У этого клиента пока нет чеков.',
+      return UcraftEmptyState(
+        title: strings.clientNoSalesTitle,
+        description: strings.clientNoSalesDesc,
       );
     }
 
@@ -459,7 +462,7 @@ final class _ClientDetailScreenState extends State<ClientDetailScreen> {
                   ),
                 ),
                 Text(
-                  '${paymentMethodLabel(sale.paymentMethod)} • ${sale.status.apiValue}',
+                  '${paymentMethodLabel(sale.paymentMethod, strings: strings)} • ${sale.status.apiValue}',
                   style: UcraftTypography.caption.copyWith(
                     color: colors.foregroundSecondary,
                   ),

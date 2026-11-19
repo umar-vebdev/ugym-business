@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:material_ui/material_ui.dart';
 import 'package:ugym_core/ugym_core.dart';
 
+import '../../../core/l10n/business_localizations.dart';
 import '../../../core/session/business_role.dart';
 import '../../../core/session/business_session_controller.dart';
 import '../domain/company_onboarding_models.dart';
@@ -105,6 +106,7 @@ final class _CompanyOnboardingCardState extends State<CompanyOnboardingCard> {
   @override
   Widget build(BuildContext context) {
     final colors = context.ucraftColors;
+    final strings = BusinessStringsScope.of(context);
 
     return UcraftCard(
       child: Column(
@@ -112,12 +114,12 @@ final class _CompanyOnboardingCardState extends State<CompanyOnboardingCard> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            'Создание компании (14 дней бесплатно)',
+            strings.onboardingTitle,
             style: UcraftTypography.title.copyWith(color: colors.foreground),
           ),
           const SizedBox(height: UcraftSpacing.space2),
           Text(
-            'Укажите название компании и первого филиала — пробный период активируется автоматически.',
+            strings.onboardingSubtitle,
             style: UcraftTypography.body.copyWith(
               color: colors.foregroundSecondary,
             ),
@@ -145,7 +147,7 @@ final class _CompanyOnboardingCardState extends State<CompanyOnboardingCard> {
           const SizedBox(height: UcraftSpacing.space4),
           UcraftTextField(
             key: const ValueKey<String>('onboarding_company_name'),
-            label: 'Название компании',
+            label: strings.onboardingCompanyNameLabel,
             hintText: 'FitLine LLC',
             controller: _companyNameController,
             enabled: !_isSubmitting,
@@ -154,7 +156,7 @@ final class _CompanyOnboardingCardState extends State<CompanyOnboardingCard> {
           const SizedBox(height: UcraftSpacing.formFieldGap),
           UcraftTextField(
             key: const ValueKey<String>('onboarding_gym_name'),
-            label: 'Название первого зала',
+            label: strings.onboardingGymNameLabel,
             hintText: 'FitLine Центральный',
             controller: _gymNameController,
             enabled: !_isSubmitting,
@@ -163,7 +165,7 @@ final class _CompanyOnboardingCardState extends State<CompanyOnboardingCard> {
           const SizedBox(height: UcraftSpacing.formFieldGap),
           UcraftTextField(
             key: const ValueKey<String>('onboarding_gym_address'),
-            label: 'Адрес зала (необязательно)',
+            label: strings.onboardingGymAddressLabel,
             hintText: 'ул. Рудаки 100',
             controller: _gymAddressController,
             enabled: !_isSubmitting,
@@ -171,7 +173,7 @@ final class _CompanyOnboardingCardState extends State<CompanyOnboardingCard> {
           ),
           const SizedBox(height: UcraftSpacing.space6),
           UcraftButton(
-            label: 'Создать компанию (14 дней бесплатно)',
+            label: strings.createCompanyCta,
             fullWidth: true,
             isLoading: _isSubmitting,
             onPressed: _submit,
@@ -389,6 +391,7 @@ final class _CompanyBranchesAndCurrencyCardState
 
   @override
   Widget build(BuildContext context) {
+    final strings = BusinessStringsScope.of(context);
     if (_loading) {
       return const UcraftLoadingState(isSkeleton: true, skeletonCount: 2);
     }
@@ -396,7 +399,7 @@ final class _CompanyBranchesAndCurrencyCardState
     if (_errorMessage != null && _branches.isEmpty && _currencies.isEmpty) {
       return UcraftErrorState(
         message: _errorMessage!,
-        retryLabel: 'Повторить',
+        retryLabel: strings.retryLabel,
         onRetry: _loadData,
       );
     }
@@ -451,7 +454,9 @@ final class _CompanyBranchesAndCurrencyCardState
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                _editingGymId == null ? 'Добавить филиал' : 'Редактировать зал',
+                _editingGymId == null
+                    ? strings.branchesAddTitle
+                    : strings.branchesEditTitle,
                 style: UcraftTypography.title.copyWith(
                   color: colors.foreground,
                 ),
@@ -486,7 +491,7 @@ final class _CompanyBranchesAndCurrencyCardState
                       Text(
                         branch.geoCheckEnabled
                             ? '${branch.geoCheckRadiusMeters} м'
-                            : 'Без геозоны',
+                            : strings.branchesNoGeofence,
                         style: UcraftTypography.mono.copyWith(
                           color: colors.foregroundSecondary,
                         ),
@@ -499,14 +504,14 @@ final class _CompanyBranchesAndCurrencyCardState
               const SizedBox(height: UcraftSpacing.space2),
               UcraftTextField(
                 key: const ValueKey<String>('gym_branch_name'),
-                label: 'Название филиала',
+                label: strings.branchesNameLabel,
                 controller: _nameController,
                 enabled: canMutateGyms && !_submitting,
               ),
               const SizedBox(height: UcraftSpacing.formFieldGap),
               UcraftTextField(
                 key: const ValueKey<String>('gym_branch_address'),
-                label: 'Адрес филиала',
+                label: strings.branchesAddressLabel,
                 controller: _addressController,
                 enabled: canMutateGyms && !_submitting,
               ),
@@ -514,7 +519,7 @@ final class _CompanyBranchesAndCurrencyCardState
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
                 title: Text(
-                  'Проверять геозону при чекине',
+                  strings.branchesGeoCheckSwitch,
                   style: UcraftTypography.bodyMedium.copyWith(
                     color: colors.foreground,
                   ),
@@ -532,7 +537,7 @@ final class _CompanyBranchesAndCurrencyCardState
                 const SizedBox(height: UcraftSpacing.space2),
                 UcraftTextField(
                   key: const ValueKey<String>('gym_geofence_radius'),
-                  label: 'Радиус геозоны (50–5000 м)',
+                  label: strings.branchesGeoRadiusLabel,
                   keyboardType: TextInputType.number,
                   controller: _radiusController,
                   enabled: canMutateGyms && !_submitting,
@@ -541,8 +546,8 @@ final class _CompanyBranchesAndCurrencyCardState
               const SizedBox(height: UcraftSpacing.space4),
               UcraftButton(
                 label: _editingGymId == null
-                    ? 'Добавить филиал'
-                    : 'Сохранить изменения',
+                    ? strings.branchesAddTitle
+                    : strings.branchesSaveChangesButton,
                 fullWidth: true,
                 isLoading: _submitting,
                 onPressed: canMutateGyms ? _saveGym : null,
@@ -550,7 +555,7 @@ final class _CompanyBranchesAndCurrencyCardState
               if (_editingGymId != null) ...[
                 const SizedBox(height: UcraftSpacing.space2),
                 UcraftButton(
-                  label: 'Отмена',
+                  label: strings.cancelLabel,
                   variant: UcraftButtonVariant.tertiary,
                   fullWidth: true,
                   onPressed: _submitting ? null : _resetForm,
@@ -565,7 +570,7 @@ final class _CompanyBranchesAndCurrencyCardState
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                'Валюта компании',
+                strings.companyCurrencyTitle,
                 style: UcraftTypography.title.copyWith(
                   color: colors.foreground,
                 ),

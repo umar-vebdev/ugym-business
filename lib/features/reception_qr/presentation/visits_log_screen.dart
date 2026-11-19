@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:material_ui/material_ui.dart';
 import 'package:ugym_core/ugym_core.dart';
 
+import '../../../core/l10n/business_localizations.dart';
 import '../../../core/session/business_role.dart';
 import '../../../core/session/business_session_controller.dart';
 import '../domain/reception_visits_models.dart';
@@ -157,6 +158,7 @@ final class _VisitsLogScreenState extends State<VisitsLogScreen> {
       listenable: widget.sessionController,
       builder: (context, _) {
         final colors = context.ucraftColors;
+        final strings = BusinessStringsScope.of(context);
         final canMutate = widget.sessionController.canMutate(
           BusinessPermission.manageReceptionQrAndVisits,
         );
@@ -173,7 +175,7 @@ final class _VisitsLogScreenState extends State<VisitsLogScreen> {
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 Text(
-                  'Журнал визитов',
+                  strings.visitsLogTitle,
                   style: UcraftTypography.title.copyWith(
                     color: colors.foreground,
                   ),
@@ -182,14 +184,14 @@ final class _VisitsLogScreenState extends State<VisitsLogScreen> {
                   spacing: UcraftSpacing.space2,
                   children: [
                     UcraftButton(
-                      label: 'Обновить',
+                      label: strings.refreshLabel,
                       variant: UcraftButtonVariant.secondary,
                       onPressed: _loading
                           ? null
                           : () => unawaited(_loadVisits()),
                     ),
                     UcraftButton(
-                      label: 'Ручная отметка',
+                      label: strings.visitsManualButton,
                       onPressed: canMutate && selectedGym != null
                           ? () => unawaited(_openManualCheckIn())
                           : null,
@@ -201,7 +203,7 @@ final class _VisitsLogScreenState extends State<VisitsLogScreen> {
             if (selectedGym == null && canMutate) ...[
               const SizedBox(height: UcraftSpacing.space2),
               Text(
-                'Выберите филиал для ручной отметки посещения.',
+                strings.visitsSelectBranchHint,
                 style: UcraftTypography.caption.copyWith(
                   color: colors.foregroundSecondary,
                 ),
@@ -218,17 +220,18 @@ final class _VisitsLogScreenState extends State<VisitsLogScreen> {
             ],
             const SizedBox(height: UcraftSpacing.space3),
             if (_loading)
-              const UcraftLoadingState(message: 'Загружаем визиты...')
+              UcraftLoadingState(message: strings.visitsLoading)
             else if (_errorMessage != null && _visits.isEmpty)
               UcraftErrorState(
-                title: 'Ошибка загрузки',
+                title: strings.posLoadErrorTitle,
                 message: _errorMessage!,
+                retryLabel: strings.retryLabel,
                 onRetry: () => unawaited(_loadVisits()),
               )
             else if (_visits.isEmpty)
-              const UcraftEmptyState(
-                title: 'Визитов пока нет',
-                description: 'Отметки по QR-коду и ручные визиты появятся в этом списке.',
+              UcraftEmptyState(
+                title: strings.visitsEmptyTitle,
+                description: strings.visitsEmptyDesc,
               )
             else
               Column(
@@ -274,6 +277,7 @@ final class _VisitCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.ucraftColors;
+    final strings = BusinessStringsScope.of(context);
     final isCancelled = visit.status == VisitStatus.cancelled;
 
     return UcraftCard(
@@ -284,14 +288,16 @@ final class _VisitCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  'Клиент №${visit.clientId} • Абонемент №${visit.membershipId}',
+                  'Клиент №${visit.clientId} • ${strings.scannerMembershipPrefix}${visit.membershipId}',
                   style: UcraftTypography.bodyMedium.copyWith(
                     color: colors.foreground,
                   ),
                 ),
               ),
               Text(
-                isCancelled ? 'Отменён' : 'Завершён',
+                isCancelled
+                    ? strings.visitStatusCancelled
+                    : strings.visitStatusCompleted,
                 style: UcraftTypography.caption.copyWith(
                   color: isCancelled ? colors.destructive : colors.success,
                 ),
@@ -300,7 +306,7 @@ final class _VisitCard extends StatelessWidget {
           ),
           const SizedBox(height: UcraftSpacing.space1),
           Text(
-            '${_methodLabel(visit.method)} • $formattedTime • Зал №${visit.gymId}',
+            '${_methodLabel(visit.method, strings)} • $formattedTime • Зал №${visit.gymId}',
             style: UcraftTypography.caption.copyWith(
               color: colors.foregroundSecondary,
             ),
@@ -308,7 +314,7 @@ final class _VisitCard extends StatelessWidget {
           if (isCancelled && visit.cancelReason != null) ...[
             const SizedBox(height: UcraftSpacing.space2),
             Text(
-              'Причина отмены: ${visit.cancelReason}',
+              '${strings.visitCancelReasonLabel}: ${visit.cancelReason}',
               style: UcraftTypography.caption.copyWith(
                 color: colors.destructiveForeground,
               ),
@@ -319,7 +325,7 @@ final class _VisitCard extends StatelessWidget {
             Align(
               alignment: Alignment.centerRight,
               child: UcraftButton(
-                label: 'Отменить визит',
+                label: strings.visitCancelButton,
                 variant: UcraftButtonVariant.destructive,
                 isLoading: isCancelling,
                 onPressed: isCancelling ? null : onCancel,
@@ -331,11 +337,11 @@ final class _VisitCard extends StatelessWidget {
     );
   }
 
-  String _methodLabel(VisitMethod method) {
+  String _methodLabel(VisitMethod method, BusinessStrings strings) {
     return switch (method) {
-      VisitMethod.qr => 'QR зала',
-      VisitMethod.clientQr => 'QR клиента',
-      VisitMethod.manual => 'Ручная отметка',
+      VisitMethod.qr => strings.visitMethodGymQr,
+      VisitMethod.clientQr => strings.visitMethodClientQr,
+      VisitMethod.manual => strings.visitsManualButton,
     };
   }
 }
@@ -496,7 +502,9 @@ final class _ManualCheckInSheetState extends State<ManualCheckInSheet> {
   @override
   Widget build(BuildContext context) {
     final colors = context.ucraftColors;
-    final gymLabel = widget.gymName ?? 'Филиал №${widget.gymId}';
+    final strings = BusinessStringsScope.of(context);
+    final gymLabel =
+        widget.gymName ?? '${strings.branchLabel} №${widget.gymId}';
 
     return SafeArea(
       child: SingleChildScrollView(
@@ -506,7 +514,7 @@ final class _ManualCheckInSheetState extends State<ManualCheckInSheet> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              'Ручная отметка визита',
+              strings.visitManualSheetTitle,
               style: UcraftTypography.title.copyWith(color: colors.foreground),
             ),
             const SizedBox(height: UcraftSpacing.space1),
@@ -519,8 +527,8 @@ final class _ManualCheckInSheetState extends State<ManualCheckInSheet> {
             const SizedBox(height: UcraftSpacing.space4),
             UcraftTextField(
               controller: _clientIdController,
-              label: 'ID клиента',
-              hintText: 'Например, 42',
+              label: strings.visitClientIdLabel,
+              hintText: '42',
               keyboardType: TextInputType.number,
               errorText: _clientIdError,
               onChanged: (_) => _invalidateIdempotencyKey(),
@@ -529,7 +537,7 @@ final class _ManualCheckInSheetState extends State<ManualCheckInSheet> {
             CheckboxListTile(
               value: _backdated,
               contentPadding: EdgeInsets.zero,
-              title: const Text('Отметить задним числом'),
+              title: Text(strings.visitBackdatedCheckbox),
               onChanged: (value) {
                 _invalidateIdempotencyKey();
                 setState(() {
@@ -544,7 +552,7 @@ final class _ManualCheckInSheetState extends State<ManualCheckInSheet> {
               const SizedBox(height: UcraftSpacing.space2),
               UcraftTextField(
                 controller: _visitedAtController,
-                label: 'Дата и время визита (+05:00)',
+                label: strings.visitDateTimeLabel,
                 hintText: '2026-11-16 14:30',
                 errorText: _visitedAtError,
                 onChanged: (_) => _invalidateIdempotencyKey(),
@@ -561,7 +569,7 @@ final class _ManualCheckInSheetState extends State<ManualCheckInSheet> {
             ],
             const SizedBox(height: UcraftSpacing.space4),
             UcraftButton(
-              label: 'Отметить посещение',
+              label: strings.visitSubmitButton,
               fullWidth: true,
               isLoading: _submitting,
               onPressed: _submitting ? null : () => unawaited(_submit()),
@@ -594,8 +602,9 @@ final class _CancelVisitDialogState extends State<_CancelVisitDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = BusinessStringsScope.of(context);
     return AlertDialog(
-      title: const Text('Отменить визит'),
+      title: Text(strings.visitCancelButton),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -604,8 +613,7 @@ final class _CancelVisitDialogState extends State<_CancelVisitDialog> {
           const SizedBox(height: UcraftSpacing.space3),
           UcraftTextField(
             controller: _reasonController,
-            label: 'Причина отмены',
-            hintText: 'Например, ошибочная отметка',
+            label: strings.visitCancelReasonLabel,
             errorText: _errorText,
             maxLines: 2,
           ),
@@ -614,10 +622,10 @@ final class _CancelVisitDialogState extends State<_CancelVisitDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Назад'),
+          child: Text(strings.backLabel),
         ),
         UcraftButton(
-          label: 'Подтвердить отмену',
+          label: strings.visitConfirmCancelButton,
           variant: UcraftButtonVariant.destructive,
           onPressed: () {
             final reason = _reasonController.text.trim();
