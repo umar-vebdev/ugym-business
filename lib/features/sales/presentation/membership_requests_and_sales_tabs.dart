@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:ugym_core/ugym_core.dart';
 
@@ -191,24 +192,21 @@ final class _MembershipRequestsQueueTabState
               ],
             ),
             const SizedBox(height: UcraftSpacing.space2),
-            Wrap(
-              spacing: UcraftSpacing.space2,
-              runSpacing: UcraftSpacing.space2,
-              children: [
+            UcraftSegmentedTabs<MembershipRequestStatus>(
+              items: [
                 for (final status in MembershipRequestStatus.values)
-                  UcraftButton(
+                  UcraftSegmentedTabItem(
+                    value: status,
                     label: _statusLabel(status, strings),
-                    variant: _filterStatus == status
-                        ? UcraftButtonVariant.primary
-                        : UcraftButtonVariant.secondary,
-                    onPressed: () {
-                      setState(() {
-                        _filterStatus = status;
-                      });
-                      unawaited(_load());
-                    },
                   ),
               ],
+              selected: _filterStatus,
+              onSelected: (status) {
+                setState(() {
+                  _filterStatus = status;
+                });
+                unawaited(_load());
+              },
             ),
             if (_errorMessage != null && _requests.isNotEmpty) ...[
               const SizedBox(height: UcraftSpacing.space2),
@@ -221,9 +219,10 @@ final class _MembershipRequestsQueueTabState
             ],
             const SizedBox(height: UcraftSpacing.space3),
             if (_loading)
-              UcraftLoadingState(message: strings.requestsLoading)
+              const UcraftLoadingState(isSkeleton: true, skeletonCount: 4)
             else if (_errorMessage != null && _requests.isEmpty)
               UcraftErrorState(
+                icon: LucideIcons.circleAlert,
                 title: strings.posLoadErrorTitle,
                 message: _errorMessage!,
                 retryLabel: strings.retryLabel,
@@ -231,15 +230,15 @@ final class _MembershipRequestsQueueTabState
               )
             else if (_requests.isEmpty)
               UcraftEmptyState(
+                icon: LucideIcons.inbox,
                 title: strings.requestsEmptyTitle,
                 description: strings.requestsEmptyDesc,
               )
             else
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+              UcraftListSection(
                 children: [
-                  for (final req in _requests) ...[
-                    _RequestCard(
+                  for (final req in _requests)
+                    _RequestRow(
                       request: req,
                       expiresLabel: _formatExpiry(req.expiresAt, nowUtc),
                       canAct:
@@ -249,8 +248,6 @@ final class _MembershipRequestsQueueTabState
                       onPay: () => unawaited(_openPayDialog(req)),
                       onCancel: () => unawaited(_cancelRequest(req)),
                     ),
-                    const SizedBox(height: UcraftSpacing.space3),
-                  ],
                 ],
               ),
           ],
@@ -279,8 +276,8 @@ final class _MembershipRequestsQueueTabState
   }
 }
 
-final class _RequestCard extends StatelessWidget {
-  const _RequestCard({
+final class _RequestRow extends StatelessWidget {
+  const _RequestRow({
     required this.request,
     required this.expiresLabel,
     required this.canAct,
@@ -298,42 +295,34 @@ final class _RequestCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.ucraftColors;
     final strings = BusinessStringsScope.of(context);
-    return UcraftCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  'Заявка №${request.id} • Тариф №${request.membershipTypeId}',
-                  style: UcraftTypography.bodyMedium.copyWith(
-                    color: colors.foreground,
-                  ),
-                ),
-              ),
-              Text(
-                expiresLabel,
-                style: UcraftTypography.caption.copyWith(
-                  color: colors.foregroundSecondary,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: UcraftSpacing.space1),
-          Text(
-            request.clientId != null
-                ? 'Клиент №${request.clientId} • Зал №${request.gymId}'
-                : 'Пользователь №${request.userId} • Зал №${request.gymId}',
-            style: UcraftTypography.caption.copyWith(
-              color: colors.foregroundSecondary,
-            ),
-          ),
-          if (canAct) ...[
-            const SizedBox(height: UcraftSpacing.space3),
-            Wrap(
+    final (icon, tone) = switch (request.status) {
+      MembershipRequestStatus.pending => (
+        LucideIcons.clock,
+        UcraftStatusTone.warning,
+      ),
+      MembershipRequestStatus.paid => (
+        LucideIcons.circleCheck,
+        UcraftStatusTone.success,
+      ),
+      MembershipRequestStatus.cancelled => (
+        LucideIcons.circleX,
+        UcraftStatusTone.destructive,
+      ),
+      MembershipRequestStatus.expired => (
+        LucideIcons.hourglass,
+        UcraftStatusTone.neutral,
+      ),
+    };
+
+    return UcraftListRow(
+      title: 'Заявка №${request.id} • Тариф №${request.membershipTypeId}',
+      subtitle: request.clientId != null
+          ? 'Клиент №${request.clientId} • Зал №${request.gymId}'
+          : 'Пользователь №${request.userId} • Зал №${request.gymId}',
+      trailing: UcraftStatusPill(icon: icon, label: expiresLabel, tone: tone),
+      bottom: canAct
+          ? Wrap(
               spacing: UcraftSpacing.space2,
               runSpacing: UcraftSpacing.space2,
               alignment: WrapAlignment.end,
@@ -346,14 +335,13 @@ final class _RequestCard extends StatelessWidget {
                 ),
                 UcraftButton(
                   label: strings.scannerAcceptPaymentButton,
+                  leadingIcon: LucideIcons.check,
                   isLoading: isBusy,
                   onPressed: isBusy ? null : onPay,
                 ),
               ],
-            ),
-          ],
-        ],
-      ),
+            )
+          : null,
     );
   }
 }
@@ -430,25 +418,21 @@ final class _PayRequestDialogState extends State<_PayRequestDialog> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Wrap(
-            spacing: UcraftSpacing.space2,
-            runSpacing: UcraftSpacing.space2,
-            children: [
+          UcraftSegmentedTabs<PaymentMethod>(
+            items: [
               for (final method in PaymentMethod.values)
-                UcraftButton(
+                UcraftSegmentedTabItem(
+                  value: method,
                   label: paymentMethodLabel(method, strings: strings),
-                  variant: _method == method
-                      ? UcraftButtonVariant.primary
-                      : UcraftButtonVariant.secondary,
-                  onPressed: _submitting
-                      ? null
-                      : () {
-                          setState(() {
-                            _method = method;
-                          });
-                        },
                 ),
             ],
+            selected: _method,
+            enabled: !_submitting,
+            onSelected: (method) {
+              setState(() {
+                _method = method;
+              });
+            },
           ),
           if (_errorText != null) ...[
             const SizedBox(height: UcraftSpacing.space3),
@@ -671,9 +655,10 @@ final class _SalesHistoryTabState extends State<SalesHistoryTab> {
             ],
             const SizedBox(height: UcraftSpacing.space3),
             if (_loading)
-              UcraftLoadingState(message: strings.salesLoading)
+              const UcraftLoadingState(isSkeleton: true, skeletonCount: 4)
             else if (_errorMessage != null && _sales.isEmpty)
               UcraftErrorState(
+                icon: LucideIcons.circleAlert,
                 title: strings.posLoadErrorTitle,
                 message: _errorMessage!,
                 retryLabel: strings.retryLabel,
@@ -681,22 +666,20 @@ final class _SalesHistoryTabState extends State<SalesHistoryTab> {
               )
             else if (_sales.isEmpty)
               UcraftEmptyState(
+                icon: LucideIcons.receipt,
                 title: strings.salesEmptyTitle,
                 description: strings.salesEmptyDesc,
               )
             else
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+              UcraftListSection(
                 children: [
-                  for (final sale in _sales) ...[
-                    _SaleCard(
+                  for (final sale in _sales)
+                    _SaleRow(
                       sale: sale,
                       canRefund: canRefund && sale.status == SaleStatus.paid,
                       isRefunding: _refundingSaleId == sale.id,
                       onRefund: () => unawaited(_refundSale(sale)),
                     ),
-                    const SizedBox(height: UcraftSpacing.space3),
-                  ],
                 ],
               ),
           ],
@@ -706,8 +689,8 @@ final class _SalesHistoryTabState extends State<SalesHistoryTab> {
   }
 }
 
-final class _SaleCard extends StatelessWidget {
-  const _SaleCard({
+final class _SaleRow extends StatelessWidget {
+  const _SaleRow({
     required this.sale,
     required this.canRefund,
     required this.isRefunding,
@@ -730,58 +713,44 @@ final class _SaleCard extends StatelessWidget {
       offset: DateFormatter.dushanbeOffset,
     );
 
-    return UcraftCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  'Чек №${sale.id} • $total ${sale.currency}',
-                  style: UcraftTypography.bodyMedium.copyWith(
-                    color: colors.foreground,
-                  ),
-                ),
-              ),
-              Text(
-                isRefunded ? strings.saleRefundButton : strings.saleStatusPaid,
-                style: UcraftTypography.caption.copyWith(
-                  color: isRefunded ? colors.destructive : colors.success,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: UcraftSpacing.space1),
-          Text(
-            '${paymentMethodLabel(sale.paymentMethod, strings: strings)} • $dateText${sale.clientId != null ? ' • Клиент №${sale.clientId}' : ''}',
-            style: UcraftTypography.caption.copyWith(
-              color: colors.foregroundSecondary,
-            ),
-          ),
-          if (isRefunded && sale.refundReason != null) ...[
-            const SizedBox(height: UcraftSpacing.space2),
-            Text(
-              '${strings.saleRefundReasonLabel}: ${sale.refundReason}',
-              style: UcraftTypography.caption.copyWith(
-                color: colors.destructiveForeground,
-              ),
-            ),
-          ],
-          if (canRefund) ...[
-            const SizedBox(height: UcraftSpacing.space3),
-            Align(
-              alignment: Alignment.centerRight,
-              child: UcraftButton(
-                label: strings.saleRefundButton,
-                variant: UcraftButtonVariant.destructive,
-                isLoading: isRefunding,
-                onPressed: isRefunding ? null : onRefund,
-              ),
-            ),
-          ],
-        ],
+    return UcraftListRow(
+      title: 'Чек №${sale.id} • $total ${sale.currency}',
+      subtitle:
+          '${paymentMethodLabel(sale.paymentMethod, strings: strings)} • $dateText${sale.clientId != null ? ' • Клиент №${sale.clientId}' : ''}',
+      trailing: UcraftStatusPill(
+        icon: isRefunded ? LucideIcons.rotateCcw : LucideIcons.circleCheck,
+        label: isRefunded ? strings.saleRefundButton : strings.saleStatusPaid,
+        tone: isRefunded
+            ? UcraftStatusTone.destructive
+            : UcraftStatusTone.success,
       ),
+      bottom: (isRefunded && sale.refundReason != null) || canRefund
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (isRefunded && sale.refundReason != null)
+                  Text(
+                    '${strings.saleRefundReasonLabel}: ${sale.refundReason}',
+                    style: UcraftTypography.caption.copyWith(
+                      color: colors.destructiveForeground,
+                    ),
+                  ),
+                if (canRefund) ...[
+                  if (isRefunded && sale.refundReason != null)
+                    const SizedBox(height: UcraftSpacing.space2),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: UcraftButton(
+                      label: strings.saleRefundButton,
+                      variant: UcraftButtonVariant.destructive,
+                      isLoading: isRefunding,
+                      onPressed: isRefunding ? null : onRefund,
+                    ),
+                  ),
+                ],
+              ],
+            )
+          : null,
     );
   }
 }

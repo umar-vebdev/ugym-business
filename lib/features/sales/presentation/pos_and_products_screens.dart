@@ -246,15 +246,43 @@ final class _PosCheckoutScreenState extends State<PosCheckoutScreen> {
                 onRetry: () => unawaited(_loadCatalog()),
               )
             : SingleChildScrollView(
-                padding: const EdgeInsets.all(UcraftSpacing.space4),
+                padding: const EdgeInsets.all(
+                  UcraftSpacing.screenHorizontalPadding,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     if (session != null) ...[
                       SubscriptionReadOnlyBanner(controller: session),
                       if (isReadOnly)
-                        const SizedBox(height: UcraftSpacing.space3),
+                        const SizedBox(height: UcraftSpacing.space4),
                     ],
+                    UcraftCard(
+                      variant: UcraftCardVariant.highlight,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Text(
+                            strings.posTitle.toUpperCase(),
+                            style: UcraftTypography.overline.copyWith(
+                              color: colors.foregroundMuted,
+                            ),
+                          ),
+                          const SizedBox(height: UcraftSpacing.space1),
+                          Text(
+                            '${strings.posTotalPrefix}$totalFormatted $currency',
+                            style: UcraftTypography.headline.copyWith(
+                              fontFamily: UcraftTypography.monoFontFamily,
+                              fontFeatures: const [
+                                FontFeature.tabularFigures(),
+                              ],
+                              color: colors.foreground,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: UcraftSpacing.space4),
                     UcraftTextField(
                       controller: _clientIdController,
                       label: strings.posClientIdLabel,
@@ -263,13 +291,8 @@ final class _PosCheckoutScreenState extends State<PosCheckoutScreen> {
                       enabled: !isReadOnly && !_submitting,
                       onChanged: (_) => _pendingKey = null,
                     ),
-                    const SizedBox(height: UcraftSpacing.space4),
-                    Text(
-                      strings.membershipsLabel,
-                      style: UcraftTypography.title.copyWith(
-                        color: colors.foreground,
-                      ),
-                    ),
+                    const SizedBox(height: UcraftSpacing.sectionGap),
+                    UcraftSectionHeader(title: strings.membershipsLabel),
                     const SizedBox(height: UcraftSpacing.space2),
                     if (_membershipTypes.isEmpty)
                       Text(
@@ -287,9 +310,10 @@ final class _PosCheckoutScreenState extends State<PosCheckoutScreen> {
                             UcraftButton(
                               label:
                                   '${type.name} (${(type.priceMinor / 100).toStringAsFixed(0)} ${type.currency})',
-                              variant: _selectedTypeIds.contains(type.id)
-                                  ? UcraftButtonVariant.primary
-                                  : UcraftButtonVariant.secondary,
+                              variant: UcraftButtonVariant.secondary,
+                              leadingIcon: _selectedTypeIds.contains(type.id)
+                                  ? LucideIcons.circleCheck
+                                  : null,
                               onPressed: () {
                                 _pendingKey = null;
                                 setState(() {
@@ -303,13 +327,8 @@ final class _PosCheckoutScreenState extends State<PosCheckoutScreen> {
                             ),
                         ],
                       ),
-                    const SizedBox(height: UcraftSpacing.space4),
-                    Text(
-                      strings.subTabProducts,
-                      style: UcraftTypography.title.copyWith(
-                        color: colors.foreground,
-                      ),
-                    ),
+                    const SizedBox(height: UcraftSpacing.sectionGap),
+                    UcraftSectionHeader(title: strings.subTabProducts),
                     const SizedBox(height: UcraftSpacing.space2),
                     if (_products.isEmpty)
                       Text(
@@ -319,65 +338,64 @@ final class _PosCheckoutScreenState extends State<PosCheckoutScreen> {
                         ),
                       )
                     else
-                      for (final product in _products) ...[
-                        UcraftCard(
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      product.name,
-                                      style: UcraftTypography.bodyMedium
-                                          .copyWith(color: colors.foreground),
+                      UcraftListSection(
+                        children: [
+                          for (final product in _products)
+                            UcraftListRow(
+                              title: product.name,
+                              subtitle:
+                                  '${(product.priceMinor / 100).toStringAsFixed(2)} ${product.currency}',
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    tooltip: strings.posDecreaseQtyTooltip,
+                                    onPressed:
+                                        (_productQuantities[product.id] ?? 0) >
+                                            0
+                                        ? () {
+                                            _pendingKey = null;
+                                            setState(() {
+                                              final current =
+                                                  _productQuantities[product
+                                                      .id] ??
+                                                  0;
+                                              _productQuantities[product.id] =
+                                                  current - 1;
+                                            });
+                                          }
+                                        : null,
+                                    icon: const Icon(
+                                      LucideIcons.minus,
+                                      size: 20,
                                     ),
-                                    Text(
-                                      '${(product.priceMinor / 100).toStringAsFixed(2)} ${product.currency}',
-                                      style: UcraftTypography.caption.copyWith(
-                                        color: colors.foregroundSecondary,
-                                      ),
+                                  ),
+                                  Text(
+                                    '${_productQuantities[product.id] ?? 0}',
+                                    style: UcraftTypography.mono,
+                                  ),
+                                  IconButton(
+                                    tooltip: strings.posIncreaseQtyTooltip,
+                                    onPressed: () {
+                                      _pendingKey = null;
+                                      setState(() {
+                                        final current =
+                                            _productQuantities[product.id] ?? 0;
+                                        _productQuantities[product.id] =
+                                            current + 1;
+                                      });
+                                    },
+                                    icon: const Icon(
+                                      LucideIcons.plus,
+                                      size: 20,
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
-                              IconButton(
-                                tooltip: strings.posDecreaseQtyTooltip,
-                                onPressed:
-                                    (_productQuantities[product.id] ?? 0) > 0
-                                    ? () {
-                                        _pendingKey = null;
-                                        setState(() {
-                                          final current =
-                                              _productQuantities[product.id] ??
-                                              0;
-                                          _productQuantities[product.id] =
-                                              current - 1;
-                                        });
-                                      }
-                                    : null,
-                                icon: const Icon(LucideIcons.minus, size: 20),
-                              ),
-                              Text('${_productQuantities[product.id] ?? 0}'),
-                              IconButton(
-                                tooltip: strings.posIncreaseQtyTooltip,
-                                onPressed: () {
-                                  _pendingKey = null;
-                                  setState(() {
-                                    final current =
-                                        _productQuantities[product.id] ?? 0;
-                                    _productQuantities[product.id] =
-                                        current + 1;
-                                  });
-                                },
-                                icon: const Icon(LucideIcons.plus, size: 20),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: UcraftSpacing.space2),
-                      ],
-                    const SizedBox(height: UcraftSpacing.space3),
+                            ),
+                        ],
+                      ),
+                    const SizedBox(height: UcraftSpacing.sectionGap),
                     Text(
                       strings.posPaymentMethodLabel,
                       style: UcraftTypography.bodyMedium.copyWith(
@@ -385,31 +403,22 @@ final class _PosCheckoutScreenState extends State<PosCheckoutScreen> {
                       ),
                     ),
                     const SizedBox(height: UcraftSpacing.space2),
-                    Wrap(
-                      spacing: UcraftSpacing.space2,
-                      runSpacing: UcraftSpacing.space2,
-                      children: [
+                    UcraftSegmentedTabs<PaymentMethod>(
+                      items: [
                         for (final method in PaymentMethod.values)
-                          UcraftButton(
+                          UcraftSegmentedTabItem(
+                            value: method,
                             label: paymentMethodLabel(method, strings: strings),
-                            variant: _paymentMethod == method
-                                ? UcraftButtonVariant.primary
-                                : UcraftButtonVariant.secondary,
-                            onPressed: () {
-                              _pendingKey = null;
-                              setState(() {
-                                _paymentMethod = method;
-                              });
-                            },
                           ),
                       ],
-                    ),
-                    const SizedBox(height: UcraftSpacing.space4),
-                    Text(
-                      '${strings.posTotalPrefix}$totalFormatted $currency',
-                      style: UcraftTypography.title.copyWith(
-                        color: colors.foreground,
-                      ),
+                      selected: _paymentMethod,
+                      enabled: !isReadOnly && !_submitting,
+                      onSelected: (method) {
+                        _pendingKey = null;
+                        setState(() {
+                          _paymentMethod = method;
+                        });
+                      },
                     ),
                     if (_submitError != null) ...[
                       const SizedBox(height: UcraftSpacing.space2),
@@ -547,15 +556,18 @@ final class _ProductsScreenState extends State<ProductsScreen> {
                 if (canManage)
                   UcraftButton(
                     label: strings.productsAddButton,
+                    leadingIcon: LucideIcons.plus,
+                    variant: UcraftButtonVariant.secondary,
                     onPressed: () => unawaited(_openCreateProduct()),
                   ),
               ],
             ),
             const SizedBox(height: UcraftSpacing.space3),
             if (_loading)
-              UcraftLoadingState(message: strings.productsLoading)
+              const UcraftLoadingState(isSkeleton: true, skeletonCount: 4)
             else if (_errorMessage != null && _products.isEmpty)
               UcraftErrorState(
+                icon: LucideIcons.circleAlert,
                 title: strings.posLoadErrorTitle,
                 message: _errorMessage!,
                 retryLabel: strings.retryLabel,
@@ -563,49 +575,44 @@ final class _ProductsScreenState extends State<ProductsScreen> {
               )
             else if (_products.isEmpty)
               UcraftEmptyState(
+                icon: LucideIcons.package,
                 title: strings.productsEmptyTitle,
                 description: strings.productsEmptyDesc,
               )
             else
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+              UcraftListSection(
                 children: [
-                  for (final product in _products) ...[
-                    UcraftCard(
-                      child: Row(
+                  for (final product in _products)
+                    UcraftListRow(
+                      title: product.name,
+                      subtitle:
+                          '${(product.priceMinor / 100).toStringAsFixed(2)} ${product.currency} • ${strings.productStockLabel}: ${product.stockQuantity ?? 0}',
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  product.name,
-                                  style: UcraftTypography.bodyMedium.copyWith(
-                                    color: colors.foreground,
-                                  ),
-                                ),
-                                const SizedBox(height: UcraftSpacing.space1),
-                                Text(
-                                  '${(product.priceMinor / 100).toStringAsFixed(2)} ${product.currency} • ${strings.productStockLabel}: ${product.stockQuantity ?? 0} • ${product.isActive ? strings.planStatusActive : strings.planStatusArchived}',
-                                  style: UcraftTypography.caption.copyWith(
-                                    color: colors.foregroundSecondary,
-                                  ),
-                                ),
-                              ],
-                            ),
+                          UcraftStatusPill(
+                            icon: product.isActive
+                                ? LucideIcons.circleCheck
+                                : LucideIcons.archive,
+                            label: product.isActive
+                                ? strings.planStatusActive
+                                : strings.planStatusArchived,
+                            tone: product.isActive
+                                ? UcraftStatusTone.success
+                                : UcraftStatusTone.neutral,
                           ),
-                          if (canManage)
+                          if (canManage) ...[
+                            const SizedBox(width: UcraftSpacing.space2),
                             UcraftButton(
                               label: strings.productEditButton,
                               variant: UcraftButtonVariant.secondary,
                               onPressed: () =>
                                   unawaited(_openEditProduct(product)),
                             ),
+                          ],
                         ],
                       ),
                     ),
-                    const SizedBox(height: UcraftSpacing.space3),
-                  ],
                 ],
               ),
           ],

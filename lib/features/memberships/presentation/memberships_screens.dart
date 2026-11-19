@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:ugym_core/ugym_core.dart';
 
@@ -165,6 +166,8 @@ final class _MembershipTypesScreenState extends State<MembershipTypesScreen> {
                     if (canManage)
                       UcraftButton(
                         label: strings.plansCreateButton,
+                        leadingIcon: LucideIcons.plus,
+                        variant: UcraftButtonVariant.secondary,
                         onPressed: () => unawaited(_openCreate()),
                       ),
                   ],
@@ -182,9 +185,10 @@ final class _MembershipTypesScreenState extends State<MembershipTypesScreen> {
             ],
             const SizedBox(height: UcraftSpacing.space3),
             if (_loading)
-              UcraftLoadingState(message: strings.plansLoading)
+              const UcraftLoadingState(isSkeleton: true, skeletonCount: 4)
             else if (_errorMessage != null && _types.isEmpty)
               UcraftErrorState(
+                icon: LucideIcons.circleAlert,
                 title: strings.posLoadErrorTitle,
                 message: _errorMessage!,
                 retryLabel: strings.retryLabel,
@@ -192,22 +196,20 @@ final class _MembershipTypesScreenState extends State<MembershipTypesScreen> {
               )
             else if (_types.isEmpty)
               UcraftEmptyState(
+                icon: LucideIcons.ticket,
                 title: strings.plansEmptyTitle,
                 description: strings.plansEmptyDesc,
               )
             else
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+              UcraftListSection(
                 children: [
-                  for (final type in _types) ...[
-                    _MembershipTypeCard(
+                  for (final type in _types)
+                    _MembershipTypeRow(
                       type: type,
                       canManage: canManage,
                       isToggling: _togglingTypeId == type.id,
                       onToggleActive: () => unawaited(_toggleActive(type)),
                     ),
-                    const SizedBox(height: UcraftSpacing.space3),
-                  ],
                 ],
               ),
           ],
@@ -217,8 +219,8 @@ final class _MembershipTypesScreenState extends State<MembershipTypesScreen> {
   }
 }
 
-final class _MembershipTypeCard extends StatelessWidget {
-  const _MembershipTypeCard({
+final class _MembershipTypeRow extends StatelessWidget {
+  const _MembershipTypeRow({
     required this.type,
     required this.canManage,
     required this.isToggling,
@@ -242,38 +244,30 @@ final class _MembershipTypeCard extends StatelessWidget {
       if (type.validityDays != null) 'срок ${type.validityDays} дн.',
     ].join(' • ');
 
-    return UcraftCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+    return UcraftListRow(
+      title: type.name,
+      subtitle: details,
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  type.name,
-                  style: UcraftTypography.bodyMedium.copyWith(
-                    color: colors.foreground,
-                  ),
-                ),
-              ),
-              Text(
-                '$priceText ${type.currency}',
-                style: UcraftTypography.bodyMedium.copyWith(
-                  color: colors.foreground,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: UcraftSpacing.space1),
           Text(
-            '$details • ${type.isActive ? strings.planStatusActive : strings.planStatusArchived}',
-            style: UcraftTypography.caption.copyWith(
-              color: colors.foregroundSecondary,
-            ),
+            '$priceText ${type.currency}',
+            style: UcraftTypography.mono.copyWith(color: colors.foreground),
           ),
-          if (canManage) ...[
-            const SizedBox(height: UcraftSpacing.space3),
-            Align(
+          const SizedBox(width: UcraftSpacing.space2),
+          UcraftStatusPill(
+            icon: type.isActive ? LucideIcons.circleCheck : LucideIcons.archive,
+            label: type.isActive
+                ? strings.planStatusActive
+                : strings.planStatusArchived,
+            tone: type.isActive
+                ? UcraftStatusTone.success
+                : UcraftStatusTone.neutral,
+          ),
+        ],
+      ),
+      bottom: canManage
+          ? Align(
               alignment: Alignment.centerRight,
               child: UcraftButton(
                 label: type.isActive
@@ -283,10 +277,8 @@ final class _MembershipTypeCard extends StatelessWidget {
                 isLoading: isToggling,
                 onPressed: isToggling ? null : onToggleActive,
               ),
-            ),
-          ],
-        ],
-      ),
+            )
+          : null,
     );
   }
 
@@ -485,24 +477,21 @@ final class _CreateMembershipTypeScreenState
                 ),
               ),
               const SizedBox(height: UcraftSpacing.space2),
-              Wrap(
-                spacing: UcraftSpacing.space2,
-                runSpacing: UcraftSpacing.space2,
-                children: [
+              UcraftSegmentedTabs<MembershipKind>(
+                items: [
                   for (final kind in MembershipKind.values)
-                    UcraftButton(
+                    UcraftSegmentedTabItem(
+                      value: kind,
                       label: _kindLabel(kind, strings),
-                      variant: _kind == kind
-                          ? UcraftButtonVariant.primary
-                          : UcraftButtonVariant.secondary,
-                      onPressed: () {
-                        setState(() {
-                          _kind = kind;
-                          _errorMessage = null;
-                        });
-                      },
                     ),
                 ],
+                selected: _kind,
+                onSelected: (kind) {
+                  setState(() {
+                    _kind = kind;
+                    _errorMessage = null;
+                  });
+                },
               ),
               const SizedBox(height: UcraftSpacing.space3),
               Text(
@@ -512,33 +501,23 @@ final class _CreateMembershipTypeScreenState
                 ),
               ),
               const SizedBox(height: UcraftSpacing.space2),
-              Wrap(
-                spacing: UcraftSpacing.space2,
-                runSpacing: UcraftSpacing.space2,
-                children: [
-                  UcraftButton(
+              UcraftSegmentedTabs<MembershipStartMode>(
+                items: [
+                  UcraftSegmentedTabItem(
+                    value: MembershipStartMode.onPurchase,
                     label: strings.planStartOnPurchase,
-                    variant: _startMode == MembershipStartMode.onPurchase
-                        ? UcraftButtonVariant.primary
-                        : UcraftButtonVariant.secondary,
-                    onPressed: () {
-                      setState(() {
-                        _startMode = MembershipStartMode.onPurchase;
-                      });
-                    },
                   ),
-                  UcraftButton(
+                  UcraftSegmentedTabItem(
+                    value: MembershipStartMode.onFirstVisit,
                     label: strings.planStartOnFirstVisit,
-                    variant: _startMode == MembershipStartMode.onFirstVisit
-                        ? UcraftButtonVariant.primary
-                        : UcraftButtonVariant.secondary,
-                    onPressed: () {
-                      setState(() {
-                        _startMode = MembershipStartMode.onFirstVisit;
-                      });
-                    },
                   ),
                 ],
+                selected: _startMode,
+                onSelected: (mode) {
+                  setState(() {
+                    _startMode = mode;
+                  });
+                },
               ),
               if (_kind != MembershipKind.visitsPack) ...[
                 const SizedBox(height: UcraftSpacing.space3),
@@ -867,9 +846,10 @@ final class _ExpiringMembershipsTabState extends State<ExpiringMembershipsTab> {
             ],
             const SizedBox(height: UcraftSpacing.space3),
             if (_loading)
-              UcraftLoadingState(message: strings.expiringLoading)
+              const UcraftLoadingState(isSkeleton: true, skeletonCount: 4)
             else if (_errorMessage != null && _items.isEmpty)
               UcraftErrorState(
+                icon: LucideIcons.circleAlert,
                 title: strings.posLoadErrorTitle,
                 message: _errorMessage!,
                 retryLabel: strings.retryLabel,
@@ -877,15 +857,15 @@ final class _ExpiringMembershipsTabState extends State<ExpiringMembershipsTab> {
               )
             else if (_items.isEmpty)
               UcraftEmptyState(
+                icon: LucideIcons.calendarCheck,
                 title: strings.expiringEmptyTitle,
                 description: strings.expiringEmptyDesc,
               )
             else
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+              UcraftListSection(
                 children: [
-                  for (final item in _items) ...[
-                    _ExpiringMembershipCard(
+                  for (final item in _items)
+                    _ExpiringMembershipRow(
                       item: item,
                       canFreeze: canFreeze,
                       canCancel: canCancel,
@@ -893,8 +873,6 @@ final class _ExpiringMembershipsTabState extends State<ExpiringMembershipsTab> {
                       onToggleFreeze: () => unawaited(_toggleFreeze(item)),
                       onCancel: () => unawaited(_cancelMembership(item)),
                     ),
-                    const SizedBox(height: UcraftSpacing.space3),
-                  ],
                 ],
               ),
           ],
@@ -904,8 +882,8 @@ final class _ExpiringMembershipsTabState extends State<ExpiringMembershipsTab> {
   }
 }
 
-final class _ExpiringMembershipCard extends StatelessWidget {
-  const _ExpiringMembershipCard({
+final class _ExpiringMembershipRow extends StatelessWidget {
+  const _ExpiringMembershipRow({
     required this.item,
     required this.canFreeze,
     required this.canCancel,
@@ -923,7 +901,6 @@ final class _ExpiringMembershipCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.ucraftColors;
     final strings = BusinessStringsScope.of(context);
     final endsText = item.endsAt != null
         ? DateFormatter.formatDateTime(
@@ -934,40 +911,26 @@ final class _ExpiringMembershipCard extends StatelessWidget {
     final isFrozen = item.status == MembershipStatus.frozen;
     final isCancelled = item.status == MembershipStatus.cancelled;
 
-    return UcraftCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  '${strings.scannerMembershipPrefix}${item.id} • Клиент №${item.clientId}',
-                  style: UcraftTypography.bodyMedium.copyWith(
-                    color: colors.foreground,
-                  ),
-                ),
-              ),
-              Text(
-                item.status.apiValue,
-                style: UcraftTypography.caption.copyWith(
-                  color: isCancelled
-                      ? colors.destructive
-                      : colors.foregroundSecondary,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: UcraftSpacing.space1),
-          Text(
-            'До: $endsText${item.remainingVisits != null ? ' • ${strings.scannerRemainingVisitsPrefix}${item.remainingVisits}' : ''}',
-            style: UcraftTypography.caption.copyWith(
-              color: colors.foregroundSecondary,
-            ),
-          ),
-          if (!isCancelled && (canFreeze || canCancel)) ...[
-            const SizedBox(height: UcraftSpacing.space3),
-            Wrap(
+    return UcraftListRow(
+      title:
+          '${strings.scannerMembershipPrefix}${item.id} • Клиент №${item.clientId}',
+      subtitle:
+          'До: $endsText${item.remainingVisits != null ? ' • ${strings.scannerRemainingVisitsPrefix}${item.remainingVisits}' : ''}',
+      trailing: UcraftStatusPill(
+        icon: isCancelled
+            ? LucideIcons.circleX
+            : isFrozen
+            ? LucideIcons.snowflake
+            : LucideIcons.clock,
+        label: item.status.apiValue,
+        tone: isCancelled
+            ? UcraftStatusTone.destructive
+            : isFrozen
+            ? UcraftStatusTone.info
+            : UcraftStatusTone.warning,
+      ),
+      bottom: !isCancelled && (canFreeze || canCancel)
+          ? Wrap(
               spacing: UcraftSpacing.space2,
               runSpacing: UcraftSpacing.space2,
               alignment: WrapAlignment.end,
@@ -989,10 +952,8 @@ final class _ExpiringMembershipCard extends StatelessWidget {
                     onPressed: isBusy ? null : onCancel,
                   ),
               ],
-            ),
-          ],
-        ],
-      ),
+            )
+          : null,
     );
   }
 }
