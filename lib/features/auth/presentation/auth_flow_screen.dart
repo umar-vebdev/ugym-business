@@ -4,6 +4,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:ugym_core/ugym_core.dart';
 
+import '../../../core/l10n/business_localizations.dart';
 import 'auth_controller.dart';
 
 /// Multi-step authentication view (Login, Register, Email OTP, Reset Password).
@@ -86,6 +87,7 @@ final class _AuthFlowScreenState extends State<AuthFlowScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = BusinessStringsScope.of(context);
     return ListenableBuilder(
       listenable: widget.controller,
       builder: (context, _) {
@@ -105,14 +107,14 @@ final class _AuthFlowScreenState extends State<AuthFlowScreen> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Text(
-                        'uGym Business',
+                        strings.appTitle,
                         style: UcraftTypography.display.copyWith(
                           color: colors.foreground,
                         ),
                       ),
                       const SizedBox(height: UcraftSpacing.space2),
                       Text(
-                        _subtitleFor(controller.step),
+                        _subtitleFor(controller.step, strings),
                         style: UcraftTypography.bodyLarge.copyWith(
                           color: colors.foregroundSecondary,
                         ),
@@ -140,11 +142,21 @@ final class _AuthFlowScreenState extends State<AuthFlowScreen> {
                       ],
                       UcraftCard(
                         child: switch (controller.step) {
-                          AuthStep.login => _buildLoginForm(controller),
-                          AuthStep.register => _buildRegisterForm(controller),
-                          AuthStep.verifyOtp => _buildOtpForm(controller),
+                          AuthStep.login => _buildLoginForm(
+                            controller,
+                            strings,
+                          ),
+                          AuthStep.register => _buildRegisterForm(
+                            controller,
+                            strings,
+                          ),
+                          AuthStep.verifyOtp => _buildOtpForm(
+                            controller,
+                            strings,
+                          ),
                           AuthStep.resetPassword => _buildResetPasswordForm(
                             controller,
+                            strings,
                           ),
                         },
                       ),
@@ -159,13 +171,13 @@ final class _AuthFlowScreenState extends State<AuthFlowScreen> {
     );
   }
 
-  Widget _buildLoginForm(AuthController controller) {
+  Widget _buildLoginForm(AuthController controller, BusinessStrings strings) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         UcraftTextField(
           key: const ValueKey<String>('login_identifier'),
-          label: 'Email или телефон',
+          label: strings.authEmailOrPhoneLabel,
           hintText: 'owner@gym.tj',
           keyboardType: TextInputType.emailAddress,
           controller: _loginIdentifierController,
@@ -175,7 +187,7 @@ final class _AuthFlowScreenState extends State<AuthFlowScreen> {
         const SizedBox(height: UcraftSpacing.formFieldGap),
         UcraftTextField(
           key: const ValueKey<String>('login_password'),
-          label: 'Пароль',
+          label: strings.authPasswordLabel,
           obscureText: true,
           controller: _loginPasswordController,
           enabled: !controller.isSubmitting,
@@ -183,7 +195,7 @@ final class _AuthFlowScreenState extends State<AuthFlowScreen> {
         ),
         const SizedBox(height: UcraftSpacing.space6),
         UcraftButton(
-          label: 'Войти',
+          label: strings.authSignInButton,
           fullWidth: true,
           isLoading: controller.isSubmitting,
           onPressed: () {
@@ -197,7 +209,7 @@ final class _AuthFlowScreenState extends State<AuthFlowScreen> {
         ),
         const SizedBox(height: UcraftSpacing.space3),
         UcraftButton(
-          label: 'Создать аккаунт',
+          label: strings.authCreateAccountButton,
           variant: UcraftButtonVariant.tertiary,
           fullWidth: true,
           onPressed: controller.isSubmitting
@@ -205,7 +217,7 @@ final class _AuthFlowScreenState extends State<AuthFlowScreen> {
               : () => controller.showStep(AuthStep.register),
         ),
         UcraftButton(
-          label: 'Сбросить пароль',
+          label: strings.authResetPasswordButton,
           variant: UcraftButtonVariant.tertiary,
           fullWidth: true,
           onPressed: controller.isSubmitting
@@ -221,7 +233,10 @@ final class _AuthFlowScreenState extends State<AuthFlowScreen> {
     );
   }
 
-  Widget _buildRegisterForm(AuthController controller) {
+  Widget _buildRegisterForm(
+    AuthController controller,
+    BusinessStrings strings,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -237,7 +252,7 @@ final class _AuthFlowScreenState extends State<AuthFlowScreen> {
         const SizedBox(height: UcraftSpacing.formFieldGap),
         UcraftTextField(
           key: const ValueKey<String>('register_phone'),
-          label: 'Телефон (необязательно)',
+          label: strings.authPhoneOptionalLabel,
           hintText: '+992900001122',
           keyboardType: TextInputType.phone,
           controller: _registerPhoneController,
@@ -247,7 +262,7 @@ final class _AuthFlowScreenState extends State<AuthFlowScreen> {
         const SizedBox(height: UcraftSpacing.formFieldGap),
         UcraftTextField(
           key: const ValueKey<String>('register_password'),
-          label: 'Пароль (минимум 8 символов)',
+          label: strings.authPasswordMinLabel,
           obscureText: true,
           controller: _registerPasswordController,
           enabled: !controller.isSubmitting,
@@ -255,7 +270,7 @@ final class _AuthFlowScreenState extends State<AuthFlowScreen> {
         ),
         const SizedBox(height: UcraftSpacing.space6),
         UcraftButton(
-          label: 'Зарегистрироваться',
+          label: strings.authRegisterButton,
           fullWidth: true,
           isLoading: controller.isSubmitting,
           onPressed: () {
@@ -270,7 +285,7 @@ final class _AuthFlowScreenState extends State<AuthFlowScreen> {
         ),
         const SizedBox(height: UcraftSpacing.space3),
         UcraftButton(
-          label: 'Назад ко входу',
+          label: strings.authBackToLoginButton,
           variant: UcraftButtonVariant.tertiary,
           fullWidth: true,
           onPressed: controller.isSubmitting
@@ -281,7 +296,7 @@ final class _AuthFlowScreenState extends State<AuthFlowScreen> {
     );
   }
 
-  Widget _buildOtpForm(AuthController controller) {
+  Widget _buildOtpForm(AuthController controller, BusinessStrings strings) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -296,7 +311,7 @@ final class _AuthFlowScreenState extends State<AuthFlowScreen> {
         const SizedBox(height: UcraftSpacing.formFieldGap),
         UcraftTextField(
           key: const ValueKey<String>('otp_code'),
-          label: '6-значный код из письма',
+          label: strings.authOtpCodeLabel,
           hintText: '123456',
           keyboardType: TextInputType.number,
           controller: _otpCodeController,
@@ -305,7 +320,7 @@ final class _AuthFlowScreenState extends State<AuthFlowScreen> {
         ),
         const SizedBox(height: UcraftSpacing.space6),
         UcraftButton(
-          label: 'Подтвердить email',
+          label: strings.authVerifyEmailButton,
           fullWidth: true,
           isLoading: controller.isSubmitting,
           onPressed: () {
@@ -319,7 +334,7 @@ final class _AuthFlowScreenState extends State<AuthFlowScreen> {
         ),
         const SizedBox(height: UcraftSpacing.space3),
         UcraftButton(
-          label: 'Отправить код повторно',
+          label: strings.authResendOtpButton,
           variant: UcraftButtonVariant.secondary,
           fullWidth: true,
           onPressed: controller.isSubmitting
@@ -332,7 +347,7 @@ final class _AuthFlowScreenState extends State<AuthFlowScreen> {
         ),
         const SizedBox(height: UcraftSpacing.space2),
         UcraftButton(
-          label: 'Назад ко входу',
+          label: strings.authBackToLoginButton,
           variant: UcraftButtonVariant.tertiary,
           fullWidth: true,
           onPressed: controller.isSubmitting
@@ -343,7 +358,10 @@ final class _AuthFlowScreenState extends State<AuthFlowScreen> {
     );
   }
 
-  Widget _buildResetPasswordForm(AuthController controller) {
+  Widget _buildResetPasswordForm(
+    AuthController controller,
+    BusinessStrings strings,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -358,7 +376,7 @@ final class _AuthFlowScreenState extends State<AuthFlowScreen> {
         ),
         const SizedBox(height: UcraftSpacing.space3),
         UcraftButton(
-          label: 'Получить код на email',
+          label: strings.authSendCodeButton,
           variant: UcraftButtonVariant.secondary,
           fullWidth: true,
           onPressed: controller.isSubmitting
@@ -372,7 +390,7 @@ final class _AuthFlowScreenState extends State<AuthFlowScreen> {
         const SizedBox(height: UcraftSpacing.formFieldGap),
         UcraftTextField(
           key: const ValueKey<String>('reset_code'),
-          label: '6-значный код из письма',
+          label: strings.authOtpCodeLabel,
           hintText: '123456',
           keyboardType: TextInputType.number,
           controller: _resetCodeController,
@@ -382,7 +400,7 @@ final class _AuthFlowScreenState extends State<AuthFlowScreen> {
         const SizedBox(height: UcraftSpacing.formFieldGap),
         UcraftTextField(
           key: const ValueKey<String>('reset_password'),
-          label: 'Новый пароль',
+          label: strings.authNewPasswordLabel,
           obscureText: true,
           controller: _resetPasswordController,
           enabled: !controller.isSubmitting,
@@ -390,7 +408,7 @@ final class _AuthFlowScreenState extends State<AuthFlowScreen> {
         ),
         const SizedBox(height: UcraftSpacing.space6),
         UcraftButton(
-          label: 'Сохранить новый пароль',
+          label: strings.authSaveNewPasswordButton,
           fullWidth: true,
           isLoading: controller.isSubmitting,
           onPressed: () {
@@ -405,7 +423,7 @@ final class _AuthFlowScreenState extends State<AuthFlowScreen> {
         ),
         const SizedBox(height: UcraftSpacing.space3),
         UcraftButton(
-          label: 'Назад ко входу',
+          label: strings.authBackToLoginButton,
           variant: UcraftButtonVariant.tertiary,
           fullWidth: true,
           onPressed: controller.isSubmitting
@@ -416,12 +434,12 @@ final class _AuthFlowScreenState extends State<AuthFlowScreen> {
     );
   }
 
-  String _subtitleFor(AuthStep step) {
+  String _subtitleFor(AuthStep step, BusinessStrings strings) {
     return switch (step) {
-      AuthStep.login => 'Вход для владельца, администратора и тренера',
-      AuthStep.register => 'Регистрация аккаунта сотрудника или владельца',
-      AuthStep.verifyOtp => 'Подтверждение email по одноразовому коду',
-      AuthStep.resetPassword => 'Восстановление доступа по коду из письма',
+      AuthStep.login => strings.authSubtitleLogin,
+      AuthStep.register => strings.authSubtitleRegister,
+      AuthStep.verifyOtp => strings.authSubtitleOtp,
+      AuthStep.resetPassword => strings.authSubtitleReset,
     };
   }
 }

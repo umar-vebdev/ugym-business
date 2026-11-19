@@ -4,6 +4,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:ugym_core/ugym_core.dart';
 
+import '../../../core/l10n/business_localizations.dart';
 import '../domain/kiosk_security.dart';
 import '../domain/reception_visits_models.dart';
 
@@ -150,11 +151,11 @@ final class _GymQrKioskScreenState extends State<GymQrKioskScreen> {
     }
   }
 
-  Future<void> _enablePinLock() async {
+  Future<void> _enablePinLock(BusinessStrings strings) async {
     final pin = _setPinController.text.trim();
     if (!KioskPinGuard.isValidPinFormat(pin)) {
       setState(() {
-        _pinError = 'Введите 4 цифры PIN-кода';
+        _pinError = strings.kioskPinFormatError;
       });
       return;
     }
@@ -171,7 +172,7 @@ final class _GymQrKioskScreenState extends State<GymQrKioskScreen> {
     });
   }
 
-  Future<void> _confirmUnlockAndExit() async {
+  Future<void> _confirmUnlockAndExit(BusinessStrings strings) async {
     final unlocked = await widget.pinGuard.unlockWithPin(
       _unlockPinController.text,
     );
@@ -180,7 +181,7 @@ final class _GymQrKioskScreenState extends State<GymQrKioskScreen> {
     }
     if (!unlocked) {
       setState(() {
-        _pinError = 'Неверный PIN-код';
+        _pinError = strings.kioskWrongPinError;
       });
       return;
     }
@@ -197,6 +198,7 @@ final class _GymQrKioskScreenState extends State<GymQrKioskScreen> {
   @override
   Widget build(BuildContext context) {
     final colors = context.ucraftColors;
+    final strings = BusinessStringsScope.of(context);
 
     return PopScope(
       canPop: !_isLocked,
@@ -225,7 +227,9 @@ final class _GymQrKioskScreenState extends State<GymQrKioskScreen> {
                               ),
                             ),
                             Text(
-                              _isLocked ? 'Киоск заблокирован' : 'Режим стойки',
+                              _isLocked
+                                  ? strings.kioskLockedBadge
+                                  : strings.kioskModeBadge,
                               style: UcraftTypography.label.copyWith(
                                 color: colors.foregroundSecondary,
                               ),
@@ -237,15 +241,21 @@ final class _GymQrKioskScreenState extends State<GymQrKioskScreen> {
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Expanded(flex: 3, child: _buildQrContent(colors)),
+                              Expanded(
+                                flex: 3,
+                                child: _buildQrContent(colors, strings),
+                              ),
                               const SizedBox(width: UcraftSpacing.space6),
-                              Expanded(flex: 2, child: _buildPinControls()),
+                              Expanded(
+                                flex: 2,
+                                child: _buildPinControls(strings),
+                              ),
                             ],
                           )
                         else ...[
-                          _buildQrContent(colors),
+                          _buildQrContent(colors, strings),
                           const SizedBox(height: UcraftSpacing.space4),
-                          _buildPinControls(),
+                          _buildPinControls(strings),
                         ],
                       ],
                     ),
@@ -259,12 +269,12 @@ final class _GymQrKioskScreenState extends State<GymQrKioskScreen> {
     );
   }
 
-  Widget _buildQrContent(UcraftColors colors) {
+  Widget _buildQrContent(UcraftColors colors, BusinessStrings strings) {
     if (_loading) {
-      return const UcraftCard(
+      return UcraftCard(
         child: Padding(
-          padding: EdgeInsets.symmetric(vertical: UcraftSpacing.space8),
-          child: UcraftLoadingState(message: 'Загрузка QR-кода зала...'),
+          padding: const EdgeInsets.symmetric(vertical: UcraftSpacing.space8),
+          child: UcraftLoadingState(message: strings.kioskLoadingQr),
         ),
       );
     }
@@ -273,7 +283,7 @@ final class _GymQrKioskScreenState extends State<GymQrKioskScreen> {
       return UcraftCard(
         child: UcraftErrorState(
           message: _errorMessage!,
-          retryLabel: 'Повторить',
+          retryLabel: strings.retryLabel,
           onRetry: _refreshQr,
         ),
       );
@@ -290,7 +300,7 @@ final class _GymQrKioskScreenState extends State<GymQrKioskScreen> {
           ),
           const SizedBox(height: UcraftSpacing.space2),
           Text(
-            'Отсканируйте код в приложении uGym',
+            strings.kioskScanPrompt,
             style: UcraftTypography.body.copyWith(
               color: colors.foregroundSecondary,
             ),
@@ -324,12 +334,12 @@ final class _GymQrKioskScreenState extends State<GymQrKioskScreen> {
           ),
           const SizedBox(height: UcraftSpacing.space4),
           Text(
-            'Обновление через $_secondsRemaining сек',
+            '${strings.kioskRefreshPrefix}$_secondsRemaining${strings.kioskSecondsSuffix}',
             style: UcraftTypography.mono.copyWith(color: colors.foreground),
           ),
           const SizedBox(height: UcraftSpacing.space2),
           Text(
-            'Слот #${qr.slot}',
+            '${strings.kioskSlotPrefix}${qr.slot}',
             style: UcraftTypography.mono.copyWith(
               color: colors.foregroundSecondary,
             ),
@@ -349,7 +359,7 @@ final class _GymQrKioskScreenState extends State<GymQrKioskScreen> {
     );
   }
 
-  Widget _buildPinControls() {
+  Widget _buildPinControls(BusinessStrings strings) {
     if (!_isLocked) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -361,7 +371,7 @@ final class _GymQrKioskScreenState extends State<GymQrKioskScreen> {
                 children: [
                   UcraftTextField(
                     key: const ValueKey<String>('kiosk_set_pin_input'),
-                    label: 'PIN-код из 4 цифр для выхода',
+                    label: strings.kioskSetPinLabel,
                     hintText: '1234',
                     keyboardType: TextInputType.number,
                     obscureText: true,
@@ -370,13 +380,13 @@ final class _GymQrKioskScreenState extends State<GymQrKioskScreen> {
                   ),
                   const SizedBox(height: UcraftSpacing.space4),
                   UcraftButton(
-                    label: 'Включить блокировку киоска',
+                    label: strings.kioskEnableLockButton,
                     fullWidth: true,
-                    onPressed: _enablePinLock,
+                    onPressed: () => unawaited(_enablePinLock(strings)),
                   ),
                   const SizedBox(height: UcraftSpacing.space2),
                   UcraftButton(
-                    label: 'Отмена',
+                    label: strings.cancelLabel,
                     variant: UcraftButtonVariant.tertiary,
                     fullWidth: true,
                     onPressed: () {
@@ -391,7 +401,7 @@ final class _GymQrKioskScreenState extends State<GymQrKioskScreen> {
             )
           else ...[
             UcraftButton(
-              label: 'Заблокировать киоск PIN-кодом',
+              label: strings.kioskLockWithPinButton,
               variant: UcraftButtonVariant.secondary,
               fullWidth: true,
               onPressed: () {
@@ -403,7 +413,7 @@ final class _GymQrKioskScreenState extends State<GymQrKioskScreen> {
             ),
             const SizedBox(height: UcraftSpacing.space3),
             UcraftButton(
-              label: 'Выйти из режима киоска',
+              label: strings.kioskExitButton,
               variant: UcraftButtonVariant.tertiary,
               fullWidth: true,
               onPressed: widget.onExitKiosk,
@@ -423,7 +433,7 @@ final class _GymQrKioskScreenState extends State<GymQrKioskScreen> {
               children: [
                 UcraftTextField(
                   key: const ValueKey<String>('kiosk_unlock_pin_input'),
-                  label: 'Введите 4-значный PIN сотрудника',
+                  label: strings.kioskUnlockPinLabel,
                   hintText: '1234',
                   keyboardType: TextInputType.number,
                   obscureText: true,
@@ -432,13 +442,13 @@ final class _GymQrKioskScreenState extends State<GymQrKioskScreen> {
                 ),
                 const SizedBox(height: UcraftSpacing.space4),
                 UcraftButton(
-                  label: 'Подтвердить PIN',
+                  label: strings.kioskConfirmPinButton,
                   fullWidth: true,
-                  onPressed: _confirmUnlockAndExit,
+                  onPressed: () => unawaited(_confirmUnlockAndExit(strings)),
                 ),
                 const SizedBox(height: UcraftSpacing.space2),
                 UcraftButton(
-                  label: 'Отмена',
+                  label: strings.cancelLabel,
                   variant: UcraftButtonVariant.tertiary,
                   fullWidth: true,
                   onPressed: () {
@@ -453,7 +463,7 @@ final class _GymQrKioskScreenState extends State<GymQrKioskScreen> {
           )
         else
           UcraftButton(
-            label: 'Разблокировать и выйти',
+            label: strings.kioskUnlockAndExitButton,
             variant: UcraftButtonVariant.secondary,
             fullWidth: true,
             onPressed: () {

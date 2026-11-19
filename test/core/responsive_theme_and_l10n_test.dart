@@ -15,9 +15,12 @@ import 'package:ugym_business/core/theme/theme_controller.dart';
 import 'package:ugym_business/features/auth/domain/auth_repository.dart';
 import 'package:ugym_business/features/auth/domain/authenticated_user.dart';
 import 'package:ugym_business/features/auth/presentation/auth_controller.dart';
+import 'package:ugym_business/features/auth/presentation/auth_flow_screen.dart';
 import 'package:ugym_business/features/reception_qr/domain/kiosk_security.dart';
 import 'package:ugym_business/features/reception_qr/domain/reception_visits_models.dart';
 import 'package:ugym_business/features/reception_qr/presentation/gym_qr_kiosk_screen.dart';
+import 'package:ugym_business/features/reception_qr/presentation/reception_scan_controller.dart';
+import 'package:ugym_business/features/reception_qr/presentation/scan_client_qr_screen.dart';
 import 'package:ugym_business/main.dart';
 import 'package:ugym_core/ugym_core.dart';
 
@@ -407,6 +410,78 @@ void main() {
       expect(find.text('Details'), findsOneWidget);
       expect(find.text('You are not a gym staff member'), findsOneWidget);
       expect(find.text('Create company (14-day free trial)'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'AuthFlowScreen, GymQrKioskScreen, and ScanClientQrScreen translate cleanly in tg and en',
+    (tester) async {
+      final authController = AuthController(repository: _FakeAuthRepo());
+      final qrRepo = _FakeQrRepo();
+      final scanController = ReceptionScanController(
+        repository: qrRepo,
+        gymId: 1,
+      );
+      final pinGuard = KioskPinGuard(storage: InMemoryTokenStorage());
+      final fakeNow = DateTime.utc(2026, 11, 18, 12, 0);
+      addTearDown(authController.dispose);
+      addTearDown(scanController.dispose);
+
+      // AuthFlowScreen in Tajik.
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: UcraftTheme.light(),
+          home: BusinessStringsScope(
+            strings: BusinessStrings.tg,
+            child: AuthFlowScreen(controller: authController),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Ворид шудан'), findsOneWidget);
+      expect(find.text('Сохтани ҳисоб'), findsOneWidget);
+
+      // GymQrKioskScreen in English.
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: UcraftTheme.light(),
+          home: BusinessStringsScope(
+            strings: BusinessStrings.en,
+            child: GymQrKioskScreen(
+              gymId: 1,
+              repository: qrRepo,
+              pinGuard: pinGuard,
+              clock: () => fakeNow,
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Desk mode'), findsOneWidget);
+      expect(find.text('Scan this code in the uGym app'), findsOneWidget);
+      expect(find.text('Lock kiosk with PIN'), findsOneWidget);
+
+      // ScanClientQrScreen in English.
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: UcraftTheme.light(),
+          home: BusinessStringsScope(
+            strings: BusinessStrings.en,
+            child: ScanClientQrScreen(
+              controller: scanController,
+              scannerBuilder: (_, _) => const SizedBox.shrink(),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Scan client QR'), findsOneWidget);
+      expect(
+        find.text(
+          'Point the camera at the client personal QR code in the uGym app',
+        ),
+        findsOneWidget,
+      );
     },
   );
 }

@@ -4,6 +4,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:ugym_core/ugym_core.dart';
 
+import '../../../core/l10n/business_localizations.dart';
 import 'qr_scanner_view.dart';
 import 'reception_scan_controller.dart';
 
@@ -26,20 +27,21 @@ final class ScanClientQrScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final strings = BusinessStringsScope.of(context);
     return ListenableBuilder(
       listenable: controller,
       builder: (context, _) {
         return Scaffold(
-          appBar: AppBar(title: const Text('Сканер QR клиента')),
+          appBar: AppBar(title: Text(strings.scanClientQrButton)),
           body: SafeArea(
             child: switch (controller.phase) {
-              ScanPhase.idle => _buildScanner(context),
-              ScanPhase.processing => const UcraftLoadingState(
-                message: 'Проверяем абонемент...',
+              ScanPhase.idle => _buildScanner(context, strings),
+              ScanPhase.processing => UcraftLoadingState(
+                message: strings.scannerCheckingMembership,
               ),
-              ScanPhase.success => _buildSuccess(context),
-              ScanPhase.refused => _buildRefusal(context),
-              ScanPhase.networkError => _buildNetworkError(context),
+              ScanPhase.success => _buildSuccess(context, strings),
+              ScanPhase.refused => _buildRefusal(context, strings),
+              ScanPhase.networkError => _buildNetworkError(context, strings),
             },
           ),
         );
@@ -47,7 +49,7 @@ final class ScanClientQrScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildScanner(BuildContext context) {
+  Widget _buildScanner(BuildContext context, BusinessStrings strings) {
     final colors = context.ucraftColors;
     return Column(
       children: [
@@ -60,7 +62,7 @@ final class ScanClientQrScreen extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.all(UcraftSpacing.space4),
           child: Text(
-            'Наведите камеру на личный QR-код клиента из приложения uGym',
+            strings.scannerCameraHint,
             textAlign: TextAlign.center,
             style: UcraftTypography.body.copyWith(
               color: colors.foregroundSecondary,
@@ -71,7 +73,7 @@ final class ScanClientQrScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSuccess(BuildContext context) {
+  Widget _buildSuccess(BuildContext context, BusinessStrings strings) {
     final colors = context.ucraftColors;
     final result = controller.result!;
     final remaining = result.remainingVisits;
@@ -79,14 +81,15 @@ final class ScanClientQrScreen extends StatelessWidget {
       icon: LucideIcons.circleCheck,
       iconColor: colors.success,
       background: colors.successBackground,
-      title: 'Посещение отмечено',
+      title: strings.scannerVisitRecorded,
       lines: [
-        'Абонемент №${result.membershipId}',
-        if (remaining != null) 'Осталось занятий: $remaining',
+        '${strings.scannerMembershipPrefix}${result.membershipId}',
+        if (remaining != null)
+          '${strings.scannerRemainingVisitsPrefix}$remaining',
       ],
       actions: [
         UcraftButton(
-          label: 'Сканировать следующего',
+          label: strings.scannerScanNextButton,
           fullWidth: true,
           onPressed: controller.scanNext,
         ),
@@ -94,7 +97,7 @@ final class ScanClientQrScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildRefusal(BuildContext context) {
+  Widget _buildRefusal(BuildContext context, BusinessStrings strings) {
     final colors = context.ucraftColors;
     final error = controller.error!;
     final bool needsPayment = error.code == 'NO_ACTIVE_MEMBERSHIP';
@@ -107,24 +110,24 @@ final class ScanClientQrScreen extends StatelessWidget {
       icon: LucideIcons.ban,
       iconColor: colors.destructive,
       background: colors.destructiveBackground,
-      title: _refusalTitle(error.code),
+      title: _refusalTitle(error.code, strings),
       lines: [error.message],
       actions: [
         if (needsPayment && onOpenPayments != null)
           UcraftButton(
-            label: 'Принять оплату',
+            label: strings.scannerAcceptPaymentButton,
             fullWidth: true,
             onPressed: onOpenPayments,
           ),
         if (isMembershipRefusal && onOpenClients != null)
           UcraftButton(
-            label: 'Открыть клиентов',
+            label: strings.scannerOpenClientsButton,
             variant: UcraftButtonVariant.secondary,
             fullWidth: true,
             onPressed: onOpenClients,
           ),
         UcraftButton(
-          label: 'Сканировать следующего',
+          label: strings.scannerScanNextButton,
           variant: UcraftButtonVariant.secondary,
           fullWidth: true,
           onPressed: controller.scanNext,
@@ -133,27 +136,27 @@ final class ScanClientQrScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildNetworkError(BuildContext context) {
+  Widget _buildNetworkError(BuildContext context, BusinessStrings strings) {
     final colors = context.ucraftColors;
     final error = controller.error;
     final lines = <String>[
       if (error?.retryAfterSeconds != null) error!.message,
-      'Нажмите «Повторить» — дубль посещения не будет создан.',
+      strings.scannerNetworkRetryHint,
     ];
     return _ResultPanel(
       icon: LucideIcons.wifiOff,
       iconColor: colors.warning,
       background: colors.warningBackground,
-      title: 'Нет связи с сервером',
+      title: strings.scannerNetworkErrorTitle,
       lines: lines,
       actions: [
         UcraftButton(
-          label: 'Повторить',
+          label: strings.retryLabel,
           fullWidth: true,
           onPressed: () => unawaited(controller.retry()),
         ),
         UcraftButton(
-          label: 'Отмена',
+          label: strings.cancelLabel,
           variant: UcraftButtonVariant.tertiary,
           fullWidth: true,
           onPressed: controller.scanNext,
@@ -162,14 +165,14 @@ final class ScanClientQrScreen extends StatelessWidget {
     );
   }
 
-  String _refusalTitle(String code) {
+  String _refusalTitle(String code, BusinessStrings strings) {
     return switch (code) {
-      'NO_ACTIVE_MEMBERSHIP' => 'Нет активного абонемента',
-      'MEMBERSHIP_FROZEN' => 'Абонемент заморожен',
-      'DAILY_LIMIT_EXCEEDED' => 'Лимит входов на сегодня исчерпан',
-      'OUTSIDE_ALLOWED_TIME' => 'Вне разрешённого времени абонемента',
-      'INVALID_QR_TOKEN' => 'QR-код недействителен или устарел',
-      _ => 'Посещение не отмечено',
+      'NO_ACTIVE_MEMBERSHIP' => strings.scannerRefusalNoActive,
+      'MEMBERSHIP_FROZEN' => strings.scannerRefusalFrozen,
+      'DAILY_LIMIT_EXCEEDED' => strings.scannerRefusalDailyLimit,
+      'OUTSIDE_ALLOWED_TIME' => strings.scannerRefusalOutsideTime,
+      'INVALID_QR_TOKEN' => strings.scannerRefusalInvalidQr,
+      _ => strings.scannerRefusalGeneric,
     };
   }
 }
