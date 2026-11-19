@@ -1,6 +1,6 @@
 # uGym Business — чек-лист задач
 
-**Текущий этап:** `B8` — Переход на uCraft Design System 1.1 (UX and Layout Addendum)
+**Текущий этап:** `B9` — Макеты uGym и uGym Business для Figma
 **Статусы:** `[ ]` не начата · `[~]` в работе · `[x]` готова · `[!]` заблокирована (причина в заметках)
 
 ## Правила ведения файла
@@ -65,8 +65,10 @@
 - [x] **B8-04b** Переведены тарифы и истекающие (`MembershipTypesScreen`, `CreateMembershipTypeScreen`, `ExpiringMembershipsTab`), очередь заявок и история продаж (`MembershipRequestsQueueTab`, `SalesHistoryTab`) и касса/товары (`PosCheckoutScreen`, `ProductsScreen`) на `UcraftListSection`/`UcraftListRow`, `UcraftStatusPill`, `UcraftSegmentedTabs`, hero-итог `highlight` и скелетоны; 126 тестов зелёные (`format ✓`, `analyze ✓`, `test ✓`).
 - [x] **B8-05** Переведены расписание и тренеры (`TrainersScreen`, `ScheduleTab`, `SessionBookingsScreen`), витрина и фото (`StorefrontEditorScreen`, `GymPhotosManager`), штат (`StaffManagementScreen`) и аналитика/рассылки/подписка (`AnalyticsScreen`, `AnnouncementsScreen`, `BillingStatusScreen`) на **uCraft Design System 1.1** (`UcraftListSection`/`UcraftListRow`, `UcraftStatusPill`, `UcraftSegmentedTabs`, `UcraftProgressBar`, hero `highlight`, скелетоны) + пересборка Wi-Fi APK; 126 тестов зелёные (`format ✓`, `analyze ✓`, `test ✓`).
 
+- [x] **B9-01** Собран общий набор макетов по скриншотам для uGym и uGym Business. В наборе 35 экранов, 15 вариантов компонентов, локальный импорт в Figma и интерактивное превью с экспортом SVG. Проверены тексты, навигация и экспорт в Chromium, генерация слоёв проверена через имитацию Figma API (`format ✓`, `analyze ✓`, `test ✓`, 126 тестов).
+
 ---
 
-## Текущий этап: Все задачи этапов `B0`–`B8` завершены
+## Текущий этап — B9
 
-*(Новых открытых задач нет — готово к живому тестированию и релизной подготовке.)*
+- [!] **B9-02** Создать файл Figma Design и проверить результат в редакторе. Figma не подключена. После подключения создать новый файл с тремя страницами, проверить редактирование слоёв, переключение темы и переходы, затем добавить ссылку в `HANDOFF.md`.
