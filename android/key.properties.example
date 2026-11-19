@@ -1,0 +1,12 @@
+# Copy this file to android/key.properties (ignored by git) and fill in your
+# Google Play upload keystore credentials before building a signed release.
+#
+# Generate a keystore once with:
+#   keytool -genkey -v -keystore ~/ugym-business-upload.jks \
+#     -keyalg RSA -keysize 2048 -validity 10000 -alias upload
+
+storePassword=REPLACE_WITH_STORE_PASSWORD
+keyPassword=REPLACE_WITH_KEY_PASSWORD
+keyAlias=upload
+storeFile=/absolute/path/to/ugym-business-upload.jks
+

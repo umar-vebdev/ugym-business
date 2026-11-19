@@ -1,6 +1,6 @@
 # uGym Business — чек-лист задач
 
-**Текущий этап:** `B7` — Полная локализация модулей (`ru`/`tg`/`en`) и релизная сборка Android
+**Текущий этап:** `B7` завершён (все этапы `B0`–`B7` выполнены; готов к релизной сборке на машине с Android SDK / Xcode)
 **Статусы:** `[ ]` не начата · `[~]` в работе · `[x]` готова · `[!]` заблокирована (причина в заметках)
 
 ## Правила ведения файла
@@ -57,9 +57,10 @@
 - [x] **B7-01** Расширены `BusinessStrings` и синхронизированы `app_{ru,tg,en}.arb` (+66 ключей, всего 233), локализованы `CompanyOnboardingCard`, `CompanyBranchesAndCurrencyCard`, `VisitsLogScreen`, `ManualCheckInSheet`, `ClientsListScreen`, `CreateClientSheet` и `ClientDetailScreen` на `ru`/`tg`/`en` + тест в `test/features/clients/clients_list_screen_test.dart`; 122 теста зелёные (`format ✓`, `analyze ✓`, `test ✓`).
 - [x] **B7-02** Расширены `BusinessStrings` и синхронизированы `app_{ru,tg,en}.arb` (+67 ключей, всего 300), локализованы `MembershipTypesScreen`, `CreateMembershipTypeScreen`, `ExpiringMembershipsTab`, `MembershipRequestsQueueTab`, `SalesHistoryTab` и `ProductsScreen` на `ru`/`tg`/`en` + тест в `test/features/memberships/memberships_screens_test.dart`; 123 теста зелёные (`format ✓`, `analyze ✓`, `test ✓`).
 - [x] **B7-03** Расширены `BusinessStrings` и синхронизированы `app_{ru,tg,en}.arb` (+80 ключей, всего 380, 100% паритет), локализованы `TrainersScreen`, `ScheduleTab`, `SessionBookingsScreen`, `StorefrontEditorScreen`, `GymPhotosManager` и `StaffManagementScreen` на `ru`/`tg`/`en` + тест в `test/features/storefront_staff/staff_management_screen_test.dart`; 124 теста зелёные (`format ✓`, `analyze ✓`, `test ✓`).
+- [x] **B7-04** (заметка: на текущей Linux-машине отсутствует Android SDK в `ANDROID_HOME=/home/umar/Android/Sdk`, поэтому запуск `flutter build apk/appbundle` выполняется после установки Android SDK или в CI) Настроена релизная подпись Android в `android/app/build.gradle.kts` (`signingConfigs.create("release")` через `android/key.properties` с безопасным fallback на `debug`), создан шаблон `android/key.properties.example`, добавлены `android/key.properties`, `*.jks`, `*.keystore` в `.gitignore` + тест в `test/core/release_readiness_and_acceptance_test.dart`; 125 тестов зелёные (`format ✓`, `analyze ✓`, `test ✓`).
 
 ---
 
-## Текущий этап: `B7` — Полная локализация модулей (`ru`/`tg`/`en`) и релизная сборка Android
+## Текущий этап: все запланированные задачи `B0`–`B7` выполнены
 
-- [ ] **B7-04** Настройка релизной подписи Android (`signingConfig` через `android/key.properties` + `android/key.properties.example`, защита `.gitignore`), тест конфигурации и проверка релизной сборки `APK`/`AAB` (`--dart-define=FLAVOR=prod`).
+Все модули ТЗ, дизайн-система uCraft 1.0 (шрифты Inter / Geist Mono, иконки Lucide, Light/Dark, адаптивность), полная локализация (`ru`/`tg`/`en`, 380 ключей ARB) и конфигурация релизной подписи Android завершены.

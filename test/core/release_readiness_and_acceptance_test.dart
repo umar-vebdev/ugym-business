@@ -437,4 +437,27 @@ void main() {
       expect(find.text('На модерации (pending)'), findsOneWidget);
     },
   );
+
+  test('Android release signing uses android/key.properties with safe fallback and ignores secrets in git', () {
+    final gitignore = File('.gitignore').readAsStringSync();
+    expect(gitignore, contains('android/key.properties'));
+    expect(gitignore, contains('*.jks'));
+    expect(gitignore, contains('*.keystore'));
+
+    final exampleFile = File('android/key.properties.example');
+    expect(exampleFile.existsSync(), isTrue);
+    final exampleContent = exampleFile.readAsStringSync();
+    expect(exampleContent, contains('storePassword='));
+    expect(exampleContent, contains('keyPassword='));
+    expect(exampleContent, contains('keyAlias='));
+    expect(exampleContent, contains('storeFile='));
+
+    final gradleFile = File('android/app/build.gradle.kts');
+    expect(gradleFile.existsSync(), isTrue);
+    final gradleContent = gradleFile.readAsStringSync();
+    expect(gradleContent, contains('rootProject.file("key.properties")'));
+    expect(gradleContent, contains('create("release")'));
+    expect(gradleContent, contains('signingConfigs.getByName("release")'));
+    expect(gradleContent, contains('applicationId = "tj.ugym.business"'));
+  });
 }

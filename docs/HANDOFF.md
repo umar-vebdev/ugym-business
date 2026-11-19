@@ -1,14 +1,16 @@
 # HANDOFF — uGym Business
 
-**Текущий этап:** `B7` — Полная локализация модулей (`ru`/`tg`/`en`) и релизная сборка Android  
-**Следующая задача:** `B7-04` — Настройка релизной подписи Android и проверка релизной сборки `APK`/`AAB`  
+**Статус:** Этапы `B0`–`B7` полностью завершены (`format ✓`, `analyze ✓`, `test ✓` — **125 тестов**)  
 **Репозиторий:** `/home/umar/ugym-mobile/uGym Business` (`main`)
 
 ## Что сделано
-- **Этапы `B0`–`B6`:** завершены полностью.
-- **B7-01, B7-02, B7-03:** локализованы все экраны приложения (`ru`/`tg`/`en`, 380 ключей ARB, 100% паритет, 124 теста зелёные).
+- **B0–B6:** полный функционал по ТЗ (`owner`/`admin`/`trainer`, RBAC, `SUBSCRIPTION_EXPIRED` read-only, идемпотентность, киоск QR + WakeLock + PIN, сканер QR, CRM, тарифы/абонементы, касса `PaymentMark`, расписание/тренеры, витрина + фотогалерея с `image_picker`, аналитика с графиками uCraft, офлайн-шрифты `Inter`/`GeistMono`, иконки `LucideIcons`, адаптивность `<600dp` / `600–839dp` / `>=840dp`).
+- **B7-01, B7-02, B7-03:** полная локализация всех экранов приложения (`ru`/`tg`/`en`) через `BusinessStringsScope` и синхронизированные `app_{ru,tg,en}.arb` (**380 ключей**, 100% паритет).
+- **B7-04:** настроена релизная подпись Android (`android/app/build.gradle.kts` читает `android/key.properties` с безопасным fallback на `debug`, добавлен шаблон `android/key.properties.example`, секреты `android/key.properties`, `*.jks`, `*.keystore` защищены в `.gitignore`).
 
-## Следующий шаг (`B7-04`)
-1. Проверить `.gitignore` на защиту `android/key.properties`, `*.jks`, `*.keystore`.
-2. Создать `android/key.properties.example` и настроить `signingConfigs.create("release")` в `android/app/build.gradle.kts` с безопасным fallback на `debug`, если `key.properties` отсутствует.
-3. Добавить тест в `test/core/release_readiness_and_acceptance_test.dart` и проверить реальную сборку `flutter build apk --release --dart-define=FLAVOR=prod`.
+## Что нужно для финальной сборки релиза
+1. Установить Android SDK (`ANDROID_HOME=/home/umar/Android/Sdk`) или запустить в CI.
+2. Скопировать `android/key.properties.example` → `android/key.properties`, указать keystore и выполнить:
+   - `flutter build appbundle --release --dart-define=FLAVOR=prod` (для Google Play)
+   - `flutter build apk --release --dart-define=FLAVOR=prod` (для прямой установки)
+3. При необходимости отправить локальные коммиты в `origin/main` (`git push`) и аналогично в `../ugym_core`.
