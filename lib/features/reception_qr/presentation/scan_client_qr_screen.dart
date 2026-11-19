@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:ugym_core/ugym_core.dart';
 
@@ -75,7 +76,7 @@ final class ScanClientQrScreen extends StatelessWidget {
     final result = controller.result!;
     final remaining = result.remainingVisits;
     return _ResultPanel(
-      icon: Icons.check_circle_outline,
+      icon: LucideIcons.circleCheck,
       iconColor: colors.success,
       background: colors.successBackground,
       title: 'Посещение отмечено',
@@ -103,7 +104,7 @@ final class ScanClientQrScreen extends StatelessWidget {
         error.code == 'DAILY_LIMIT_EXCEEDED' ||
         error.code == 'OUTSIDE_ALLOWED_TIME';
     return _ResultPanel(
-      icon: Icons.block,
+      icon: LucideIcons.ban,
       iconColor: colors.destructive,
       background: colors.destructiveBackground,
       title: _refusalTitle(error.code),
@@ -140,7 +141,7 @@ final class ScanClientQrScreen extends StatelessWidget {
       'Нажмите «Повторить» — дубль посещения не будет создан.',
     ];
     return _ResultPanel(
-      icon: Icons.wifi_off,
+      icon: LucideIcons.wifiOff,
       iconColor: colors.warning,
       background: colors.warningBackground,
       title: 'Нет связи с сервером',

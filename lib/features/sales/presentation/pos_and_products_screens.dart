@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:ugym_core/ugym_core.dart';
 
@@ -338,6 +339,7 @@ final class _PosCheckoutScreenState extends State<PosCheckoutScreen> {
                                 ),
                               ),
                               IconButton(
+                                tooltip: 'Уменьшить количество',
                                 onPressed:
                                     (_productQuantities[product.id] ?? 0) > 0
                                     ? () {
@@ -351,10 +353,11 @@ final class _PosCheckoutScreenState extends State<PosCheckoutScreen> {
                                         });
                                       }
                                     : null,
-                                icon: const Icon(Icons.remove),
+                                icon: const Icon(LucideIcons.minus, size: 20),
                               ),
                               Text('${_productQuantities[product.id] ?? 0}'),
                               IconButton(
+                                tooltip: 'Увеличить количество',
                                 onPressed: () {
                                   _pendingKey = null;
                                   setState(() {
@@ -364,7 +367,7 @@ final class _PosCheckoutScreenState extends State<PosCheckoutScreen> {
                                         current + 1;
                                   });
                                 },
-                                icon: const Icon(Icons.add),
+                                icon: const Icon(LucideIcons.plus, size: 20),
                               ),
                             ],
                           ),

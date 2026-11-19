@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:ugym_business/core/session/business_role.dart';
@@ -312,7 +313,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byIcon(Icons.add));
+      await tester.tap(find.byIcon(LucideIcons.plus));
       await tester.pumpAndSettle();
 
       await tester.ensureVisible(find.text('Провести продажу'));

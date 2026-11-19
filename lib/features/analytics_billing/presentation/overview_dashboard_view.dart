@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:ugym_core/ugym_core.dart';
 
@@ -505,10 +506,8 @@ final class _OverviewDashboardViewState extends State<OverviewDashboardView> {
           Row(
             children: [
               Icon(
-                highlightWarning
-                    ? Icons.notifications_active_outlined
-                    : Icons.check_circle_outline,
-                size: 18,
+                highlightWarning ? LucideIcons.bell : LucideIcons.circleCheck,
+                size: 20,
                 color: highlightWarning ? colors.warning : colors.success,
               ),
               const SizedBox(width: UcraftSpacing.iconLabelGap),

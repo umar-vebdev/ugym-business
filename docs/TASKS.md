@@ -50,11 +50,11 @@
 - [x] **B5-04** Добавлен `image_picker` (`D-006`), реализована обёртка `pickGymPhotoFromGallery` / `normalizePickedPhotoFilename` (`lib/features/storefront_staff/presentation/gym_photo_picker.dart`, нативное сжатие до `1920x1920`, `quality: 85`), подключена в `BusinessShell`, а в `GymPhotosManager` добавлены превью фотографий (`Image.network` с fallback) и обработка ошибок доступа к галерее + 2 теста в `test/features/storefront_staff/storefront_editor_screen_test.dart`; 112 тестов зелёные (`format ✓`, `analyze ✓`, `test ✓`).
 - [x] **B6-01** Реализованы визуальные графики `VisitsByDayBarChart` и `RevenuePaymentMixBar` (`lib/features/analytics_billing/presentation/analytics_charts.dart`) по uCraft 1.0 §15 (семантические токены, горизонтальная сетка `border`, табличный `GeistMono`, `Semantics`, пустые состояния, Light/Dark) и подключены в `AnalyticsScreen` + 3 теста в `test/features/analytics_billing/analytics_charts_test.dart`; 115 тестов зелёные (`format ✓`, `analyze ✓`, `test ✓`).
 - [x] **B6-02a** Загружены и зарегистрированы офлайн-шрифты `Inter` и `GeistMono` (`assets/fonts/` + `pubspec.yaml`, OFL), добавлен `lucide_icons_flutter` (`D-007`), переведены на `LucideIcons` оболочка `BusinessShell` и `role_guard_and_banners.dart` + 2 теста в `test/core/ucraft_assets_and_icons_test.dart`; 117 тестов зелёные (`format ✓`, `analyze ✓`, `test ✓`).
+- [x] **B6-02b** Переведены иконки всех остальных экранов (`AuthFlowScreen`, `ScanClientQrScreen`, `PosCheckoutScreen` с доступными `tooltip`, `GymPhotosManager`, `OverviewDashboardView`) на `LucideIcons.*` и добавлена автоматическая проверка отсутствия `Icons.*` в `lib/` (`test/core/ucraft_assets_and_icons_test.dart`); 118 тестов зелёные (`format ✓`, `analyze ✓`, `test ✓`).
 
 ---
 
 ## Текущий этап: `B6` — Локализация (`ru`/`tg`/`en`) и полировка по uCraft Design System 1.0
 
-- [ ] **B6-02b** Перевод иконок экранов модулей (`AuthFlowScreen`, `ScanClientQrScreen`, `PosCheckoutScreen`, `GymPhotosManager`, `OverviewDashboardView`) на `LucideIcons`.
 - [ ] **B6-03** Контекстная локализация (`BusinessStringsScope` в `UgymBusinessApp`, расширение `app_{ru,tg,en}.arb`) и перевод `BusinessShell`, `RoleGuard` / `SubscriptionReadOnlyBanner`, `OverviewDashboardView` и `AuthFlowScreen`.
 - [ ] **B6-04** Полная локализация (`ru`/`tg`/`en`) экранов ресепшна, киоска, кассы, аналитики, рассылок и подписки (`ScanClientQrScreen`, `GymQrKioskScreen`, `PosCheckoutScreen`, `AnalyticsScreen`, `AnnouncementsScreen`, `BillingStatusScreen`).

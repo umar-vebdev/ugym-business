@@ -67,4 +67,21 @@ void main() {
     expect(find.byIcon(LucideIcons.dumbbell), findsOneWidget);
     expect(find.byIcon(LucideIcons.chevronDown), findsOneWidget);
   });
+
+  test('Application code in lib/ uses Lucide icons exclusively (no Material Icons.*)', () {
+    final dartFiles = Directory('lib')
+        .listSync(recursive: true)
+        .whereType<File>()
+        .where((f) => f.path.endsWith('.dart'));
+    final materialIconPattern = RegExp(r'\bIcons\.');
+
+    final violations = <String>[];
+    for (final file in dartFiles) {
+      if (materialIconPattern.hasMatch(file.readAsStringSync())) {
+        violations.add(file.path);
+      }
+    }
+
+    expect(violations, isEmpty);
+  });
 }

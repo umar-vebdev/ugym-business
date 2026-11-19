@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:ugym_core/ugym_core.dart';
 
@@ -120,7 +121,7 @@ final class _AuthFlowScreenState extends State<AuthFlowScreen> {
                       if (controller.infoMessage != null) ...[
                         _FeedbackBanner(
                           message: controller.infoMessage!,
-                          icon: Icons.check_circle_outline,
+                          icon: LucideIcons.circleCheck,
                           backgroundColor: colors.successBackground,
                           borderColor: colors.success,
                           foregroundColor: colors.successForeground,
@@ -130,7 +131,7 @@ final class _AuthFlowScreenState extends State<AuthFlowScreen> {
                       if (controller.errorMessage != null) ...[
                         _FeedbackBanner(
                           message: controller.errorMessage!,
-                          icon: Icons.error_outline,
+                          icon: LucideIcons.circleAlert,
                           backgroundColor: colors.destructiveBackground,
                           borderColor: colors.destructive,
                           foregroundColor: colors.destructiveForeground,

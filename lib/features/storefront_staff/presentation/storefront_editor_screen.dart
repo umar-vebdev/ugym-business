@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:ugym_core/ugym_core.dart';
 
@@ -792,7 +793,7 @@ final class _GymPhotosManagerState extends State<GymPhotosManager> {
                         color: colors.surfaceSecondary,
                         alignment: Alignment.center,
                         child: Icon(
-                          Icons.photo_outlined,
+                          LucideIcons.image,
                           size: 20,
                           color: colors.foregroundSecondary,
                         ),
