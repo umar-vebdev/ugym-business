@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:ugym_core/ugym_core.dart';
 
@@ -204,9 +205,10 @@ final class _ClientsListScreenState extends State<ClientsListScreen> {
             ),
             const SizedBox(height: UcraftSpacing.space3),
             if (_loading)
-              UcraftLoadingState(message: strings.clientsLoading)
+              const UcraftLoadingState(isSkeleton: true, skeletonCount: 4)
             else if (_errorMessage != null && _clients.isEmpty)
               UcraftErrorState(
+                icon: LucideIcons.circleAlert,
                 title: strings.posLoadErrorTitle,
                 message: _errorMessage!,
                 retryLabel: strings.retryLabel,
@@ -214,6 +216,7 @@ final class _ClientsListScreenState extends State<ClientsListScreen> {
               )
             else if (_clients.isEmpty)
               UcraftEmptyState(
+                icon: LucideIcons.users,
                 title: strings.clientsEmptyTitle,
                 description: strings.clientsEmptyDesc,
               )
@@ -221,16 +224,19 @@ final class _ClientsListScreenState extends State<ClientsListScreen> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  for (final client in _clients) ...[
-                    _ClientCard(
-                      client: client,
-                      onTap: widget.onOpenClient == null
-                          ? null
-                          : () => widget.onOpenClient!(client),
-                    ),
+                  UcraftListSection(
+                    children: [
+                      for (final client in _clients)
+                        _ClientRow(
+                          client: client,
+                          onTap: widget.onOpenClient == null
+                              ? null
+                              : () => widget.onOpenClient!(client),
+                        ),
+                    ],
+                  ),
+                  if (_hasMore) ...[
                     const SizedBox(height: UcraftSpacing.space3),
-                  ],
-                  if (_hasMore)
                     UcraftButton(
                       label: strings.clientsShowMoreButton,
                       variant: UcraftButtonVariant.secondary,
@@ -240,6 +246,7 @@ final class _ClientsListScreenState extends State<ClientsListScreen> {
                           ? null
                           : () => unawaited(_loadClients(reset: false)),
                     ),
+                  ],
                 ],
               ),
           ],
@@ -249,8 +256,8 @@ final class _ClientsListScreenState extends State<ClientsListScreen> {
   }
 }
 
-final class _ClientCard extends StatelessWidget {
-  const _ClientCard({required this.client, this.onTap});
+final class _ClientRow extends StatelessWidget {
+  const _ClientRow({required this.client, this.onTap});
 
   final ClientSummary client;
   final VoidCallback? onTap;
@@ -259,45 +266,53 @@ final class _ClientCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.ucraftColors;
     final strings = BusinessStringsScope.of(context);
-    return UcraftCard(
-      child: InkWell(
-        onTap: onTap,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    '${client.name} (#${client.id})',
-                    style: UcraftTypography.bodyMedium.copyWith(
-                      color: colors.foreground,
-                    ),
-                  ),
-                ),
-                Text(
-                  client.linked
-                      ? strings.clientLinkedBadge
-                      : strings.clientOfflineBadge,
-                  style: UcraftTypography.caption.copyWith(
-                    color: client.linked
-                        ? colors.success
-                        : colors.foregroundSecondary,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: UcraftSpacing.space1),
-            Text(
-              client.email != null
-                  ? '${client.phone} • ${client.email}'
-                  : client.phone,
-              style: UcraftTypography.caption.copyWith(
-                color: colors.foregroundSecondary,
-              ),
+    final trimmedName = client.name.trim();
+    final initial = trimmedName.isEmpty ? '?' : trimmedName[0].toUpperCase();
+    final subtitle = client.email != null
+        ? '${client.phone} • ${client.email}'
+        : client.phone;
+
+    return UcraftListRow(
+      onTap: onTap,
+      leading: Container(
+        width: UcraftSpacing.space10,
+        height: UcraftSpacing.space10,
+        decoration: BoxDecoration(
+          color: colors.primarySubtle,
+          borderRadius: UcraftRadius.borderFull,
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          initial,
+          style: UcraftTypography.bodyMedium.copyWith(
+            fontWeight: FontWeight.w600,
+            color: colors.primary,
+          ),
+        ),
+      ),
+      title: '${client.name} (#${client.id})',
+      subtitle: subtitle,
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          UcraftStatusPill(
+            icon: client.linked ? LucideIcons.link2 : LucideIcons.user,
+            label: client.linked
+                ? strings.clientLinkedBadge
+                : strings.clientOfflineBadge,
+            tone: client.linked
+                ? UcraftStatusTone.success
+                : UcraftStatusTone.neutral,
+          ),
+          if (onTap != null) ...[
+            const SizedBox(width: UcraftSpacing.space2),
+            Icon(
+              LucideIcons.chevronRight,
+              size: 16,
+              color: colors.foregroundMuted,
             ),
           ],
-        ),
+        ],
       ),
     );
   }

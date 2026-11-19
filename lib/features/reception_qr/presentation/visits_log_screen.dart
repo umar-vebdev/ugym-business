@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:ugym_core/ugym_core.dart';
 
@@ -192,6 +193,8 @@ final class _VisitsLogScreenState extends State<VisitsLogScreen> {
                     ),
                     UcraftButton(
                       label: strings.visitsManualButton,
+                      leadingIcon: LucideIcons.checkCheck,
+                      variant: UcraftButtonVariant.secondary,
                       onPressed: canMutate && selectedGym != null
                           ? () => unawaited(_openManualCheckIn())
                           : null,
@@ -220,9 +223,10 @@ final class _VisitsLogScreenState extends State<VisitsLogScreen> {
             ],
             const SizedBox(height: UcraftSpacing.space3),
             if (_loading)
-              UcraftLoadingState(message: strings.visitsLoading)
+              const UcraftLoadingState(isSkeleton: true, skeletonCount: 4)
             else if (_errorMessage != null && _visits.isEmpty)
               UcraftErrorState(
+                icon: LucideIcons.circleAlert,
                 title: strings.posLoadErrorTitle,
                 message: _errorMessage!,
                 retryLabel: strings.retryLabel,
@@ -230,15 +234,15 @@ final class _VisitsLogScreenState extends State<VisitsLogScreen> {
               )
             else if (_visits.isEmpty)
               UcraftEmptyState(
+                icon: LucideIcons.calendarCheck,
                 title: strings.visitsEmptyTitle,
                 description: strings.visitsEmptyDesc,
               )
             else
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+              UcraftListSection(
                 children: [
-                  for (final visit in _visits) ...[
-                    _VisitCard(
+                  for (final visit in _visits)
+                    _VisitRow(
                       visit: visit,
                       formattedTime: DateFormatter.formatDateTime(
                         visit.visitedAt,
@@ -248,8 +252,6 @@ final class _VisitsLogScreenState extends State<VisitsLogScreen> {
                       isCancelling: _cancellingVisitId == visit.id,
                       onCancel: () => unawaited(_promptCancelVisit(visit)),
                     ),
-                    const SizedBox(height: UcraftSpacing.space3),
-                  ],
                 ],
               ),
           ],
@@ -259,8 +261,8 @@ final class _VisitsLogScreenState extends State<VisitsLogScreen> {
   }
 }
 
-final class _VisitCard extends StatelessWidget {
-  const _VisitCard({
+final class _VisitRow extends StatelessWidget {
+  const _VisitRow({
     required this.visit,
     required this.formattedTime,
     required this.canCancel,
@@ -274,66 +276,70 @@ final class _VisitCard extends StatelessWidget {
   final bool isCancelling;
   final VoidCallback onCancel;
 
+  String _timeOnly(DateTime utc) {
+    final local = DateFormatter.toTargetZone(
+      utc,
+      offset: DateFormatter.dushanbeOffset,
+    );
+    final hh = local.hour.toString().padLeft(2, '0');
+    final mm = local.minute.toString().padLeft(2, '0');
+    return '$hh:$mm';
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = context.ucraftColors;
     final strings = BusinessStringsScope.of(context);
     final isCancelled = visit.status == VisitStatus.cancelled;
 
-    return UcraftCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  'Клиент №${visit.clientId} • ${strings.scannerMembershipPrefix}${visit.membershipId}',
-                  style: UcraftTypography.bodyMedium.copyWith(
-                    color: colors.foreground,
-                  ),
-                ),
-              ),
-              Text(
-                isCancelled
-                    ? strings.visitStatusCancelled
-                    : strings.visitStatusCompleted,
-                style: UcraftTypography.caption.copyWith(
-                  color: isCancelled ? colors.destructive : colors.success,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: UcraftSpacing.space1),
-          Text(
-            '${_methodLabel(visit.method, strings)} • $formattedTime • Зал №${visit.gymId}',
-            style: UcraftTypography.caption.copyWith(
-              color: colors.foregroundSecondary,
-            ),
-          ),
-          if (isCancelled && visit.cancelReason != null) ...[
-            const SizedBox(height: UcraftSpacing.space2),
-            Text(
-              '${strings.visitCancelReasonLabel}: ${visit.cancelReason}',
-              style: UcraftTypography.caption.copyWith(
-                color: colors.destructiveForeground,
-              ),
-            ),
-          ],
-          if (canCancel) ...[
-            const SizedBox(height: UcraftSpacing.space3),
-            Align(
-              alignment: Alignment.centerRight,
-              child: UcraftButton(
-                label: strings.visitCancelButton,
-                variant: UcraftButtonVariant.destructive,
-                isLoading: isCancelling,
-                onPressed: isCancelling ? null : onCancel,
-              ),
-            ),
-          ],
-        ],
+    return UcraftListRow(
+      monoLeadingWidth: true,
+      leading: Text(
+        _timeOnly(visit.visitedAt),
+        style: UcraftTypography.mono.copyWith(
+          color: colors.foregroundSecondary,
+        ),
       ),
+      title:
+          'Клиент №${visit.clientId} • ${strings.scannerMembershipPrefix}${visit.membershipId}',
+      subtitle:
+          '${_methodLabel(visit.method, strings)} • $formattedTime • Зал №${visit.gymId}',
+      trailing: UcraftStatusPill(
+        icon: isCancelled ? LucideIcons.circleX : LucideIcons.circleCheck,
+        label: isCancelled
+            ? strings.visitStatusCancelled
+            : strings.visitStatusCompleted,
+        tone: isCancelled
+            ? UcraftStatusTone.destructive
+            : UcraftStatusTone.success,
+      ),
+      bottom: (isCancelled && visit.cancelReason != null) || canCancel
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (isCancelled && visit.cancelReason != null)
+                  Text(
+                    '${strings.visitCancelReasonLabel}: ${visit.cancelReason}',
+                    style: UcraftTypography.caption.copyWith(
+                      color: colors.destructiveForeground,
+                    ),
+                  ),
+                if (canCancel) ...[
+                  if (isCancelled && visit.cancelReason != null)
+                    const SizedBox(height: UcraftSpacing.space2),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: UcraftButton(
+                      label: strings.visitCancelButton,
+                      variant: UcraftButtonVariant.destructive,
+                      isLoading: isCancelling,
+                      onPressed: isCancelling ? null : onCancel,
+                    ),
+                  ),
+                ],
+              ],
+            )
+          : null,
     );
   }
 

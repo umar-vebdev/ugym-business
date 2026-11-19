@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:ugym_core/ugym_core.dart';
 
@@ -211,7 +212,9 @@ final class _ClientDetailScreenState extends State<ClientDetailScreen> {
           appBar: AppBar(title: Text(widget.client.name)),
           body: SafeArea(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(UcraftSpacing.space4),
+              padding: const EdgeInsets.all(
+                UcraftSpacing.screenHorizontalPadding,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -219,8 +222,9 @@ final class _ClientDetailScreenState extends State<ClientDetailScreen> {
                     controller: widget.sessionController,
                   ),
                   if (widget.sessionController.isReadOnly)
-                    const SizedBox(height: UcraftSpacing.space3),
+                    const SizedBox(height: UcraftSpacing.space4),
                   UcraftCard(
+                    variant: UcraftCardVariant.highlight,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
@@ -229,20 +233,21 @@ final class _ClientDetailScreenState extends State<ClientDetailScreen> {
                             Expanded(
                               child: Text(
                                 '${widget.client.name} (#${widget.client.id})',
-                                style: UcraftTypography.title.copyWith(
+                                style: UcraftTypography.titleLarge.copyWith(
                                   color: colors.foreground,
                                 ),
                               ),
                             ),
-                            Text(
-                              widget.client.linked
+                            UcraftStatusPill(
+                              icon: widget.client.linked
+                                  ? LucideIcons.link2
+                                  : LucideIcons.user,
+                              label: widget.client.linked
                                   ? strings.clientLinkedBadge
                                   : strings.clientOfflineBadge,
-                              style: UcraftTypography.caption.copyWith(
-                                color: widget.client.linked
-                                    ? colors.success
-                                    : colors.foregroundSecondary,
-                              ),
+                              tone: widget.client.linked
+                                  ? UcraftStatusTone.success
+                                  : UcraftStatusTone.neutral,
                             ),
                           ],
                         ),
@@ -255,49 +260,38 @@ final class _ClientDetailScreenState extends State<ClientDetailScreen> {
                             color: colors.foregroundSecondary,
                           ),
                         ),
-                        if (canSell) ...[
-                          const SizedBox(height: UcraftSpacing.space3),
-                          UcraftButton(
-                            label: strings.clientSellCta,
-                            fullWidth: true,
-                            onPressed: () => unawaited(_openPosCheckout()),
-                          ),
-                        ],
                       ],
                     ),
                   ),
-                  const SizedBox(height: UcraftSpacing.space3),
-                  Wrap(
-                    spacing: UcraftSpacing.space2,
-                    runSpacing: UcraftSpacing.space2,
-                    children: [
-                      UcraftButton(
+                  if (canSell) ...[
+                    const SizedBox(height: UcraftSpacing.space4),
+                    UcraftButton(
+                      label: strings.clientSellCta,
+                      leadingIcon: LucideIcons.shoppingBag,
+                      fullWidth: true,
+                      onPressed: () => unawaited(_openPosCheckout()),
+                    ),
+                  ],
+                  const SizedBox(height: UcraftSpacing.sectionGap),
+                  UcraftSegmentedTabs<_ClientDetailTab>(
+                    items: [
+                      UcraftSegmentedTabItem(
+                        value: _ClientDetailTab.memberships,
                         label: strings.membershipsLabel,
-                        variant: _tab == _ClientDetailTab.memberships
-                            ? UcraftButtonVariant.primary
-                            : UcraftButtonVariant.secondary,
-                        onPressed: () =>
-                            setState(() => _tab = _ClientDetailTab.memberships),
                       ),
-                      UcraftButton(
+                      UcraftSegmentedTabItem(
+                        value: _ClientDetailTab.visits,
                         label: strings.clientTabVisits,
-                        variant: _tab == _ClientDetailTab.visits
-                            ? UcraftButtonVariant.primary
-                            : UcraftButtonVariant.secondary,
-                        onPressed: () =>
-                            setState(() => _tab = _ClientDetailTab.visits),
                       ),
-                      UcraftButton(
+                      UcraftSegmentedTabItem(
+                        value: _ClientDetailTab.sales,
                         label: strings.clientTabSales,
-                        variant: _tab == _ClientDetailTab.sales
-                            ? UcraftButtonVariant.primary
-                            : UcraftButtonVariant.secondary,
-                        onPressed: () =>
-                            setState(() => _tab = _ClientDetailTab.sales),
                       ),
                     ],
+                    selected: _tab,
+                    onSelected: (next) => setState(() => _tab = next),
                   ),
-                  const SizedBox(height: UcraftSpacing.space3),
+                  const SizedBox(height: UcraftSpacing.space4),
                   if (_errorMessage != null) ...[
                     Text(
                       _errorMessage!,
@@ -308,7 +302,7 @@ final class _ClientDetailScreenState extends State<ClientDetailScreen> {
                     const SizedBox(height: UcraftSpacing.space3),
                   ],
                   if (_loading)
-                    UcraftLoadingState(message: strings.clientDetailLoading)
+                    const UcraftLoadingState(isSkeleton: true, skeletonCount: 3)
                   else
                     switch (_tab) {
                       _ClientDetailTab.memberships => _buildMembershipsTab(
@@ -331,65 +325,57 @@ final class _ClientDetailScreenState extends State<ClientDetailScreen> {
   }
 
   Widget _buildMembershipsTab(BuildContext context, bool canFreeze) {
-    final colors = context.ucraftColors;
     final strings = BusinessStringsScope.of(context);
     if (_memberships.isEmpty) {
       return UcraftEmptyState(
+        icon: LucideIcons.ticket,
         title: strings.clientNoMembershipsTitle,
         description: strings.clientNoMembershipsDesc,
       );
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+    return UcraftListSection(
       children: [
-        for (final item in _memberships) ...[
-          UcraftCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  '${strings.scannerMembershipPrefix}${item.id} • ${item.status.apiValue}',
-                  style: UcraftTypography.bodyMedium.copyWith(
-                    color: colors.foreground,
-                  ),
-                ),
-                if (item.remainingVisits != null)
-                  Text(
-                    '${strings.scannerRemainingVisitsPrefix}${item.remainingVisits}',
-                    style: UcraftTypography.caption.copyWith(
-                      color: colors.foregroundSecondary,
-                    ),
-                  ),
-                if (canFreeze &&
+        for (final item in _memberships)
+          UcraftListRow(
+            title:
+                '${strings.scannerMembershipPrefix}${item.id} • ${item.status.apiValue}',
+            subtitle: item.remainingVisits != null
+                ? '${strings.scannerRemainingVisitsPrefix}${item.remainingVisits}'
+                : null,
+            trailing:
+                canFreeze &&
                     (item.status == MembershipStatus.active ||
-                        item.status == MembershipStatus.frozen)) ...[
-                  const SizedBox(height: UcraftSpacing.space2),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: UcraftButton(
-                      label: item.status == MembershipStatus.frozen
-                          ? strings.clientUnfreezeButton
-                          : strings.clientFreezeButton,
-                      variant: UcraftButtonVariant.secondary,
-                      isLoading: _busyMembershipId == item.id,
-                      onPressed: _busyMembershipId == item.id
-                          ? null
-                          : () => unawaited(_toggleFreeze(item)),
-                    ),
+                        item.status == MembershipStatus.frozen)
+                ? UcraftButton(
+                    label: item.status == MembershipStatus.frozen
+                        ? strings.clientUnfreezeButton
+                        : strings.clientFreezeButton,
+                    variant: UcraftButtonVariant.secondary,
+                    isLoading: _busyMembershipId == item.id,
+                    onPressed: _busyMembershipId == item.id
+                        ? null
+                        : () => unawaited(_toggleFreeze(item)),
+                  )
+                : UcraftStatusPill(
+                    icon: item.status == MembershipStatus.active
+                        ? LucideIcons.circleCheck
+                        : item.status == MembershipStatus.frozen
+                        ? LucideIcons.snowflake
+                        : LucideIcons.circleX,
+                    label: item.status.apiValue,
+                    tone: item.status == MembershipStatus.active
+                        ? UcraftStatusTone.success
+                        : item.status == MembershipStatus.frozen
+                        ? UcraftStatusTone.info
+                        : UcraftStatusTone.neutral,
                   ),
-                ],
-              ],
-            ),
           ),
-          const SizedBox(height: UcraftSpacing.space3),
-        ],
       ],
     );
   }
 
   Widget _buildVisitsTab(BuildContext context, bool canManualVisit) {
-    final colors = context.ucraftColors;
     final strings = BusinessStringsScope.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -397,6 +383,7 @@ final class _ClientDetailScreenState extends State<ClientDetailScreen> {
         if (canManualVisit) ...[
           UcraftButton(
             label: strings.clientManualCheckInButton,
+            leadingIcon: LucideIcons.checkCheck,
             variant: UcraftButtonVariant.secondary,
             onPressed: () => unawaited(_openManualVisit()),
           ),
@@ -404,74 +391,68 @@ final class _ClientDetailScreenState extends State<ClientDetailScreen> {
         ],
         if (_visits.isEmpty)
           UcraftEmptyState(
+            icon: LucideIcons.calendarCheck,
             title: strings.clientNoVisitsTitle,
             description: strings.clientNoVisitsDesc,
           )
         else
-          for (final visit in _visits) ...[
-            UcraftCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    'Визит №${visit.id} • ${visit.status.name}',
-                    style: UcraftTypography.bodyMedium.copyWith(
-                      color: colors.foreground,
-                    ),
+          UcraftListSection(
+            children: [
+              for (final visit in _visits)
+                UcraftListRow(
+                  title: 'Визит №${visit.id} • ${visit.status.name}',
+                  subtitle: DateFormatter.formatDateTime(
+                    visit.visitedAt,
+                    offset: DateFormatter.dushanbeOffset,
                   ),
-                  Text(
-                    DateFormatter.formatDateTime(
-                      visit.visitedAt,
-                      offset: DateFormatter.dushanbeOffset,
-                    ),
-                    style: UcraftTypography.caption.copyWith(
-                      color: colors.foregroundSecondary,
-                    ),
+                  trailing: UcraftStatusPill(
+                    icon: visit.status == VisitStatus.cancelled
+                        ? LucideIcons.circleX
+                        : LucideIcons.circleCheck,
+                    label: visit.status == VisitStatus.cancelled
+                        ? strings.visitStatusCancelled
+                        : strings.visitStatusCompleted,
+                    tone: visit.status == VisitStatus.cancelled
+                        ? UcraftStatusTone.destructive
+                        : UcraftStatusTone.success,
                   ),
-                ],
-              ),
-            ),
-            const SizedBox(height: UcraftSpacing.space3),
-          ],
+                ),
+            ],
+          ),
       ],
     );
   }
 
   Widget _buildSalesTab(BuildContext context) {
-    final colors = context.ucraftColors;
     final strings = BusinessStringsScope.of(context);
     if (_sales.isEmpty) {
       return UcraftEmptyState(
+        icon: LucideIcons.receipt,
         title: strings.clientNoSalesTitle,
         description: strings.clientNoSalesDesc,
       );
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+    return UcraftListSection(
       children: [
-        for (final sale in _sales) ...[
-          UcraftCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  'Чек №${sale.id} • ${(sale.totalMinor / 100).toStringAsFixed(2)} ${sale.currency}',
-                  style: UcraftTypography.bodyMedium.copyWith(
-                    color: colors.foreground,
-                  ),
-                ),
-                Text(
-                  '${paymentMethodLabel(sale.paymentMethod, strings: strings)} • ${sale.status.apiValue}',
-                  style: UcraftTypography.caption.copyWith(
-                    color: colors.foregroundSecondary,
-                  ),
-                ),
-              ],
+        for (final sale in _sales)
+          UcraftListRow(
+            title:
+                'Чек №${sale.id} • ${(sale.totalMinor / 100).toStringAsFixed(2)} ${sale.currency}',
+            subtitle:
+                '${paymentMethodLabel(sale.paymentMethod, strings: strings)} • ${sale.status.apiValue}',
+            trailing: UcraftStatusPill(
+              icon: sale.status == SaleStatus.refunded
+                  ? LucideIcons.rotateCcw
+                  : LucideIcons.circleCheck,
+              label: sale.status == SaleStatus.refunded
+                  ? strings.saleRefundButton
+                  : strings.saleStatusPaid,
+              tone: sale.status == SaleStatus.refunded
+                  ? UcraftStatusTone.destructive
+                  : UcraftStatusTone.success,
             ),
           ),
-          const SizedBox(height: UcraftSpacing.space3),
-        ],
       ],
     );
   }

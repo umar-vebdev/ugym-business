@@ -61,11 +61,11 @@
 - [x] **B8-01** Документация обновлена до **uCraft Design System 1.1**: разделы 25–33 (UX and Layout Addendum) добавлены в `docs/specs/uCraft_Design_System.md`, решение `D-008` записано в `docs/DECISIONS.md`.
 - [x] **B8-02** (реализовано в `../ugym_core`, коммит `94668a9`) Реализованы общие компоненты и темы v1.1 (`UcraftStatusPill`, `UcraftProgressBar`, `UcraftSectionHeader`, `UcraftListRow`, `UcraftListSection`, `UcraftSegmentedTabs`), обновлены `UcraftCardVariant.highlight` и `NavigationBarThemeData`; 35/35 тестов `ugym_core` зелёные (`format ✓`, `analyze ✓`, `test ✓`).
 - [x] **B8-03** Применены правила v1.1 в `BusinessShell` (разделитель нижней панели, `UcraftSegmentedTabs`), `RoleGuard` (`highlight`), `OverviewDashboardView` (единый hero KPI + одна основная CTA + `UcraftListSection`) и `AuthFlowScreen`; 126 тестов зелёные (`format ✓`, `analyze ✓`, `test ✓`).
+- [x] **B8-04a** CRM клиентов (`ClientsListScreen`, `ClientDetailScreen`) и журнал визитов (`VisitsLogScreen`) переведены на v1.1: hero-карточка `highlight`, `UcraftSegmentedTabs`, строки `UcraftListSection`/`UcraftListRow`, статусы `UcraftStatusPill` и скелетоны; 126 тестов зелёные (`format ✓`, `analyze ✓`, `test ✓`).
 
 ---
 
 ## Текущий этап: `B8` — Переход на **uCraft Design System 1.1**
 
-- [~] **B8-04a** Применение v1.1 к CRM клиентов (`ClientsListScreen`, `ClientDetailScreen`) и журналу визитов (`VisitsLogScreen`): строки списка `UcraftListRow`, статусы-пилюли `UcraftStatusPill`, единая основная кнопка, скелетоны.
-- [ ] **B8-04b** Применение v1.1 к тарифам/истекающим (`memberships_screens.dart`), заявкам/продажам (`membership_requests_and_sales_tabs.dart`) и кассе/складу (`pos_and_products_screens.dart`).
+- [~] **B8-04b** Применение v1.1 к тарифам/истекающим (`memberships_screens.dart`), заявкам/продажам (`membership_requests_and_sales_tabs.dart`) и кассе/складу (`pos_and_products_screens.dart`).
 - [ ] **B8-05** Применение v1.1 к тренерам/расписанию (`trainers_screen.dart`, `schedule_tab.dart`), витрине/штату (`storefront_editor_screen.dart`, `staff_management_screen.dart`), аналитике/рассылкам/подписке (`analytics_and_billing_screens.dart`) + пересборка Wi-Fi APK.
