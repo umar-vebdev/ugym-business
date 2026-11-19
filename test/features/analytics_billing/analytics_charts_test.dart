@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:ugym_business/core/l10n/business_localizations.dart';
 import 'package:ugym_business/features/analytics_billing/domain/analytics_and_billing_models.dart';
 import 'package:ugym_business/features/analytics_billing/presentation/analytics_charts.dart';
 import 'package:ugym_core/ugym_core.dart';
@@ -99,4 +100,65 @@ void main() {
       expect(find.text('Оплат за выбранный период нет.'), findsOneWidget);
     },
   );
+
+  testWidgets('Charts respect BusinessStringsScope in tg and en', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: UcraftTheme.light(),
+        home: const BusinessStringsScope(
+          strings: BusinessStrings.tg,
+          child: Scaffold(
+            body: Column(
+              children: [
+                VisitsByDayBarChart(byDay: {'2026-11-19': 12}),
+                RevenuePaymentMixBar(
+                  byPaymentMethod: RevenueByPaymentMethod(
+                    cash: 10000,
+                    cardTerminal: 0,
+                    transfer: 0,
+                  ),
+                  currency: 'TJS',
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Ташрифҳо аз рӯи рӯз'), findsOneWidget);
+    expect(find.text('Бештарин дар як рӯз: 12'), findsOneWidget);
+    expect(find.text('Нақд 100% (100.00 TJS)'), findsOneWidget);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: UcraftTheme.dark(),
+        home: const BusinessStringsScope(
+          strings: BusinessStrings.en,
+          child: Scaffold(
+            body: Column(
+              children: [
+                VisitsByDayBarChart(byDay: {}),
+                RevenuePaymentMixBar(
+                  byPaymentMethod: RevenueByPaymentMethod(
+                    cash: 0,
+                    cardTerminal: 0,
+                    transfer: 0,
+                  ),
+                  currency: 'TJS',
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('No visit data for the selected period.'), findsOneWidget);
+    expect(find.text('No payments in the selected period.'), findsOneWidget);
+  });
 }

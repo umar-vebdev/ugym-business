@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:material_ui/material_ui.dart';
 import 'package:ugym_core/ugym_core.dart';
 
+import '../../../core/l10n/business_localizations.dart';
 import '../domain/analytics_and_billing_models.dart';
 
 /// Accessible vertical bar chart for daily gym visits following uCraft 1.0 §15.
@@ -10,21 +11,25 @@ final class VisitsByDayBarChart extends StatelessWidget {
   const VisitsByDayBarChart({
     super.key,
     required this.byDay,
-    this.seriesLabel = 'Посещения по дням',
-    this.peakLabelPrefix = 'Максимум за день',
-    this.emptyMessage = 'Нет данных по посещениям за выбранный период.',
+    this.seriesLabel,
+    this.peakLabelPrefix,
+    this.emptyMessage,
   });
 
   final Map<String, int> byDay;
-  final String seriesLabel;
-  final String peakLabelPrefix;
-  final String emptyMessage;
+  final String? seriesLabel;
+  final String? peakLabelPrefix;
+  final String? emptyMessage;
 
   static const double _barPlotHeight = 120;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.ucraftColors;
+    final strings = BusinessStringsScope.of(context);
+    final effectiveSeriesLabel = seriesLabel ?? strings.chartVisitsByDayLabel;
+    final effectivePeakPrefix = peakLabelPrefix ?? strings.chartPeakDayPrefix;
+    final effectiveEmptyMessage = emptyMessage ?? strings.chartVisitsEmpty;
     final entries = byDay.entries.toList()
       ..sort((a, b) => a.key.compareTo(b.key));
     final int maxCount = entries.fold<int>(
@@ -44,7 +49,7 @@ final class VisitsByDayBarChart extends StatelessWidget {
           ),
         ),
         child: Text(
-          emptyMessage,
+          effectiveEmptyMessage,
           style: UcraftTypography.caption.copyWith(
             color: colors.foregroundSecondary,
           ),
@@ -76,7 +81,7 @@ final class VisitsByDayBarChart extends StatelessWidget {
                 ),
                 const SizedBox(width: UcraftSpacing.space2),
                 Text(
-                  seriesLabel,
+                  effectiveSeriesLabel,
                   style: UcraftTypography.label.copyWith(
                     color: colors.foreground,
                   ),
@@ -84,7 +89,7 @@ final class VisitsByDayBarChart extends StatelessWidget {
               ],
             ),
             Text(
-              '$peakLabelPrefix: $maxCount',
+              '$effectivePeakPrefix: $maxCount',
               style: UcraftTypography.caption.copyWith(
                 fontFamily: UcraftTypography.monoFontFamily,
                 fontFeatures: const [FontFeature.tabularFigures()],
@@ -268,22 +273,23 @@ final class RevenuePaymentMixBar extends StatelessWidget {
     super.key,
     required this.byPaymentMethod,
     required this.currency,
-    this.cashLabel = 'Наличные',
-    this.terminalLabel = 'Терминал',
-    this.transferLabel = 'Перевод',
-    this.emptyMessage = 'Оплат за выбранный период нет.',
+    this.cashLabel,
+    this.terminalLabel,
+    this.transferLabel,
+    this.emptyMessage,
   });
 
   final RevenueByPaymentMethod byPaymentMethod;
   final String currency;
-  final String cashLabel;
-  final String terminalLabel;
-  final String transferLabel;
-  final String emptyMessage;
+  final String? cashLabel;
+  final String? terminalLabel;
+  final String? transferLabel;
+  final String? emptyMessage;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.ucraftColors;
+    final strings = BusinessStringsScope.of(context);
     final int total =
         byPaymentMethod.cash +
         byPaymentMethod.cardTerminal +
@@ -291,7 +297,7 @@ final class RevenuePaymentMixBar extends StatelessWidget {
 
     if (total <= 0) {
       return Text(
-        emptyMessage,
+        emptyMessage ?? strings.chartPaymentsEmpty,
         style: UcraftTypography.caption.copyWith(
           color: colors.foregroundSecondary,
         ),
@@ -299,14 +305,18 @@ final class RevenuePaymentMixBar extends StatelessWidget {
     }
 
     final segments = <({String label, int minor, Color color})>[
-      (label: cashLabel, minor: byPaymentMethod.cash, color: colors.primary),
       (
-        label: terminalLabel,
+        label: cashLabel ?? strings.paymentCashLabel,
+        minor: byPaymentMethod.cash,
+        color: colors.primary,
+      ),
+      (
+        label: terminalLabel ?? strings.paymentTerminalLabel,
         minor: byPaymentMethod.cardTerminal,
         color: colors.info,
       ),
       (
-        label: transferLabel,
+        label: transferLabel ?? strings.paymentTransferLabel,
         minor: byPaymentMethod.transfer,
         color: colors.success,
       ),

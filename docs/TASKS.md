@@ -1,6 +1,6 @@
 # uGym Business — чек-лист задач
 
-**Текущий этап:** `B6` — Локализация (`ru`/`tg`/`en`) и полировка по uCraft Design System 1.0
+**Текущий этап:** Все этапы (`B0`–`B6`) завершены ✓
 **Статусы:** `[ ]` не начата · `[~]` в работе · `[x]` готова · `[!]` заблокирована (причина в заметках)
 
 ## Правила ведения файла
@@ -53,9 +53,10 @@
 - [x] **B6-02b** Переведены иконки всех остальных экранов (`AuthFlowScreen`, `ScanClientQrScreen`, `PosCheckoutScreen` с доступными `tooltip`, `GymPhotosManager`, `OverviewDashboardView`) на `LucideIcons.*` и добавлена автоматическая проверка отсутствия `Icons.*` в `lib/` (`test/core/ucraft_assets_and_icons_test.dart`); 118 тестов зелёные (`format ✓`, `analyze ✓`, `test ✓`).
 - [x] **B6-03** Реализован `BusinessStringsScope` (`InheritedWidget`) с пробросом через `MaterialApp.builder` и `BusinessShell`, расширены и синхронизированы `app_ru.arb`/`app_tg.arb`/`app_en.arb` (64 ключа), переведены `BusinessShell` (подвкладки и панель ресепшна), `RoleGuard`, `SubscriptionReadOnlyBanner`, `GymBranchSelector` и `OverviewDashboardView` + тест в `test/core/responsive_theme_and_l10n_test.dart`; 119 тестов зелёные (`format ✓`, `analyze ✓`, `test ✓`).
 - [x] **B6-04a** Расширены `BusinessStrings` и синхронизированы `app_{ru,tg,en}.arb` (+52 ключа), локализованы экраны `AuthFlowScreen`, `ScanClientQrScreen` и `GymQrKioskScreen` на `ru`/`tg`/`en` + тест в `test/core/responsive_theme_and_l10n_test.dart`; 120 тестов зелёные (`format ✓`, `analyze ✓`, `test ✓`).
+- [x] **B6-04b** Расширены `BusinessStrings` и синхронизированы `app_{ru,tg,en}.arb` (всего 167 ключей, 100% паритет), локализованы `PosCheckoutScreen`, `paymentMethodLabel`, `AnalyticsScreen`, `VisitsByDayBarChart`, `RevenuePaymentMixBar`, `AnnouncementsScreen` и `BillingStatusScreen` на `ru`/`tg`/`en` + тест в `test/features/analytics_billing/analytics_charts_test.dart`; 121 тест зелёный (`format ✓`, `analyze ✓`, `test ✓`).
 
 ---
 
-## Текущий этап: `B6` — Локализация (`ru`/`tg`/`en`) и полировка по uCraft Design System 1.0
+## Текущий этап: `B6` — Локализация (`ru`/`tg`/`en`) и полировка по uCraft Design System 1.0 (Завершён)
 
-- [ ] **B6-04b** Локализация (`ru`/`tg`/`en`) экранов кассы, аналитики, рассылок и подписки (`PosCheckoutScreen`, `AnalyticsScreen`, `VisitsByDayBarChart`, `RevenuePaymentMixBar`, `AnnouncementsScreen`, `BillingStatusScreen`) с синхронизацией `app_{ru,tg,en}.arb`.
+Все задачи этапов `B0`–`B6` выполнены и проверены (`dart format`, `flutter analyze`, `flutter test`).

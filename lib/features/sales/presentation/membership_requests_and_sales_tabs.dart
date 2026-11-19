@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:material_ui/material_ui.dart';
 import 'package:ugym_core/ugym_core.dart';
 
+import '../../../core/l10n/business_localizations.dart';
 import '../../../core/session/business_role.dart';
 import '../../../core/session/business_session_controller.dart';
 import '../domain/sales_and_requests_models.dart';
@@ -833,10 +834,11 @@ final class _RefundSaleDialogState extends State<_RefundSaleDialog> {
 }
 
 /// Localized display label for [PaymentMethod].
-String paymentMethodLabel(PaymentMethod method) {
+String paymentMethodLabel(PaymentMethod method, {BusinessStrings? strings}) {
+  final s = strings ?? BusinessStrings.ru;
   return switch (method) {
-    PaymentMethod.cash => 'Наличные',
-    PaymentMethod.cardTerminal => 'Терминал',
-    PaymentMethod.transfer => 'Перевод',
+    PaymentMethod.cash => s.paymentCashLabel,
+    PaymentMethod.cardTerminal => s.paymentTerminalLabel,
+    PaymentMethod.transfer => s.paymentTransferLabel,
   };
 }

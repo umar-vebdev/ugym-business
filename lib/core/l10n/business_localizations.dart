@@ -141,6 +141,58 @@ final class BusinessStrings {
     required this.kioskUnlockAndExitButton,
     required this.kioskPinFormatError,
     required this.kioskWrongPinError,
+    required this.paymentCashLabel,
+    required this.paymentTerminalLabel,
+    required this.paymentTransferLabel,
+    required this.posTitle,
+    required this.posLoadingCatalog,
+    required this.posLoadErrorTitle,
+    required this.posClientIdLabel,
+    required this.posNoActivePlans,
+    required this.posNoActiveProducts,
+    required this.posPaymentMethodLabel,
+    required this.posTotalPrefix,
+    required this.posSubmitSaleButton,
+    required this.posDecreaseQtyTooltip,
+    required this.posIncreaseQtyTooltip,
+    required this.analyticsNoAccessTitle,
+    required this.analyticsOwnerOnlyDesc,
+    required this.analyticsPeriodFilterTitle,
+    required this.analyticsTodayLabel,
+    required this.analyticsWeekLabel,
+    required this.analyticsMonthLabel,
+    required this.analyticsFromDateLabel,
+    required this.analyticsToDateLabel,
+    required this.analyticsInactiveDaysLabel,
+    required this.analyticsApplyButton,
+    required this.analyticsLoading,
+    required this.analyticsErrorTitle,
+    required this.analyticsEmptyTitle,
+    required this.analyticsEmptyDesc,
+    required this.analyticsRevenuePrefix,
+    required this.analyticsClientsAndVisitsTitle,
+    required this.analyticsTopPlansTitle,
+    required this.analyticsTopProductsTitle,
+    required this.analyticsNoSalesInPeriod,
+    required this.chartVisitsByDayLabel,
+    required this.chartPeakDayPrefix,
+    required this.chartVisitsEmpty,
+    required this.chartPaymentsEmpty,
+    required this.announcementsTitle,
+    required this.announcementsNoAccessDesc,
+    required this.announcementsTitleField,
+    required this.announcementsBodyField,
+    required this.announcementsSendButton,
+    required this.billingNoAccessDesc,
+    required this.billingLoading,
+    required this.billingStatusPrefix,
+    required this.billingValidUntilPrefix,
+    required this.billingReadOnlyHint,
+    required this.billingPlansTitle,
+    required this.billingPlansEmpty,
+    required this.billingStatusTrial,
+    required this.billingStatusActive,
+    required this.billingStatusExpired,
   });
 
   final String appTitle;
@@ -258,6 +310,58 @@ final class BusinessStrings {
   final String kioskUnlockAndExitButton;
   final String kioskPinFormatError;
   final String kioskWrongPinError;
+  final String paymentCashLabel;
+  final String paymentTerminalLabel;
+  final String paymentTransferLabel;
+  final String posTitle;
+  final String posLoadingCatalog;
+  final String posLoadErrorTitle;
+  final String posClientIdLabel;
+  final String posNoActivePlans;
+  final String posNoActiveProducts;
+  final String posPaymentMethodLabel;
+  final String posTotalPrefix;
+  final String posSubmitSaleButton;
+  final String posDecreaseQtyTooltip;
+  final String posIncreaseQtyTooltip;
+  final String analyticsNoAccessTitle;
+  final String analyticsOwnerOnlyDesc;
+  final String analyticsPeriodFilterTitle;
+  final String analyticsTodayLabel;
+  final String analyticsWeekLabel;
+  final String analyticsMonthLabel;
+  final String analyticsFromDateLabel;
+  final String analyticsToDateLabel;
+  final String analyticsInactiveDaysLabel;
+  final String analyticsApplyButton;
+  final String analyticsLoading;
+  final String analyticsErrorTitle;
+  final String analyticsEmptyTitle;
+  final String analyticsEmptyDesc;
+  final String analyticsRevenuePrefix;
+  final String analyticsClientsAndVisitsTitle;
+  final String analyticsTopPlansTitle;
+  final String analyticsTopProductsTitle;
+  final String analyticsNoSalesInPeriod;
+  final String chartVisitsByDayLabel;
+  final String chartPeakDayPrefix;
+  final String chartVisitsEmpty;
+  final String chartPaymentsEmpty;
+  final String announcementsTitle;
+  final String announcementsNoAccessDesc;
+  final String announcementsTitleField;
+  final String announcementsBodyField;
+  final String announcementsSendButton;
+  final String billingNoAccessDesc;
+  final String billingLoading;
+  final String billingStatusPrefix;
+  final String billingValidUntilPrefix;
+  final String billingReadOnlyHint;
+  final String billingPlansTitle;
+  final String billingPlansEmpty;
+  final String billingStatusTrial;
+  final String billingStatusActive;
+  final String billingStatusExpired;
 
   static const BusinessStrings ru = BusinessStrings._(
     appTitle: 'uGym Business',
@@ -379,6 +483,59 @@ final class BusinessStrings {
     kioskUnlockAndExitButton: 'Разблокировать и выйти',
     kioskPinFormatError: 'Введите 4 цифры PIN-кода',
     kioskWrongPinError: 'Неверный PIN-код',
+    paymentCashLabel: 'Наличные',
+    paymentTerminalLabel: 'Терминал',
+    paymentTransferLabel: 'Перевод',
+    posTitle: 'Касса',
+    posLoadingCatalog: 'Загружаем товары и тарифы...',
+    posLoadErrorTitle: 'Ошибка загрузки',
+    posClientIdLabel: 'ID клиента (обязателен для абонемента)',
+    posNoActivePlans: 'Нет активных тарифов.',
+    posNoActiveProducts: 'Нет активных товаров.',
+    posPaymentMethodLabel: 'Способ оплаты',
+    posTotalPrefix: 'Итого: ',
+    posSubmitSaleButton: 'Провести продажу',
+    posDecreaseQtyTooltip: 'Уменьшить количество',
+    posIncreaseQtyTooltip: 'Увеличить количество',
+    analyticsNoAccessTitle: 'Недостаточно прав',
+    analyticsOwnerOnlyDesc: 'Аналитика и выручка доступны только владельцу.',
+    analyticsPeriodFilterTitle: 'Фильтр периода',
+    analyticsTodayLabel: 'Сегодня',
+    analyticsWeekLabel: 'Неделя',
+    analyticsMonthLabel: 'Месяц',
+    analyticsFromDateLabel: 'С (ГГГГ-ММ-ДД)',
+    analyticsToDateLabel: 'По (ГГГГ-ММ-ДД)',
+    analyticsInactiveDaysLabel: 'Неактивные (1–365 дн.)',
+    analyticsApplyButton: 'Применить',
+    analyticsLoading: 'Загружаем аналитику...',
+    analyticsErrorTitle: 'Ошибка аналитики',
+    analyticsEmptyTitle: 'Данных нет',
+    analyticsEmptyDesc: 'Выберите период и обновите отчёт.',
+    analyticsRevenuePrefix: 'Выручка: ',
+    analyticsClientsAndVisitsTitle: 'Клиенты и посещаемость',
+    analyticsTopPlansTitle: 'Топ тарифов',
+    analyticsTopProductsTitle: 'Топ товаров',
+    analyticsNoSalesInPeriod: 'За период продаж не было.',
+    chartVisitsByDayLabel: 'Посещения по дням',
+    chartPeakDayPrefix: 'Максимум за день',
+    chartVisitsEmpty: 'Нет данных по посещениям за выбранный период.',
+    chartPaymentsEmpty: 'Оплат за выбранный период нет.',
+    announcementsTitle: 'Массовая рассылка',
+    announcementsNoAccessDesc: 'Рассылки доступны владельцу и администратору.',
+    announcementsTitleField: 'Заголовок (до 120)',
+    announcementsBodyField: 'Текст сообщения (до 1000)',
+    announcementsSendButton: 'Отправить рассылку',
+    billingNoAccessDesc:
+        'Подписка платформы доступна владельцу и администратору.',
+    billingLoading: 'Загружаем подписку...',
+    billingStatusPrefix: 'Подписка платформы: ',
+    billingValidUntilPrefix: 'Действует до: ',
+    billingReadOnlyHint: 'Режим только для чтения: для продления свяжитесь с поддержкой платформы.',
+    billingPlansTitle: 'Тарифы платформы',
+    billingPlansEmpty: 'Список тарифов пуст.',
+    billingStatusTrial: 'Пробный период (trial)',
+    billingStatusActive: 'Активна (active)',
+    billingStatusExpired: 'Истекла (expired)',
   );
 
   static const BusinessStrings tg = BusinessStrings._(
@@ -501,6 +658,59 @@ final class BusinessStrings {
     kioskUnlockAndExitButton: 'Кушодан ва баромадан',
     kioskPinFormatError: '4 рақами PIN-рамзро ворид кунед',
     kioskWrongPinError: 'PIN-рамз нодуруст аст',
+    paymentCashLabel: 'Нақд',
+    paymentTerminalLabel: 'Терминал',
+    paymentTransferLabel: 'Интиқол',
+    posTitle: 'Хазина',
+    posLoadingCatalog: 'Молҳо ва тарифҳо бор мешаванд...',
+    posLoadErrorTitle: 'Хатогии боркунӣ',
+    posClientIdLabel: 'ID мизоҷ (барои обуна ҳатмӣ)',
+    posNoActivePlans: 'Тарифҳои фаъол нестанд.',
+    posNoActiveProducts: 'Молҳои фаъол нестанд.',
+    posPaymentMethodLabel: 'Усули пардохт',
+    posTotalPrefix: 'Ҷамъ: ',
+    posSubmitSaleButton: 'Анҷоми фурӯш',
+    posDecreaseQtyTooltip: 'Кам кардани миқдор',
+    posIncreaseQtyTooltip: 'Зиёд кардани миқдор',
+    analyticsNoAccessTitle: 'Ҳуқуқ кофӣ нест',
+    analyticsOwnerOnlyDesc: 'Таҳлил ва даромад танҳо барои соҳиб дастрас аст.',
+    analyticsPeriodFilterTitle: 'Филтри давра',
+    analyticsTodayLabel: 'Имрӯз',
+    analyticsWeekLabel: 'Ҳафта',
+    analyticsMonthLabel: 'Моҳ',
+    analyticsFromDateLabel: 'Аз (СССС-ММ-РР)',
+    analyticsToDateLabel: 'То (СССС-ММ-РР)',
+    analyticsInactiveDaysLabel: 'Ғайрифаъол (1–365 рӯз)',
+    analyticsApplyButton: 'Татбиқ',
+    analyticsLoading: 'Таҳлил бор мешавад...',
+    analyticsErrorTitle: 'Хатогии таҳлил',
+    analyticsEmptyTitle: 'Маълумот нест',
+    analyticsEmptyDesc: 'Давраро интихоб кунед ва ҳисоботро нав созед.',
+    analyticsRevenuePrefix: 'Даромад: ',
+    analyticsClientsAndVisitsTitle: 'Мизоҷон ва ташрифҳо',
+    analyticsTopPlansTitle: 'Тарифҳои беҳтарин',
+    analyticsTopProductsTitle: 'Молҳои беҳтарин',
+    analyticsNoSalesInPeriod: 'Дар ин давра фурӯш набуд.',
+    chartVisitsByDayLabel: 'Ташрифҳо аз рӯи рӯз',
+    chartPeakDayPrefix: 'Бештарин дар як рӯз',
+    chartVisitsEmpty: 'Дар давраи интихобшуда маълумоти ташриф нест.',
+    chartPaymentsEmpty: 'Дар давраи интихобшуда пардохт нест.',
+    announcementsTitle: 'Паёмномаи оммавӣ',
+    announcementsNoAccessDesc: 'Паёмномаҳо барои соҳиб ва маъмур дастрасанд.',
+    announcementsTitleField: 'Сарлавҳа (то 120)',
+    announcementsBodyField: 'Матни паём (то 1000)',
+    announcementsSendButton: 'Фиристодани паёмнома',
+    billingNoAccessDesc: 'Обунаи платформа барои соҳиб ва маъмур дастрас аст.',
+    billingLoading: 'Обуна бор мешавад...',
+    billingStatusPrefix: 'Обунаи платформа: ',
+    billingValidUntilPrefix: 'Амал мекунад то: ',
+    billingReadOnlyHint:
+        'Реҷаи танҳо дидан: барои тамдид бо дастгирии платформа тамос гиред.',
+    billingPlansTitle: 'Тарифҳои платформа',
+    billingPlansEmpty: 'Рӯйхати тарифҳо холӣ аст.',
+    billingStatusTrial: 'Давраи озмоишӣ (trial)',
+    billingStatusActive: 'Фаъол (active)',
+    billingStatusExpired: 'Ба охир расид (expired)',
   );
 
   static const BusinessStrings en = BusinessStrings._(
@@ -622,6 +832,61 @@ final class BusinessStrings {
     kioskUnlockAndExitButton: 'Unlock and exit',
     kioskPinFormatError: 'Enter a 4-digit PIN',
     kioskWrongPinError: 'Incorrect PIN',
+    paymentCashLabel: 'Cash',
+    paymentTerminalLabel: 'Card terminal',
+    paymentTransferLabel: 'Transfer',
+    posTitle: 'POS',
+    posLoadingCatalog: 'Loading products and plans...',
+    posLoadErrorTitle: 'Load error',
+    posClientIdLabel: 'Client ID (required for membership)',
+    posNoActivePlans: 'No active plans.',
+    posNoActiveProducts: 'No active products.',
+    posPaymentMethodLabel: 'Payment method',
+    posTotalPrefix: 'Total: ',
+    posSubmitSaleButton: 'Complete sale',
+    posDecreaseQtyTooltip: 'Decrease quantity',
+    posIncreaseQtyTooltip: 'Increase quantity',
+    analyticsNoAccessTitle: 'Insufficient permissions',
+    analyticsOwnerOnlyDesc:
+        'Analytics and revenue are available to the owner only.',
+    analyticsPeriodFilterTitle: 'Period filter',
+    analyticsTodayLabel: 'Today',
+    analyticsWeekLabel: 'Week',
+    analyticsMonthLabel: 'Month',
+    analyticsFromDateLabel: 'From (YYYY-MM-DD)',
+    analyticsToDateLabel: 'To (YYYY-MM-DD)',
+    analyticsInactiveDaysLabel: 'Inactive (1–365 days)',
+    analyticsApplyButton: 'Apply',
+    analyticsLoading: 'Loading analytics...',
+    analyticsErrorTitle: 'Analytics error',
+    analyticsEmptyTitle: 'No data',
+    analyticsEmptyDesc: 'Select a period and refresh the report.',
+    analyticsRevenuePrefix: 'Revenue: ',
+    analyticsClientsAndVisitsTitle: 'Clients & attendance',
+    analyticsTopPlansTitle: 'Top plans',
+    analyticsTopProductsTitle: 'Top products',
+    analyticsNoSalesInPeriod: 'No sales in this period.',
+    chartVisitsByDayLabel: 'Visits by day',
+    chartPeakDayPrefix: 'Daily peak',
+    chartVisitsEmpty: 'No visit data for the selected period.',
+    chartPaymentsEmpty: 'No payments in the selected period.',
+    announcementsTitle: 'Bulk announcement',
+    announcementsNoAccessDesc:
+        'Announcements are available to owner and admin.',
+    announcementsTitleField: 'Title (up to 120)',
+    announcementsBodyField: 'Message text (up to 1000)',
+    announcementsSendButton: 'Send announcement',
+    billingNoAccessDesc:
+        'Platform subscription is available to owner and admin.',
+    billingLoading: 'Loading subscription...',
+    billingStatusPrefix: 'Platform subscription: ',
+    billingValidUntilPrefix: 'Valid until: ',
+    billingReadOnlyHint: 'Read-only mode: contact platform support to renew.',
+    billingPlansTitle: 'Platform plans',
+    billingPlansEmpty: 'No plans available.',
+    billingStatusTrial: 'Trial period (trial)',
+    billingStatusActive: 'Active (active)',
+    billingStatusExpired: 'Expired (expired)',
   );
 
   static BusinessStrings of(AppLocale locale) {

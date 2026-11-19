@@ -4,6 +4,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:ugym_core/ugym_core.dart';
 
+import '../../../core/l10n/business_localizations.dart';
 import '../../../core/router/role_guard_and_banners.dart';
 import '../../../core/session/business_role.dart';
 import '../../../core/session/business_session_controller.dart';
@@ -226,20 +227,22 @@ final class _PosCheckoutScreenState extends State<PosCheckoutScreen> {
 
   Widget _buildScaffold(BuildContext context) {
     final colors = context.ucraftColors;
+    final strings = BusinessStringsScope.of(context);
     final totalFormatted = (_totalMinor() / 100).toStringAsFixed(2);
     final currency = _currencyLabel();
     final session = widget.sessionController;
     final isReadOnly = _isReadOnly;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Касса')),
+      appBar: AppBar(title: Text(strings.posTitle)),
       body: SafeArea(
         child: _loading
-            ? const UcraftLoadingState(message: 'Загружаем товары и тарифы...')
+            ? UcraftLoadingState(message: strings.posLoadingCatalog)
             : _loadError != null
             ? UcraftErrorState(
-                title: 'Ошибка загрузки',
+                title: strings.posLoadErrorTitle,
                 message: _loadError!,
+                retryLabel: strings.retryLabel,
                 onRetry: () => unawaited(_loadCatalog()),
               )
             : SingleChildScrollView(
@@ -254,7 +257,7 @@ final class _PosCheckoutScreenState extends State<PosCheckoutScreen> {
                     ],
                     UcraftTextField(
                       controller: _clientIdController,
-                      label: 'ID клиента (обязателен для абонемента)',
+                      label: strings.posClientIdLabel,
                       hintText: 'Например, 11',
                       keyboardType: TextInputType.number,
                       enabled: !isReadOnly && !_submitting,
@@ -262,7 +265,7 @@ final class _PosCheckoutScreenState extends State<PosCheckoutScreen> {
                     ),
                     const SizedBox(height: UcraftSpacing.space4),
                     Text(
-                      'Абонементы',
+                      strings.membershipsLabel,
                       style: UcraftTypography.title.copyWith(
                         color: colors.foreground,
                       ),
@@ -270,7 +273,7 @@ final class _PosCheckoutScreenState extends State<PosCheckoutScreen> {
                     const SizedBox(height: UcraftSpacing.space2),
                     if (_membershipTypes.isEmpty)
                       Text(
-                        'Нет активных тарифов.',
+                        strings.posNoActivePlans,
                         style: UcraftTypography.caption.copyWith(
                           color: colors.foregroundSecondary,
                         ),
@@ -302,7 +305,7 @@ final class _PosCheckoutScreenState extends State<PosCheckoutScreen> {
                       ),
                     const SizedBox(height: UcraftSpacing.space4),
                     Text(
-                      'Товары',
+                      strings.subTabProducts,
                       style: UcraftTypography.title.copyWith(
                         color: colors.foreground,
                       ),
@@ -310,7 +313,7 @@ final class _PosCheckoutScreenState extends State<PosCheckoutScreen> {
                     const SizedBox(height: UcraftSpacing.space2),
                     if (_products.isEmpty)
                       Text(
-                        'Нет активных товаров.',
+                        strings.posNoActiveProducts,
                         style: UcraftTypography.caption.copyWith(
                           color: colors.foregroundSecondary,
                         ),
@@ -339,7 +342,7 @@ final class _PosCheckoutScreenState extends State<PosCheckoutScreen> {
                                 ),
                               ),
                               IconButton(
-                                tooltip: 'Уменьшить количество',
+                                tooltip: strings.posDecreaseQtyTooltip,
                                 onPressed:
                                     (_productQuantities[product.id] ?? 0) > 0
                                     ? () {
@@ -357,7 +360,7 @@ final class _PosCheckoutScreenState extends State<PosCheckoutScreen> {
                               ),
                               Text('${_productQuantities[product.id] ?? 0}'),
                               IconButton(
-                                tooltip: 'Увеличить количество',
+                                tooltip: strings.posIncreaseQtyTooltip,
                                 onPressed: () {
                                   _pendingKey = null;
                                   setState(() {
@@ -376,7 +379,7 @@ final class _PosCheckoutScreenState extends State<PosCheckoutScreen> {
                       ],
                     const SizedBox(height: UcraftSpacing.space3),
                     Text(
-                      'Способ оплаты',
+                      strings.posPaymentMethodLabel,
                       style: UcraftTypography.bodyMedium.copyWith(
                         color: colors.foreground,
                       ),
@@ -388,7 +391,7 @@ final class _PosCheckoutScreenState extends State<PosCheckoutScreen> {
                       children: [
                         for (final method in PaymentMethod.values)
                           UcraftButton(
-                            label: paymentMethodLabel(method),
+                            label: paymentMethodLabel(method, strings: strings),
                             variant: _paymentMethod == method
                                 ? UcraftButtonVariant.primary
                                 : UcraftButtonVariant.secondary,
@@ -403,7 +406,7 @@ final class _PosCheckoutScreenState extends State<PosCheckoutScreen> {
                     ),
                     const SizedBox(height: UcraftSpacing.space4),
                     Text(
-                      'Итого: $totalFormatted $currency',
+                      '${strings.posTotalPrefix}$totalFormatted $currency',
                       style: UcraftTypography.title.copyWith(
                         color: colors.foreground,
                       ),
@@ -419,7 +422,7 @@ final class _PosCheckoutScreenState extends State<PosCheckoutScreen> {
                     ],
                     const SizedBox(height: UcraftSpacing.space4),
                     UcraftButton(
-                      label: 'Провести продажу',
+                      label: strings.posSubmitSaleButton,
                       fullWidth: true,
                       isLoading: _submitting,
                       onPressed: _submitting || isReadOnly

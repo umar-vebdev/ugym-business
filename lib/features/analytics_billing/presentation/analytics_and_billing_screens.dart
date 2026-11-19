@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:material_ui/material_ui.dart';
 import 'package:ugym_core/ugym_core.dart';
 
+import '../../../core/l10n/business_localizations.dart';
 import '../../../core/session/business_role.dart';
 import '../../../core/session/business_session_controller.dart';
 import '../domain/analytics_and_billing_models.dart';
@@ -135,6 +136,7 @@ final class _AnalyticsScreenState extends State<AnalyticsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = BusinessStringsScope.of(context);
     return ListenableBuilder(
       listenable: widget.sessionController,
       builder: (context, _) {
@@ -142,9 +144,9 @@ final class _AnalyticsScreenState extends State<AnalyticsScreen> {
         if (!widget.sessionController.canView(
           BusinessPermission.viewAnalytics,
         )) {
-          return const UcraftEmptyState(
-            title: 'Недостаточно прав',
-            description: 'Аналитика и выручка доступны только владельцу.',
+          return UcraftEmptyState(
+            title: strings.analyticsNoAccessTitle,
+            description: strings.analyticsOwnerOnlyDesc,
           );
         }
 
@@ -159,7 +161,7 @@ final class _AnalyticsScreenState extends State<AnalyticsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    'Фильтр периода',
+                    strings.analyticsPeriodFilterTitle,
                     style: UcraftTypography.title.copyWith(
                       color: colors.foreground,
                     ),
@@ -170,17 +172,17 @@ final class _AnalyticsScreenState extends State<AnalyticsScreen> {
                     runSpacing: UcraftSpacing.space2,
                     children: [
                       UcraftButton(
-                        label: 'Сегодня',
+                        label: strings.analyticsTodayLabel,
                         variant: UcraftButtonVariant.secondary,
                         onPressed: () => _applyPreset(0),
                       ),
                       UcraftButton(
-                        label: 'Неделя',
+                        label: strings.analyticsWeekLabel,
                         variant: UcraftButtonVariant.secondary,
                         onPressed: () => _applyPreset(6),
                       ),
                       UcraftButton(
-                        label: 'Месяц',
+                        label: strings.analyticsMonthLabel,
                         variant: UcraftButtonVariant.secondary,
                         onPressed: () => _applyPreset(29),
                       ),
@@ -192,14 +194,14 @@ final class _AnalyticsScreenState extends State<AnalyticsScreen> {
                       Expanded(
                         child: UcraftTextField(
                           controller: _fromController,
-                          label: 'С (ГГГГ-ММ-ДД)',
+                          label: strings.analyticsFromDateLabel,
                         ),
                       ),
                       const SizedBox(width: UcraftSpacing.space2),
                       Expanded(
                         child: UcraftTextField(
                           controller: _toController,
-                          label: 'По (ГГГГ-ММ-ДД)',
+                          label: strings.analyticsToDateLabel,
                         ),
                       ),
                     ],
@@ -210,13 +212,13 @@ final class _AnalyticsScreenState extends State<AnalyticsScreen> {
                       Expanded(
                         child: UcraftTextField(
                           controller: _inactiveDaysController,
-                          label: 'Неактивные (1–365 дн.)',
+                          label: strings.analyticsInactiveDaysLabel,
                           keyboardType: TextInputType.number,
                         ),
                       ),
                       const SizedBox(width: UcraftSpacing.space2),
                       UcraftButton(
-                        label: 'Применить',
+                        label: strings.analyticsApplyButton,
                         onPressed: _loading ? null : () => unawaited(_load()),
                       ),
                     ],
@@ -226,33 +228,36 @@ final class _AnalyticsScreenState extends State<AnalyticsScreen> {
             ),
             const SizedBox(height: UcraftSpacing.space3),
             if (_loading)
-              const UcraftLoadingState(message: 'Загружаем аналитику...')
+              UcraftLoadingState(message: strings.analyticsLoading)
             else if (_errorMessage != null)
               UcraftErrorState(
-                title: 'Ошибка аналитики',
+                title: strings.analyticsErrorTitle,
                 message: _errorMessage!,
+                retryLabel: strings.retryLabel,
                 onRetry: () => unawaited(_load()),
               )
             else if (overview == null || report == null)
-              const UcraftEmptyState(
-                title: 'Данных нет',
-                description: 'Выберите период и обновите отчёт.',
+              UcraftEmptyState(
+                title: strings.analyticsEmptyTitle,
+                description: strings.analyticsEmptyDesc,
               )
             else ...[
-              _buildRevenueCard(context, report.summary),
+              _buildRevenueCard(context, report.summary, strings),
               const SizedBox(height: UcraftSpacing.space3),
-              _buildClientsAndVisitsCard(context, overview),
+              _buildClientsAndVisitsCard(context, overview, strings),
               const SizedBox(height: UcraftSpacing.space3),
               _buildPopularityCard(
                 context,
-                title: 'Топ тарифов',
+                title: strings.analyticsTopPlansTitle,
                 items: overview.popularMemberships,
+                strings: strings,
               ),
               const SizedBox(height: UcraftSpacing.space3),
               _buildPopularityCard(
                 context,
-                title: 'Топ товаров',
+                title: strings.analyticsTopProductsTitle,
                 items: overview.popularProducts,
+                strings: strings,
               ),
             ],
           ],
@@ -261,7 +266,11 @@ final class _AnalyticsScreenState extends State<AnalyticsScreen> {
     );
   }
 
-  Widget _buildRevenueCard(BuildContext context, RevenueSummary summary) {
+  Widget _buildRevenueCard(
+    BuildContext context,
+    RevenueSummary summary,
+    BusinessStrings strings,
+  ) {
     final colors = context.ucraftColors;
     final c = summary.currency;
     return UcraftCard(
@@ -269,19 +278,19 @@ final class _AnalyticsScreenState extends State<AnalyticsScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            'Выручка: ${_money(summary.totalMinor)} $c',
+            '${strings.analyticsRevenuePrefix}${_money(summary.totalMinor)} $c',
             style: UcraftTypography.title.copyWith(color: colors.foreground),
           ),
           const SizedBox(height: UcraftSpacing.space1),
           Text(
-            'Абонементы: ${_money(summary.membershipsMinor)} $c • Товары: ${_money(summary.productsMinor)} $c • Чеков: ${summary.salesCount}',
+            '${strings.membershipsLabel}: ${_money(summary.membershipsMinor)} $c • ${strings.subTabProducts}: ${_money(summary.productsMinor)} $c • ${strings.receiptsCountLabel}: ${summary.salesCount}',
             style: UcraftTypography.caption.copyWith(
               color: colors.foregroundSecondary,
             ),
           ),
           const SizedBox(height: UcraftSpacing.space1),
           Text(
-            'Наличные: ${_money(summary.byPaymentMethod.cash)} $c • Терминал: ${_money(summary.byPaymentMethod.cardTerminal)} $c • Перевод: ${_money(summary.byPaymentMethod.transfer)} $c',
+            '${strings.paymentCashLabel}: ${_money(summary.byPaymentMethod.cash)} $c • ${strings.paymentTerminalLabel}: ${_money(summary.byPaymentMethod.cardTerminal)} $c • ${strings.paymentTransferLabel}: ${_money(summary.byPaymentMethod.transfer)} $c',
             style: UcraftTypography.caption.copyWith(
               color: colors.foregroundSecondary,
             ),
@@ -299,6 +308,7 @@ final class _AnalyticsScreenState extends State<AnalyticsScreen> {
   Widget _buildClientsAndVisitsCard(
     BuildContext context,
     OverviewAnalytics overview,
+    BusinessStrings strings,
   ) {
     final colors = context.ucraftColors;
     return UcraftCard(
@@ -306,7 +316,7 @@ final class _AnalyticsScreenState extends State<AnalyticsScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            'Клиенты и посещаемость',
+            strings.analyticsClientsAndVisitsTitle,
             style: UcraftTypography.title.copyWith(color: colors.foreground),
           ),
           const SizedBox(height: UcraftSpacing.space1),
@@ -341,6 +351,7 @@ final class _AnalyticsScreenState extends State<AnalyticsScreen> {
     BuildContext context, {
     required String title,
     required List<ItemPopularity> items,
+    required BusinessStrings strings,
   }) {
     final colors = context.ucraftColors;
     return UcraftCard(
@@ -354,7 +365,7 @@ final class _AnalyticsScreenState extends State<AnalyticsScreen> {
           const SizedBox(height: UcraftSpacing.space2),
           if (items.isEmpty)
             Text(
-              'За период продаж не было.',
+              strings.analyticsNoSalesInPeriod,
               style: UcraftTypography.caption.copyWith(
                 color: colors.foregroundSecondary,
               ),
@@ -474,6 +485,7 @@ final class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = BusinessStringsScope.of(context);
     return ListenableBuilder(
       listenable: widget.sessionController,
       builder: (context, _) {
@@ -481,9 +493,9 @@ final class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
         if (!widget.sessionController.canView(
           BusinessPermission.sendAnnouncements,
         )) {
-          return const UcraftEmptyState(
-            title: 'Недостаточно прав',
-            description: 'Рассылки доступны владельцу и администратору.',
+          return UcraftEmptyState(
+            title: strings.analyticsNoAccessTitle,
+            description: strings.announcementsNoAccessDesc,
           );
         }
 
@@ -496,7 +508,7 @@ final class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                'Массовая рассылка',
+                strings.announcementsTitle,
                 style: UcraftTypography.title.copyWith(
                   color: colors.foreground,
                 ),
@@ -531,13 +543,13 @@ final class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
               const SizedBox(height: UcraftSpacing.space3),
               UcraftTextField(
                 controller: _titleController,
-                label: 'Заголовок (до 120)',
+                label: strings.announcementsTitleField,
                 enabled: canSend && !_submitting,
               ),
               const SizedBox(height: UcraftSpacing.space3),
               UcraftTextField(
                 controller: _bodyController,
-                label: 'Текст сообщения (до 1000)',
+                label: strings.announcementsBodyField,
                 maxLines: 3,
                 enabled: canSend && !_submitting,
               ),
@@ -561,7 +573,7 @@ final class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
               ],
               const SizedBox(height: UcraftSpacing.space4),
               UcraftButton(
-                label: 'Отправить рассылку',
+                label: strings.announcementsSendButton,
                 fullWidth: true,
                 isLoading: _submitting,
                 onPressed: canSend && !_submitting
@@ -648,21 +660,23 @@ final class _BillingStatusScreenState extends State<BillingStatusScreen> {
   @override
   Widget build(BuildContext context) {
     final colors = context.ucraftColors;
+    final strings = BusinessStringsScope.of(context);
     if (!widget.sessionController.canView(BusinessPermission.viewBilling)) {
-      return const UcraftEmptyState(
-        title: 'Недостаточно прав',
-        description: 'Подписка платформы доступна владельцу и администратору.',
+      return UcraftEmptyState(
+        title: strings.analyticsNoAccessTitle,
+        description: strings.billingNoAccessDesc,
       );
     }
 
     if (_loading) {
-      return const UcraftLoadingState(message: 'Загружаем подписку...');
+      return UcraftLoadingState(message: strings.billingLoading);
     }
 
     if (_errorMessage != null) {
       return UcraftErrorState(
-        title: 'Ошибка загрузки',
+        title: strings.posLoadErrorTitle,
         message: _errorMessage!,
+        retryLabel: strings.retryLabel,
         onRetry: () => unawaited(_load()),
       );
     }
@@ -677,7 +691,7 @@ final class _BillingStatusScreenState extends State<BillingStatusScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  'Подписка платформы: ${_statusLabel(sub.status)}',
+                  '${strings.billingStatusPrefix}${_statusLabel(sub.status, strings)}',
                   style: UcraftTypography.title.copyWith(
                     color: sub.isReadOnly
                         ? colors.destructive
@@ -686,7 +700,7 @@ final class _BillingStatusScreenState extends State<BillingStatusScreen> {
                 ),
                 const SizedBox(height: UcraftSpacing.space1),
                 Text(
-                  'Действует до: ${DateFormatter.formatDateTime(sub.endsAt, offset: DateFormatter.dushanbeOffset)}',
+                  '${strings.billingValidUntilPrefix}${DateFormatter.formatDateTime(sub.endsAt, offset: DateFormatter.dushanbeOffset)}',
                   style: UcraftTypography.body.copyWith(
                     color: colors.foregroundSecondary,
                   ),
@@ -694,7 +708,7 @@ final class _BillingStatusScreenState extends State<BillingStatusScreen> {
                 if (sub.isReadOnly) ...[
                   const SizedBox(height: UcraftSpacing.space2),
                   Text(
-                    'Режим только для чтения: для продления свяжитесь с поддержкой платформы.',
+                    strings.billingReadOnlyHint,
                     style: UcraftTypography.caption.copyWith(
                       color: colors.destructive,
                     ),
@@ -709,7 +723,7 @@ final class _BillingStatusScreenState extends State<BillingStatusScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                'Тарифы платформы',
+                strings.billingPlansTitle,
                 style: UcraftTypography.title.copyWith(
                   color: colors.foreground,
                 ),
@@ -717,7 +731,7 @@ final class _BillingStatusScreenState extends State<BillingStatusScreen> {
               const SizedBox(height: UcraftSpacing.space2),
               if (_plans.isEmpty)
                 Text(
-                  'Список тарифов пуст.',
+                  strings.billingPlansEmpty,
                   style: UcraftTypography.caption.copyWith(
                     color: colors.foregroundSecondary,
                   ),
@@ -745,11 +759,14 @@ final class _BillingStatusScreenState extends State<BillingStatusScreen> {
     );
   }
 
-  String _statusLabel(CompanySubscriptionStatus status) {
+  String _statusLabel(
+    CompanySubscriptionStatus status,
+    BusinessStrings strings,
+  ) {
     return switch (status) {
-      CompanySubscriptionStatus.trial => 'Пробный период (trial)',
-      CompanySubscriptionStatus.active => 'Активна (active)',
-      CompanySubscriptionStatus.expired => 'Истекла (expired)',
+      CompanySubscriptionStatus.trial => strings.billingStatusTrial,
+      CompanySubscriptionStatus.active => strings.billingStatusActive,
+      CompanySubscriptionStatus.expired => strings.billingStatusExpired,
     };
   }
 }
