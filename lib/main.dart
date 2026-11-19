@@ -220,6 +220,10 @@ final class _UgymBusinessAppState extends State<UgymBusinessApp> {
           theme: UcraftTheme.light(),
           darkTheme: UcraftTheme.dark(),
           themeMode: _effectiveThemeController.themeMode,
+          builder: (context, child) => BusinessStringsScope(
+            strings: _effectiveLocaleController.strings,
+            child: child ?? const SizedBox.shrink(),
+          ),
           home: requiresAuth
               ? AuthFlowScreen(controller: widget.authController!)
               : BusinessShell(

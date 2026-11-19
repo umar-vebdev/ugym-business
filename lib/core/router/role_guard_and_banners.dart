@@ -4,6 +4,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:ugym_core/ugym_core.dart';
 
+import '../l10n/business_localizations.dart';
 import '../session/business_role.dart';
 import '../session/business_session_controller.dart';
 
@@ -12,16 +13,17 @@ final class SubscriptionReadOnlyBanner extends StatelessWidget {
   const SubscriptionReadOnlyBanner({
     super.key,
     required this.controller,
-    this.message = 'Подписка истекла — доступен только просмотр',
+    this.message,
     this.onOpenDetails,
   });
 
   final BusinessSessionController controller;
-  final String message;
+  final String? message;
   final VoidCallback? onOpenDetails;
 
   @override
   Widget build(BuildContext context) {
+    final strings = BusinessStringsScope.of(context);
     return ListenableBuilder(
       listenable: controller,
       builder: (context, _) {
@@ -53,7 +55,7 @@ final class SubscriptionReadOnlyBanner extends StatelessWidget {
                 const SizedBox(width: UcraftSpacing.iconLabelGap),
                 Expanded(
                   child: Text(
-                    message,
+                    message ?? strings.readOnlyBanner,
                     style: UcraftTypography.bodyMedium.copyWith(
                       color: colors.warningForeground,
                     ),
@@ -62,7 +64,7 @@ final class SubscriptionReadOnlyBanner extends StatelessWidget {
                 if (onOpenDetails != null) ...[
                   const SizedBox(width: UcraftSpacing.space2),
                   UcraftButton(
-                    label: 'Подробнее',
+                    label: strings.detailsLabel,
                     variant: UcraftButtonVariant.secondary,
                     onPressed: onOpenDetails,
                   ),
@@ -95,6 +97,7 @@ final class RoleGuard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final strings = BusinessStringsScope.of(context);
     return ListenableBuilder(
       listenable: controller,
       builder: (context, _) {
@@ -109,14 +112,14 @@ final class RoleGuard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
-                      'Вы не являетесь сотрудником зала',
+                      strings.noCompanyTitle,
                       style: UcraftTypography.title.copyWith(
                         color: colors.foreground,
                       ),
                     ),
                     const SizedBox(height: UcraftSpacing.space2),
                     Text(
-                      'Создайте свою компанию или откройте клиентское приложение uGym.',
+                      strings.noCompanyDescription,
                       style: UcraftTypography.body.copyWith(
                         color: colors.foregroundSecondary,
                       ),
@@ -124,7 +127,7 @@ final class RoleGuard extends StatelessWidget {
                     if (onCreateCompany != null) ...[
                       const SizedBox(height: UcraftSpacing.space4),
                       UcraftButton(
-                        label: 'Создать компанию (14 дней бесплатно)',
+                        label: strings.createCompanyCta,
                         fullWidth: true,
                         onPressed: onCreateCompany,
                       ),
@@ -132,7 +135,7 @@ final class RoleGuard extends StatelessWidget {
                     if (onOpenClientApp != null) ...[
                       const SizedBox(height: UcraftSpacing.space3),
                       UcraftButton(
-                        label: 'Перейти в клиентское приложение uGym',
+                        label: strings.openClientAppCta,
                         variant: UcraftButtonVariant.secondary,
                         fullWidth: true,
                         onPressed: onOpenClientApp,
@@ -146,10 +149,10 @@ final class RoleGuard extends StatelessWidget {
         }
 
         if (!controller.canView(permission)) {
-          return const UcraftEmptyState(
+          return UcraftEmptyState(
             icon: LucideIcons.lock,
-            title: 'Недостаточно прав для доступа к разделу',
-            description: 'Доступ ограничен вашей текущей ролью в компании.',
+            title: strings.permissionDeniedTitle,
+            description: strings.permissionDeniedDescription,
           );
         }
 
@@ -167,13 +170,14 @@ final class GymBranchSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final strings = BusinessStringsScope.of(context);
     return ListenableBuilder(
       listenable: controller,
       builder: (context, _) {
         final colors = context.ucraftColors;
         final gyms = controller.gyms;
         final selected = controller.selectedGym;
-        final label = selected?.name ?? 'Филиал не выбран';
+        final label = selected?.name ?? strings.branchNotSelected;
 
         final Widget chip = Container(
           constraints: const BoxConstraints(minHeight: 48),

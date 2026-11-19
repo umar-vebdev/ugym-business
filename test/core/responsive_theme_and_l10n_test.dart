@@ -331,4 +331,82 @@ void main() {
       expect(retried, isTrue);
     },
   );
+
+  testWidgets(
+    'BusinessStringsScope live-translates RoleGuard, ReadOnlyBanner Details, and Shell sub-tabs in ru/tg/en',
+    (tester) async {
+      final prefs = AppPreferences(storage: InMemoryTokenStorage());
+      final session = BusinessSessionController(
+        preferences: prefs,
+        initialRole: BusinessRole.owner,
+        initialReadOnly: true,
+      );
+      final locale = LocaleController(preferences: prefs);
+      addTearDown(session.dispose);
+      addTearDown(locale.dispose);
+
+      await tester.pumpWidget(
+        UgymBusinessApp(
+          sessionController: session,
+          localeController: locale,
+          visitsRepository: _FakeQrRepo(),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Switch to EN via More tab.
+      await tester.tap(find.text('Ещё'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('EN'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Overview'));
+      await tester.pumpAndSettle();
+      expect(find.text('No branch selected'), findsWidgets);
+
+      // Switch to TG.
+      await tester.tap(find.text('More'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('TG'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Шарҳ'));
+      await tester.pumpAndSettle();
+      expect(find.text('Филиал интихоб нашудааст'), findsWidgets);
+
+      // Verify RoleGuard respects BusinessStringsScope in EN.
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: UcraftTheme.light(),
+          home: BusinessStringsScope(
+            strings: BusinessStrings.en,
+            child: Scaffold(
+              body: Column(
+                children: [
+                  SubscriptionReadOnlyBanner(
+                    controller: session,
+                    onOpenDetails: () {},
+                  ),
+                  RoleGuard(
+                    controller: BusinessSessionController(
+                      preferences: prefs,
+                      initialRole: BusinessRole.noCompany,
+                    ),
+                    permission: BusinessPermission.viewGyms,
+                    onCreateCompany: () {},
+                    child: const SizedBox.shrink(),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Details'), findsOneWidget);
+      expect(find.text('You are not a gym staff member'), findsOneWidget);
+      expect(find.text('Create company (14-day free trial)'), findsOneWidget);
+    },
+  );
 }

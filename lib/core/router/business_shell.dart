@@ -246,17 +246,43 @@ final class _BusinessShellState extends State<BusinessShell> {
               ),
             );
 
-            if (useRail) {
-              return Scaffold(
-                body: Row(
-                  children: [
-                    NavigationRail(
+            final Widget scaffold = useRail
+                ? Scaffold(
+                    body: Row(
+                      children: [
+                        NavigationRail(
+                          backgroundColor: colors.surface,
+                          selectedIndex: selectedIndex,
+                          extended: isExpanded,
+                          labelType: isExpanded
+                              ? NavigationRailLabelType.none
+                              : NavigationRailLabelType.all,
+                          onDestinationSelected: (index) {
+                            setState(() {
+                              _selected = destinations[index];
+                            });
+                          },
+                          destinations: [
+                            for (final dest in destinations)
+                              NavigationRailDestination(
+                                icon: Icon(_iconFor(dest, selected: false)),
+                                selectedIcon: Icon(
+                                  _iconFor(dest, selected: true),
+                                ),
+                                label: Text(_labelFor(dest, strings)),
+                              ),
+                          ],
+                        ),
+                        VerticalDivider(width: 1, color: colors.border),
+                        Expanded(child: content),
+                      ],
+                    ),
+                  )
+                : Scaffold(
+                    body: content,
+                    bottomNavigationBar: NavigationBar(
                       backgroundColor: colors.surface,
                       selectedIndex: selectedIndex,
-                      extended: isExpanded,
-                      labelType: isExpanded
-                          ? NavigationRailLabelType.none
-                          : NavigationRailLabelType.all,
                       onDestinationSelected: (index) {
                         setState(() {
                           _selected = destinations[index];
@@ -264,40 +290,16 @@ final class _BusinessShellState extends State<BusinessShell> {
                       },
                       destinations: [
                         for (final dest in destinations)
-                          NavigationRailDestination(
+                          NavigationDestination(
                             icon: Icon(_iconFor(dest, selected: false)),
                             selectedIcon: Icon(_iconFor(dest, selected: true)),
-                            label: Text(_labelFor(dest, strings)),
+                            label: _labelFor(dest, strings),
                           ),
                       ],
                     ),
-                    VerticalDivider(width: 1, color: colors.border),
-                    Expanded(child: content),
-                  ],
-                ),
-              );
-            }
+                  );
 
-            return Scaffold(
-              body: content,
-              bottomNavigationBar: NavigationBar(
-                backgroundColor: colors.surface,
-                selectedIndex: selectedIndex,
-                onDestinationSelected: (index) {
-                  setState(() {
-                    _selected = destinations[index];
-                  });
-                },
-                destinations: [
-                  for (final dest in destinations)
-                    NavigationDestination(
-                      icon: Icon(_iconFor(dest, selected: false)),
-                      selectedIcon: Icon(_iconFor(dest, selected: true)),
-                      label: _labelFor(dest, strings),
-                    ),
-                ],
-              ),
-            );
+            return BusinessStringsScope(strings: strings, child: scaffold);
           },
         );
       },
@@ -312,7 +314,7 @@ final class _BusinessShellState extends State<BusinessShell> {
   ) {
     return switch (destination) {
       BusinessDestination.overview => _buildOverview(context, strings),
-      BusinessDestination.operations => _buildOperations(context),
+      BusinessDestination.operations => _buildOperations(context, strings),
       BusinessDestination.members => _buildMembers(context, strings),
       BusinessDestination.analytics =>
         widget.analyticsAndBillingRepository != null
@@ -406,7 +408,7 @@ final class _BusinessShellState extends State<BusinessShell> {
           children: [
             if (clientsRepo != null)
               UcraftButton(
-                label: 'Клиенты',
+                label: strings.subTabClients,
                 variant: _membersTab == _MembersSubTab.clients
                     ? UcraftButtonVariant.primary
                     : UcraftButtonVariant.secondary,
@@ -415,7 +417,7 @@ final class _BusinessShellState extends State<BusinessShell> {
               ),
             if (membershipsRepo != null) ...[
               UcraftButton(
-                label: 'Истекающие',
+                label: strings.subTabExpiring,
                 variant: _membersTab == _MembersSubTab.expiring
                     ? UcraftButtonVariant.primary
                     : UcraftButtonVariant.secondary,
@@ -423,7 +425,7 @@ final class _BusinessShellState extends State<BusinessShell> {
                     setState(() => _membersTab = _MembersSubTab.expiring),
               ),
               UcraftButton(
-                label: 'Тарифы',
+                label: strings.subTabTypes,
                 variant: _membersTab == _MembersSubTab.types
                     ? UcraftButtonVariant.primary
                     : UcraftButtonVariant.secondary,
@@ -461,7 +463,7 @@ final class _BusinessShellState extends State<BusinessShell> {
     );
   }
 
-  Widget _buildOperations(BuildContext context) {
+  Widget _buildOperations(BuildContext context, BusinessStrings strings) {
     final colors = context.ucraftColors;
     final visitsRepo = widget.visitsRepository;
     final salesRepo = widget.salesRepository;
@@ -469,8 +471,8 @@ final class _BusinessShellState extends State<BusinessShell> {
     final scheduleRepo = widget.trainersScheduleRepository;
 
     if (visitsRepo == null && salesRepo == null && scheduleRepo == null) {
-      return const UcraftEmptyState(
-        title: 'Операции',
+      return UcraftEmptyState(
+        title: strings.navOperations,
         description: 'Подключите сервис визитов и кассы.',
       );
     }
@@ -541,7 +543,7 @@ final class _BusinessShellState extends State<BusinessShell> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  'Ресепшен и касса',
+                  strings.receptionAndPosTitle,
                   style: UcraftTypography.title.copyWith(
                     color: colors.foreground,
                   ),
@@ -553,7 +555,7 @@ final class _BusinessShellState extends State<BusinessShell> {
                   children: [
                     if (visitsRepo != null)
                       UcraftButton(
-                        label: 'Сканер QR клиента',
+                        label: strings.scanClientQrButton,
                         onPressed: canScan
                             ? () => unawaited(
                                 _openClientScanner(
@@ -566,7 +568,7 @@ final class _BusinessShellState extends State<BusinessShell> {
                       ),
                     if (canOpenKiosk)
                       UcraftButton(
-                        label: 'Киоск QR зала',
+                        label: strings.kioskQrButton,
                         variant: UcraftButtonVariant.secondary,
                         onPressed: () => unawaited(
                           _openKiosk(context, visitsRepo, selectedGym.id),
@@ -574,7 +576,7 @@ final class _BusinessShellState extends State<BusinessShell> {
                       ),
                     if (canPos)
                       UcraftButton(
-                        label: 'Открыть кассу',
+                        label: strings.openPosButton,
                         variant: UcraftButtonVariant.secondary,
                         onPressed: () => unawaited(
                           _openPosCheckout(context, salesRepo, membershipsRepo),
@@ -593,7 +595,7 @@ final class _BusinessShellState extends State<BusinessShell> {
             children: [
               if (visitsRepo != null)
                 UcraftButton(
-                  label: 'Визиты',
+                  label: strings.subTabVisits,
                   variant: effectiveTab == _OperationsSubTab.visits
                       ? UcraftButtonVariant.primary
                       : UcraftButtonVariant.secondary,
@@ -602,7 +604,7 @@ final class _BusinessShellState extends State<BusinessShell> {
                 ),
               if (showSalesTabs) ...[
                 UcraftButton(
-                  label: 'Заявки',
+                  label: strings.subTabRequests,
                   variant: effectiveTab == _OperationsSubTab.requests
                       ? UcraftButtonVariant.primary
                       : UcraftButtonVariant.secondary,
@@ -611,7 +613,7 @@ final class _BusinessShellState extends State<BusinessShell> {
                   ),
                 ),
                 UcraftButton(
-                  label: 'Продажи',
+                  label: strings.subTabSales,
                   variant: effectiveTab == _OperationsSubTab.sales
                       ? UcraftButtonVariant.primary
                       : UcraftButtonVariant.secondary,
@@ -619,7 +621,7 @@ final class _BusinessShellState extends State<BusinessShell> {
                       setState(() => _operationsTab = _OperationsSubTab.sales),
                 ),
                 UcraftButton(
-                  label: 'Товары',
+                  label: strings.subTabProducts,
                   variant: effectiveTab == _OperationsSubTab.products
                       ? UcraftButtonVariant.primary
                       : UcraftButtonVariant.secondary,
@@ -630,7 +632,7 @@ final class _BusinessShellState extends State<BusinessShell> {
               ],
               if (showScheduleTab)
                 UcraftButton(
-                  label: 'Расписание',
+                  label: strings.subTabSchedule,
                   variant: effectiveTab == _OperationsSubTab.schedule
                       ? UcraftButtonVariant.primary
                       : UcraftButtonVariant.secondary,
@@ -640,7 +642,7 @@ final class _BusinessShellState extends State<BusinessShell> {
                 ),
               if (showTrainersTab)
                 UcraftButton(
-                  label: 'Тренеры',
+                  label: strings.subTabTrainers,
                   variant: effectiveTab == _OperationsSubTab.trainers
                       ? UcraftButtonVariant.primary
                       : UcraftButtonVariant.secondary,
@@ -765,7 +767,7 @@ final class _BusinessShellState extends State<BusinessShell> {
             runSpacing: UcraftSpacing.space2,
             children: [
               UcraftButton(
-                label: 'Настройки',
+                label: strings.subTabSettings,
                 variant: effectiveTab == _MoreSubTab.settings
                     ? UcraftButtonVariant.primary
                     : UcraftButtonVariant.secondary,
@@ -774,7 +776,7 @@ final class _BusinessShellState extends State<BusinessShell> {
               ),
               if (canStorefront)
                 UcraftButton(
-                  label: 'Витрина',
+                  label: strings.subTabStorefront,
                   variant: effectiveTab == _MoreSubTab.storefront
                       ? UcraftButtonVariant.primary
                       : UcraftButtonVariant.secondary,
@@ -783,7 +785,7 @@ final class _BusinessShellState extends State<BusinessShell> {
                 ),
               if (canStaff)
                 UcraftButton(
-                  label: 'Штат',
+                  label: strings.subTabStaff,
                   variant: effectiveTab == _MoreSubTab.staff
                       ? UcraftButtonVariant.primary
                       : UcraftButtonVariant.secondary,
@@ -791,7 +793,7 @@ final class _BusinessShellState extends State<BusinessShell> {
                 ),
               if (canAnnouncements)
                 UcraftButton(
-                  label: 'Рассылки',
+                  label: strings.subTabAnnouncements,
                   variant: effectiveTab == _MoreSubTab.announcements
                       ? UcraftButtonVariant.primary
                       : UcraftButtonVariant.secondary,
@@ -800,7 +802,7 @@ final class _BusinessShellState extends State<BusinessShell> {
                 ),
               if (canBilling)
                 UcraftButton(
-                  label: 'Подписка',
+                  label: strings.subTabBilling,
                   variant: effectiveTab == _MoreSubTab.billing
                       ? UcraftButtonVariant.primary
                       : UcraftButtonVariant.secondary,

@@ -4,6 +4,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:ugym_core/ugym_core.dart';
 
+import '../../../core/l10n/business_localizations.dart';
 import '../../../core/session/business_role.dart';
 import '../../../core/session/business_session_controller.dart';
 import '../../memberships/domain/memberships_models.dart';
@@ -204,13 +205,15 @@ final class _OverviewDashboardViewState extends State<OverviewDashboardView> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = BusinessStringsScope.of(context);
     return ListenableBuilder(
       listenable: widget.sessionController,
       builder: (context, _) {
         final colors = context.ucraftColors;
         final role = widget.sessionController.role;
         final gymName =
-            widget.sessionController.selectedGym?.name ?? 'Филиал не выбран';
+            widget.sessionController.selectedGym?.name ??
+            strings.branchNotSelected;
 
         final hasQuickActions =
             widget.onOpenScanner != null ||
@@ -238,7 +241,7 @@ final class _OverviewDashboardViewState extends State<OverviewDashboardView> {
                       ),
                       const SizedBox(height: UcraftSpacing.space1),
                       Text(
-                        'Роль: ${role?.name ?? 'не определена'} • Филиал: $gymName',
+                        '${strings.roleLabel}: ${role?.name ?? strings.roleUnset} • ${strings.branchLabel}: $gymName',
                         style: UcraftTypography.body.copyWith(
                           color: colors.foregroundSecondary,
                         ),
@@ -247,7 +250,7 @@ final class _OverviewDashboardViewState extends State<OverviewDashboardView> {
                   ),
                   if (_hasAnyDataSource)
                     UcraftButton(
-                      label: 'Обновить',
+                      label: strings.refreshLabel,
                       variant: UcraftButtonVariant.secondary,
                       isLoading: _loading,
                       onPressed: _loading ? null : () => unawaited(_load()),
@@ -262,7 +265,7 @@ final class _OverviewDashboardViewState extends State<OverviewDashboardView> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
-                      'Быстрые действия',
+                      strings.quickActionsTitle,
                       style: UcraftTypography.title.copyWith(
                         color: colors.foreground,
                       ),
@@ -274,7 +277,7 @@ final class _OverviewDashboardViewState extends State<OverviewDashboardView> {
                       children: [
                         if (widget.onOpenScanner != null)
                           UcraftButton(
-                            label: 'Сканер QR клиента',
+                            label: strings.scanClientQrButton,
                             onPressed:
                                 widget.sessionController.canMutate(
                                   BusinessPermission.manageReceptionQrAndVisits,
@@ -284,7 +287,7 @@ final class _OverviewDashboardViewState extends State<OverviewDashboardView> {
                           ),
                         if (widget.onOpenKiosk != null)
                           UcraftButton(
-                            label: 'Киоск QR зала',
+                            label: strings.kioskQrButton,
                             variant: UcraftButtonVariant.secondary,
                             onPressed: widget.onOpenKiosk,
                           ),
@@ -294,7 +297,7 @@ final class _OverviewDashboardViewState extends State<OverviewDashboardView> {
                                   .manageMembershipRequestsAndSales,
                             ))
                           UcraftButton(
-                            label: 'Открыть кассу',
+                            label: strings.openPosButton,
                             variant: UcraftButtonVariant.secondary,
                             onPressed: widget.onOpenPos,
                           ),
@@ -313,13 +316,13 @@ final class _OverviewDashboardViewState extends State<OverviewDashboardView> {
                 const UcraftLoadingState(isSkeleton: true, skeletonCount: 2)
               else if (_errorMessage != null)
                 UcraftErrorState(
-                  title: 'Ошибка загрузки сводки',
+                  title: strings.overviewErrorTitle,
                   message: _errorMessage!,
-                  retryLabel: 'Повторить',
+                  retryLabel: strings.retryLabel,
                   onRetry: () => unawaited(_load()),
                 )
               else
-                _buildMetricsGrid(context),
+                _buildMetricsGrid(context, strings),
             ],
           ],
         );
@@ -327,35 +330,35 @@ final class _OverviewDashboardViewState extends State<OverviewDashboardView> {
     );
   }
 
-  Widget _buildMetricsGrid(BuildContext context) {
+  Widget _buildMetricsGrid(BuildContext context, BusinessStrings strings) {
     final cards = <Widget>[
-      if (_overview != null) _buildRevenueKpiCard(context, _overview!),
-      if (_overview != null) _buildVisitsKpiCard(context, _overview!),
+      if (_overview != null) _buildRevenueKpiCard(context, _overview!, strings),
+      if (_overview != null) _buildVisitsKpiCard(context, _overview!, strings),
       if (_pendingRequestsCount != null)
         _buildOperationalAlertCard(
           context,
-          title: 'Заявки в ожидании',
+          title: strings.pendingRequestsTitle,
           value: '$_pendingRequestsCount',
           subtitle: _pendingRequestsCount == 0
-              ? 'Необработанных заявок из uGym нет'
-              : 'Ожидают подтверждения оплаты на кассе',
+              ? strings.pendingRequestsEmpty
+              : strings.pendingRequestsHint,
           highlightWarning: _pendingRequestsCount! > 0,
           actionLabel: widget.onOpenPendingRequests != null
-              ? 'К заявкам'
+              ? strings.goToRequestsButton
               : null,
           onAction: widget.onOpenPendingRequests,
         ),
       if (_expiringMembershipsCount != null)
         _buildOperationalAlertCard(
           context,
-          title: 'Истекают за 7 дней',
+          title: strings.expiringSoonTitle,
           value: '$_expiringMembershipsCount',
           subtitle: _expiringMembershipsCount == 0
-              ? 'Истекающих абонементов нет'
-              : 'Абонементы для напоминания о продлении',
+              ? strings.expiringSoonEmpty
+              : strings.expiringSoonHint,
           highlightWarning: _expiringMembershipsCount! > 0,
           actionLabel: widget.onOpenExpiringMemberships != null
-              ? 'К истекающим'
+              ? strings.goToExpiringButton
               : null,
           onAction: widget.onOpenExpiringMemberships,
         ),
@@ -397,6 +400,7 @@ final class _OverviewDashboardViewState extends State<OverviewDashboardView> {
   Widget _buildRevenueKpiCard(
     BuildContext context,
     OverviewAnalytics overview,
+    BusinessStrings strings,
   ) {
     final colors = context.ucraftColors;
     final revenue = overview.revenue;
@@ -419,7 +423,7 @@ final class _OverviewDashboardViewState extends State<OverviewDashboardView> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            'Выручка сегодня',
+            strings.revenueTodayTitle,
             style: UcraftTypography.label.copyWith(
               color: colors.foregroundSecondary,
             ),
@@ -435,7 +439,7 @@ final class _OverviewDashboardViewState extends State<OverviewDashboardView> {
           ),
           const SizedBox(height: UcraftSpacing.space2),
           Text(
-            'Чеков: ${revenue.salesCount} • Абонементы: $memberships • Товары: $products',
+            '${strings.receiptsCountLabel}: ${revenue.salesCount} • ${strings.membershipsLabel}: $memberships • ${strings.subTabProducts}: $products',
             style: UcraftTypography.caption.copyWith(
               color: colors.foregroundSecondary,
             ),
@@ -443,7 +447,7 @@ final class _OverviewDashboardViewState extends State<OverviewDashboardView> {
           if (widget.onOpenAnalytics != null) ...[
             const SizedBox(height: UcraftSpacing.space3),
             UcraftButton(
-              label: 'Открыть аналитику',
+              label: strings.openAnalyticsButton,
               variant: UcraftButtonVariant.secondary,
               onPressed: widget.onOpenAnalytics,
             ),
@@ -453,7 +457,11 @@ final class _OverviewDashboardViewState extends State<OverviewDashboardView> {
     );
   }
 
-  Widget _buildVisitsKpiCard(BuildContext context, OverviewAnalytics overview) {
+  Widget _buildVisitsKpiCard(
+    BuildContext context,
+    OverviewAnalytics overview,
+    BusinessStrings strings,
+  ) {
     final colors = context.ucraftColors;
     final visits = overview.visits;
     final clients = overview.clients;
@@ -463,7 +471,7 @@ final class _OverviewDashboardViewState extends State<OverviewDashboardView> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            'Посещения сегодня',
+            strings.visitsTodayTitle,
             style: UcraftTypography.label.copyWith(
               color: colors.foregroundSecondary,
             ),
@@ -479,7 +487,7 @@ final class _OverviewDashboardViewState extends State<OverviewDashboardView> {
           ),
           const SizedBox(height: UcraftSpacing.space2),
           Text(
-            'QR: ${visits.qrVisits} • Ручные: ${visits.manualVisits} • Новых клиентов: ${clients.newClients}',
+            'QR: ${visits.qrVisits} • ${strings.manualVisitsLabel}: ${visits.manualVisits} • ${strings.newClientsLabel}: ${clients.newClients}',
             style: UcraftTypography.caption.copyWith(
               color: colors.foregroundSecondary,
             ),
