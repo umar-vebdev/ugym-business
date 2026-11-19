@@ -5,6 +5,7 @@ import 'package:ugym_core/ugym_core.dart';
 
 import '../../features/analytics_billing/domain/analytics_and_billing_models.dart';
 import '../../features/analytics_billing/presentation/analytics_and_billing_screens.dart';
+import '../../features/analytics_billing/presentation/overview_dashboard_view.dart';
 import '../../features/auth/presentation/auth_controller.dart';
 import '../../features/clients/domain/clients_models.dart';
 import '../../features/clients/presentation/client_detail_screen.dart';
@@ -322,7 +323,6 @@ final class _BusinessShellState extends State<BusinessShell> {
   }
 
   Widget _buildOverview(BuildContext context, BusinessStrings strings) {
-    final colors = context.ucraftColors;
     final role = widget.sessionController.role;
     if (role == BusinessRole.noCompany && widget.onboardingRepository != null) {
       return CompanyOnboardingCard(
@@ -331,25 +331,53 @@ final class _BusinessShellState extends State<BusinessShell> {
       );
     }
 
-    final gymName =
-        widget.sessionController.selectedGym?.name ?? 'Филиал не выбран';
-    return UcraftCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            strings.appTitle,
-            style: UcraftTypography.title.copyWith(color: colors.foreground),
-          ),
-          const SizedBox(height: UcraftSpacing.space2),
-          Text(
-            'Роль: ${role?.name ?? 'не определена'} • Филиал: $gymName',
-            style: UcraftTypography.body.copyWith(
-              color: colors.foregroundSecondary,
-            ),
-          ),
-        ],
-      ),
+    final visitsRepo = widget.visitsRepository;
+    final salesRepo = widget.salesRepository;
+    final membershipsRepo = widget.membershipsRepository;
+    final selectedGym = widget.sessionController.selectedGym;
+    final bool canOpenKiosk =
+        widget.config.enableKioskMode &&
+        visitsRepo != null &&
+        selectedGym != null &&
+        (role == BusinessRole.owner || role == BusinessRole.admin);
+
+    return OverviewDashboardView(
+      appTitle: strings.appTitle,
+      sessionController: widget.sessionController,
+      analyticsRepository: widget.analyticsAndBillingRepository,
+      salesRepository: salesRepo,
+      membershipsRepository: membershipsRepo,
+      onOpenScanner: visitsRepo != null && selectedGym != null
+          ? () => unawaited(
+              _openClientScanner(context, visitsRepo, selectedGym.id),
+            )
+          : null,
+      onOpenKiosk: canOpenKiosk
+          ? () => unawaited(_openKiosk(context, visitsRepo, selectedGym.id))
+          : null,
+      onOpenPos: salesRepo != null && membershipsRepo != null
+          ? () =>
+                unawaited(_openPosCheckout(context, salesRepo, membershipsRepo))
+          : null,
+      onOpenPendingRequests: salesRepo != null
+          ? () => setState(() {
+              _selected = BusinessDestination.operations;
+              _operationsTab = _OperationsSubTab.requests;
+            })
+          : null,
+      onOpenExpiringMemberships: membershipsRepo != null
+          ? () => setState(() {
+              _selected = BusinessDestination.members;
+              _membersTab = _MembersSubTab.expiring;
+            })
+          : null,
+      onOpenAnalytics:
+          widget.analyticsAndBillingRepository != null &&
+              widget.sessionController.canView(BusinessPermission.viewAnalytics)
+          ? () => setState(() {
+              _selected = BusinessDestination.analytics;
+            })
+          : null,
     );
   }
 
