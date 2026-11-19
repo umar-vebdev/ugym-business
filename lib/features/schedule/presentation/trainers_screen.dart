@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:ugym_core/ugym_core.dart';
 
@@ -163,7 +164,7 @@ final class _TrainersScreenState extends State<TrainersScreen> {
             ),
             const SizedBox(height: UcraftSpacing.space3),
             if (_loading)
-              UcraftLoadingState(message: strings.trainersLoading)
+              const UcraftLoadingState(isSkeleton: true, skeletonCount: 4)
             else if (_errorMessage != null && _trainers.isEmpty)
               UcraftErrorState(
                 title: strings.posLoadErrorTitle,
@@ -173,62 +174,61 @@ final class _TrainersScreenState extends State<TrainersScreen> {
               )
             else if (_trainers.isEmpty)
               UcraftEmptyState(
+                icon: LucideIcons.dumbbell,
                 title: strings.trainersEmptyTitle,
                 description: strings.trainersEmptyDesc,
               )
             else
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+              UcraftListSection(
                 children: [
-                  for (final trainer in _trainers) ...[
-                    UcraftCard(
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  trainer.name,
-                                  style: UcraftTypography.bodyMedium.copyWith(
-                                    color: colors.foreground,
-                                  ),
-                                ),
-                                if (trainer.bio != null &&
-                                    trainer.bio!.isNotEmpty) ...[
-                                  const SizedBox(height: UcraftSpacing.space1),
-                                  Text(
-                                    trainer.bio!,
-                                    style: UcraftTypography.caption.copyWith(
-                                      color: colors.foregroundSecondary,
-                                    ),
-                                  ),
-                                ],
-                                const SizedBox(height: UcraftSpacing.space1),
-                                Text(
-                                  trainer.isActive
-                                      ? strings.planStatusActive
-                                      : strings.trainerStatusInactive,
-                                  style: UcraftTypography.caption.copyWith(
-                                    color: trainer.isActive
-                                        ? colors.success
-                                        : colors.foregroundSecondary,
-                                  ),
-                                ),
-                              ],
-                            ),
+                  for (final trainer in _trainers)
+                    UcraftListRow(
+                      leading: Container(
+                        width: UcraftSpacing.space10,
+                        height: UcraftSpacing.space10,
+                        decoration: BoxDecoration(
+                          color: colors.primarySubtle,
+                          shape: BoxShape.circle,
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          trainer.name.trim().isEmpty
+                              ? '?'
+                              : trainer.name
+                                    .trim()
+                                    .substring(0, 1)
+                                    .toUpperCase(),
+                          style: UcraftTypography.bodyMedium.copyWith(
+                            color: colors.primary,
                           ),
-                          if (canManage)
-                            UcraftButton(
-                              label: strings.productEditButton,
-                              variant: UcraftButtonVariant.secondary,
-                              onPressed: () => unawaited(_openEdit(trainer)),
-                            ),
-                        ],
+                        ),
                       ),
+                      title: trainer.name,
+                      subtitle: trainer.bio != null && trainer.bio!.isNotEmpty
+                          ? trainer.bio
+                          : null,
+                      trailing: UcraftStatusPill(
+                        icon: trainer.isActive
+                            ? LucideIcons.circleCheck
+                            : LucideIcons.pause,
+                        label: trainer.isActive
+                            ? strings.planStatusActive
+                            : strings.trainerStatusInactive,
+                        tone: trainer.isActive
+                            ? UcraftStatusTone.success
+                            : UcraftStatusTone.neutral,
+                      ),
+                      bottom: canManage
+                          ? Align(
+                              alignment: Alignment.centerRight,
+                              child: UcraftButton(
+                                label: strings.productEditButton,
+                                variant: UcraftButtonVariant.secondary,
+                                onPressed: () => unawaited(_openEdit(trainer)),
+                              ),
+                            )
+                          : null,
                     ),
-                    const SizedBox(height: UcraftSpacing.space3),
-                  ],
                 ],
               ),
           ],

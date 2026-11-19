@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:ugym_core/ugym_core.dart';
 
@@ -394,26 +395,19 @@ final class _ScheduleTabState extends State<ScheduleTab> {
             ),
             if (canManage) ...[
               const SizedBox(height: UcraftSpacing.space3),
-              Wrap(
-                spacing: UcraftSpacing.space2,
-                children: [
-                  UcraftButton(
+              UcraftSegmentedTabs<_ScheduleSubView>(
+                items: [
+                  UcraftSegmentedTabItem(
+                    value: _ScheduleSubView.sessions,
                     label: strings.scheduleSessionsTab,
-                    variant: _view == _ScheduleSubView.sessions
-                        ? UcraftButtonVariant.primary
-                        : UcraftButtonVariant.secondary,
-                    onPressed: () =>
-                        setState(() => _view = _ScheduleSubView.sessions),
                   ),
-                  UcraftButton(
+                  UcraftSegmentedTabItem(
+                    value: _ScheduleSubView.templates,
                     label: strings.scheduleTemplatesTab,
-                    variant: _view == _ScheduleSubView.templates
-                        ? UcraftButtonVariant.primary
-                        : UcraftButtonVariant.secondary,
-                    onPressed: () =>
-                        setState(() => _view = _ScheduleSubView.templates),
                   ),
                 ],
+                selected: _view,
+                onSelected: (next) => setState(() => _view = next),
               ),
             ],
             if (_errorMessage != null) ...[
@@ -427,7 +421,7 @@ final class _ScheduleTabState extends State<ScheduleTab> {
             ],
             const SizedBox(height: UcraftSpacing.space3),
             if (_loading)
-              UcraftLoadingState(message: strings.scheduleLoading)
+              const UcraftLoadingState(isSkeleton: true, skeletonCount: 4)
             else if (_view == _ScheduleSubView.templates && canManage)
               _buildTemplatesList(colors, strings)
             else
@@ -439,113 +433,115 @@ final class _ScheduleTabState extends State<ScheduleTab> {
   }
 
   Widget _buildSessionsList(
-    dynamic colors,
+    UcraftColors colors,
     BusinessStrings strings,
     bool canManage,
     bool canViewBookings,
   ) {
     if (_sessions.isEmpty) {
       return UcraftEmptyState(
+        icon: LucideIcons.calendar,
         title: strings.scheduleNoSessionsTitle,
         description: strings.scheduleNoSessionsDesc,
       );
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+    return UcraftListSection(
       children: [
-        for (final session in _sessions) ...[
-          UcraftCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        session.title,
-                        style: UcraftTypography.bodyMedium,
-                      ),
-                    ),
-                    Text(
-                      session.status == ClassSessionStatus.cancelled
-                          ? strings.scheduleSessionCancelled
-                          : '${session.bookedCount}/${session.capacity}',
-                      style: UcraftTypography.caption,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: UcraftSpacing.space1),
-                Text(
-                  DateFormatter.formatDateTime(
-                    session.startsAt,
-                    offset: DateFormatter.dushanbeOffset,
-                  ),
-                  style: UcraftTypography.caption,
-                ),
-                const SizedBox(height: UcraftSpacing.space3),
-                Wrap(
-                  spacing: UcraftSpacing.space2,
-                  runSpacing: UcraftSpacing.space2,
-                  alignment: WrapAlignment.end,
-                  children: [
-                    if (canViewBookings)
-                      UcraftButton(
-                        label: strings.scheduleBookingsButton,
-                        variant: UcraftButtonVariant.secondary,
-                        onPressed: () => unawaited(_openBookings(session)),
-                      ),
-                    if (canManage &&
-                        session.status == ClassSessionStatus.scheduled)
-                      UcraftButton(
-                        label: strings.membershipCancelButton,
-                        variant: UcraftButtonVariant.destructive,
-                        isLoading: _cancellingSessionId == session.id,
-                        onPressed: _cancellingSessionId == session.id
-                            ? null
-                            : () => unawaited(_cancelSession(session)),
-                      ),
-                  ],
-                ),
-              ],
+        for (final session in _sessions)
+          UcraftListRow(
+            monoLeadingWidth: true,
+            leading: Text(
+              DateFormatter.formatTime(
+                session.startsAt,
+                offset: DateFormatter.dushanbeOffset,
+              ),
+              style: UcraftTypography.mono.copyWith(color: colors.foreground),
             ),
+            title: session.title,
+            subtitle: DateFormatter.formatDateTime(
+              session.startsAt,
+              offset: DateFormatter.dushanbeOffset,
+            ),
+            trailing: UcraftStatusPill(
+              icon: session.status == ClassSessionStatus.cancelled
+                  ? LucideIcons.circleX
+                  : LucideIcons.users,
+              label: session.status == ClassSessionStatus.cancelled
+                  ? strings.scheduleSessionCancelled
+                  : '${session.bookedCount}/${session.capacity}',
+              tone: session.status == ClassSessionStatus.cancelled
+                  ? UcraftStatusTone.destructive
+                  : session.bookedCount >= session.capacity
+                  ? UcraftStatusTone.warning
+                  : UcraftStatusTone.info,
+            ),
+            bottom:
+                (canViewBookings ||
+                    (canManage &&
+                        session.status == ClassSessionStatus.scheduled))
+                ? Wrap(
+                    spacing: UcraftSpacing.space2,
+                    runSpacing: UcraftSpacing.space2,
+                    alignment: WrapAlignment.end,
+                    children: [
+                      if (canViewBookings)
+                        UcraftButton(
+                          label: strings.scheduleBookingsButton,
+                          variant: UcraftButtonVariant.secondary,
+                          onPressed: () => unawaited(_openBookings(session)),
+                        ),
+                      if (canManage &&
+                          session.status == ClassSessionStatus.scheduled)
+                        UcraftButton(
+                          label: strings.membershipCancelButton,
+                          variant: UcraftButtonVariant.destructive,
+                          isLoading: _cancellingSessionId == session.id,
+                          onPressed: _cancellingSessionId == session.id
+                              ? null
+                              : () => unawaited(_cancelSession(session)),
+                        ),
+                    ],
+                  )
+                : null,
           ),
-          const SizedBox(height: UcraftSpacing.space3),
-        ],
       ],
     );
   }
 
-  Widget _buildTemplatesList(dynamic colors, BusinessStrings strings) {
+  Widget _buildTemplatesList(UcraftColors colors, BusinessStrings strings) {
     if (_templates.isEmpty) {
       return UcraftEmptyState(
+        icon: LucideIcons.repeat,
         title: strings.scheduleNoTemplatesTitle,
         description: strings.scheduleNoTemplatesDesc,
       );
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+    return UcraftListSection(
       children: [
-        for (final tmpl in _templates) ...[
-          UcraftCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  '${tmpl.title} • ${_weekdayLabel(tmpl.weekday)} ${tmpl.formattedStartTime}',
-                  style: UcraftTypography.bodyMedium,
-                ),
-                const SizedBox(height: UcraftSpacing.space1),
-                Text(
-                  '${tmpl.durationMinutes} мин • до ${tmpl.capacity} мест • ${tmpl.isActive ? strings.planStatusActive : strings.planStatusArchived}',
-                  style: UcraftTypography.caption,
-                ),
-              ],
+        for (final tmpl in _templates)
+          UcraftListRow(
+            monoLeadingWidth: true,
+            leading: Text(
+              tmpl.formattedStartTime,
+              style: UcraftTypography.mono.copyWith(color: colors.foreground),
+            ),
+            title:
+                '${tmpl.title} • ${_weekdayLabel(tmpl.weekday)} ${tmpl.formattedStartTime}',
+            subtitle: '${tmpl.durationMinutes} мин • до ${tmpl.capacity} мест',
+            trailing: UcraftStatusPill(
+              icon: tmpl.isActive
+                  ? LucideIcons.circleCheck
+                  : LucideIcons.archive,
+              label: tmpl.isActive
+                  ? strings.planStatusActive
+                  : strings.planStatusArchived,
+              tone: tmpl.isActive
+                  ? UcraftStatusTone.success
+                  : UcraftStatusTone.neutral,
             ),
           ),
-          const SizedBox(height: UcraftSpacing.space3),
-        ],
       ],
     );
   }
@@ -635,22 +631,32 @@ final class _SessionBookingsScreenState extends State<SessionBookingsScreen> {
       appBar: AppBar(title: Text(widget.session.title)),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(UcraftSpacing.space4),
+          padding: const EdgeInsets.symmetric(
+            horizontal: UcraftSpacing.screenHorizontalPadding,
+            vertical: UcraftSpacing.space4,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                widget.session.capacity > 0
-                    ? 'Занято мест: ${widget.session.bookedCount} / ${widget.session.capacity}'
-                    : 'Записей в списке: ${_bookings.length}',
-                style: UcraftTypography.bodyMedium.copyWith(
-                  color: colors.foreground,
+              UcraftCard(
+                variant: UcraftCardVariant.highlight,
+                child: Text(
+                  widget.session.capacity > 0
+                      ? 'Занято мест: ${widget.session.bookedCount} / ${widget.session.capacity}'
+                      : 'Записей в списке: ${_bookings.length}',
+                  style: UcraftTypography.title.copyWith(
+                    color: colors.foreground,
+                    fontFeatures: const [FontFeature.tabularFigures()],
+                  ),
                 ),
               ),
-              const SizedBox(height: UcraftSpacing.space3),
+              const SizedBox(height: UcraftSpacing.sectionGap),
               Expanded(
                 child: _loading
-                    ? UcraftLoadingState(message: strings.bookingsLoading)
+                    ? const UcraftLoadingState(
+                        isSkeleton: true,
+                        skeletonCount: 4,
+                      )
                     : _errorMessage != null
                     ? UcraftErrorState(
                         title: strings.posLoadErrorTitle,
@@ -660,40 +666,36 @@ final class _SessionBookingsScreenState extends State<SessionBookingsScreen> {
                       )
                     : _bookings.isEmpty
                     ? UcraftEmptyState(
+                        icon: LucideIcons.users,
                         title: strings.bookingsEmptyTitle,
                         description: strings.bookingsEmptyDesc,
                       )
-                    : ListView.separated(
-                        itemCount: _bookings.length,
-                        separatorBuilder: (_, _) =>
-                            const SizedBox(height: UcraftSpacing.space2),
-                        itemBuilder: (context, index) {
-                          final booking = _bookings[index];
-                          return UcraftCard(
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    'Клиент №${booking.clientId}',
-                                    style: UcraftTypography.bodyMedium,
-                                  ),
-                                ),
-                                Text(
-                                  booking.status == ClassBookingStatus.cancelled
+                    : SingleChildScrollView(
+                        child: UcraftListSection(
+                          children: [
+                            for (final booking in _bookings)
+                              UcraftListRow(
+                                title: 'Клиент №${booking.clientId}',
+                                trailing: UcraftStatusPill(
+                                  icon:
+                                      booking.status ==
+                                          ClassBookingStatus.cancelled
+                                      ? LucideIcons.circleX
+                                      : LucideIcons.circleCheck,
+                                  label:
+                                      booking.status ==
+                                          ClassBookingStatus.cancelled
                                       ? strings.bookingStatusCancelled
                                       : strings.bookingStatusBooked,
-                                  style: UcraftTypography.caption.copyWith(
-                                    color:
-                                        booking.status ==
-                                            ClassBookingStatus.cancelled
-                                        ? colors.destructive
-                                        : colors.success,
-                                  ),
+                                  tone:
+                                      booking.status ==
+                                          ClassBookingStatus.cancelled
+                                      ? UcraftStatusTone.destructive
+                                      : UcraftStatusTone.success,
                                 ),
-                              ],
-                            ),
-                          );
-                        },
+                              ),
+                          ],
+                        ),
                       ),
               ),
             ],

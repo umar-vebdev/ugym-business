@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:ugym_core/ugym_core.dart';
 
@@ -34,6 +35,7 @@ final class _AnalyticsScreenState extends State<AnalyticsScreen> {
   final _inactiveDaysController = TextEditingController(text: '14');
 
   bool _loading = true;
+  int? _selectedPresetDays = 6;
   String? _errorMessage;
   OverviewAnalytics? _overview;
   RevenueReport? _revenueReport;
@@ -41,6 +43,9 @@ final class _AnalyticsScreenState extends State<AnalyticsScreen> {
   @override
   void initState() {
     super.initState();
+    if (widget.initialFrom != null || widget.initialTo != null) {
+      _selectedPresetDays = null;
+    }
     final now = DateTime.now().toUtc();
     _fromController = TextEditingController(
       text:
@@ -74,6 +79,9 @@ final class _AnalyticsScreenState extends State<AnalyticsScreen> {
 
   void _applyPreset(int days) {
     final now = DateTime.now().toUtc();
+    setState(() {
+      _selectedPresetDays = days;
+    });
     _fromController.text = _formatDate(now.subtract(Duration(days: days)));
     _toController.text = _formatDate(now);
     unawaited(_load());
@@ -145,6 +153,7 @@ final class _AnalyticsScreenState extends State<AnalyticsScreen> {
           BusinessPermission.viewAnalytics,
         )) {
           return UcraftEmptyState(
+            icon: LucideIcons.shieldAlert,
             title: strings.analyticsNoAccessTitle,
             description: strings.analyticsOwnerOnlyDesc,
           );
@@ -167,26 +176,23 @@ final class _AnalyticsScreenState extends State<AnalyticsScreen> {
                     ),
                   ),
                   const SizedBox(height: UcraftSpacing.space2),
-                  Wrap(
-                    spacing: UcraftSpacing.space2,
-                    runSpacing: UcraftSpacing.space2,
-                    children: [
-                      UcraftButton(
+                  UcraftSegmentedTabs<int>(
+                    items: [
+                      UcraftSegmentedTabItem(
+                        value: 0,
                         label: strings.analyticsTodayLabel,
-                        variant: UcraftButtonVariant.secondary,
-                        onPressed: () => _applyPreset(0),
                       ),
-                      UcraftButton(
+                      UcraftSegmentedTabItem(
+                        value: 6,
                         label: strings.analyticsWeekLabel,
-                        variant: UcraftButtonVariant.secondary,
-                        onPressed: () => _applyPreset(6),
                       ),
-                      UcraftButton(
+                      UcraftSegmentedTabItem(
+                        value: 29,
                         label: strings.analyticsMonthLabel,
-                        variant: UcraftButtonVariant.secondary,
-                        onPressed: () => _applyPreset(29),
                       ),
                     ],
+                    selected: _selectedPresetDays,
+                    onSelected: _applyPreset,
                   ),
                   const SizedBox(height: UcraftSpacing.space3),
                   Row(
@@ -219,16 +225,25 @@ final class _AnalyticsScreenState extends State<AnalyticsScreen> {
                       const SizedBox(width: UcraftSpacing.space2),
                       UcraftButton(
                         label: strings.analyticsApplyButton,
-                        onPressed: _loading ? null : () => unawaited(_load()),
+                        onPressed: _loading
+                            ? null
+                            : () {
+                                setState(() => _selectedPresetDays = null);
+                                unawaited(_load());
+                              },
                       ),
                     ],
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: UcraftSpacing.space3),
+            const SizedBox(height: UcraftSpacing.sectionGap),
             if (_loading)
-              UcraftLoadingState(message: strings.analyticsLoading)
+              const UcraftLoadingState(
+                isSkeleton: true,
+                skeletonCount: 3,
+                skeletonHeight: 96,
+              )
             else if (_errorMessage != null)
               UcraftErrorState(
                 title: strings.analyticsErrorTitle,
@@ -238,22 +253,23 @@ final class _AnalyticsScreenState extends State<AnalyticsScreen> {
               )
             else if (overview == null || report == null)
               UcraftEmptyState(
+                icon: LucideIcons.trendingUp,
                 title: strings.analyticsEmptyTitle,
                 description: strings.analyticsEmptyDesc,
               )
             else ...[
               _buildRevenueCard(context, report.summary, strings),
-              const SizedBox(height: UcraftSpacing.space3),
+              const SizedBox(height: UcraftSpacing.sectionGap),
               _buildClientsAndVisitsCard(context, overview, strings),
-              const SizedBox(height: UcraftSpacing.space3),
-              _buildPopularityCard(
+              const SizedBox(height: UcraftSpacing.sectionGap),
+              _buildPopularitySection(
                 context,
                 title: strings.analyticsTopPlansTitle,
                 items: overview.popularMemberships,
                 strings: strings,
               ),
-              const SizedBox(height: UcraftSpacing.space3),
-              _buildPopularityCard(
+              const SizedBox(height: UcraftSpacing.sectionGap),
+              _buildPopularitySection(
                 context,
                 title: strings.analyticsTopProductsTitle,
                 items: overview.popularProducts,
@@ -274,18 +290,23 @@ final class _AnalyticsScreenState extends State<AnalyticsScreen> {
     final colors = context.ucraftColors;
     final c = summary.currency;
     return UcraftCard(
+      variant: UcraftCardVariant.highlight,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
             '${strings.analyticsRevenuePrefix}${_money(summary.totalMinor)} $c',
-            style: UcraftTypography.title.copyWith(color: colors.foreground),
+            style: UcraftTypography.headline.copyWith(
+              color: colors.foreground,
+              fontFeatures: const [FontFeature.tabularFigures()],
+            ),
           ),
           const SizedBox(height: UcraftSpacing.space1),
           Text(
             '${strings.membershipsLabel}: ${_money(summary.membershipsMinor)} $c • ${strings.subTabProducts}: ${_money(summary.productsMinor)} $c • ${strings.receiptsCountLabel}: ${summary.salesCount}',
             style: UcraftTypography.caption.copyWith(
               color: colors.foregroundSecondary,
+              fontFeatures: const [FontFeature.tabularFigures()],
             ),
           ),
           const SizedBox(height: UcraftSpacing.space1),
@@ -293,6 +314,7 @@ final class _AnalyticsScreenState extends State<AnalyticsScreen> {
             '${strings.paymentCashLabel}: ${_money(summary.byPaymentMethod.cash)} $c • ${strings.paymentTerminalLabel}: ${_money(summary.byPaymentMethod.cardTerminal)} $c • ${strings.paymentTransferLabel}: ${_money(summary.byPaymentMethod.transfer)} $c',
             style: UcraftTypography.caption.copyWith(
               color: colors.foregroundSecondary,
+              fontFeatures: const [FontFeature.tabularFigures()],
             ),
           ),
           const SizedBox(height: UcraftSpacing.space3),
@@ -347,42 +369,43 @@ final class _AnalyticsScreenState extends State<AnalyticsScreen> {
     );
   }
 
-  Widget _buildPopularityCard(
+  Widget _buildPopularitySection(
     BuildContext context, {
     required String title,
     required List<ItemPopularity> items,
     required BusinessStrings strings,
   }) {
     final colors = context.ucraftColors;
-    return UcraftCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            title,
-            style: UcraftTypography.title.copyWith(color: colors.foreground),
-          ),
-          const SizedBox(height: UcraftSpacing.space2),
-          if (items.isEmpty)
-            Text(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        UcraftSectionHeader(title: title),
+        const SizedBox(height: UcraftSpacing.space2),
+        if (items.isEmpty)
+          UcraftCard(
+            child: Text(
               strings.analyticsNoSalesInPeriod,
               style: UcraftTypography.caption.copyWith(
                 color: colors.foregroundSecondary,
               ),
-            )
-          else
-            for (final item in items)
-              Padding(
-                padding: const EdgeInsets.only(bottom: UcraftSpacing.space1),
-                child: Text(
-                  '${item.name} — ${item.soldCount} шт. (${_money(item.revenueMinor)} ${item.currency})',
-                  style: UcraftTypography.body.copyWith(
-                    color: colors.foreground,
+            ),
+          )
+        else
+          UcraftListSection(
+            children: [
+              for (final item in items)
+                UcraftListRow(
+                  title: '${item.name} — ${item.soldCount} шт.',
+                  trailing: Text(
+                    '${_money(item.revenueMinor)} ${item.currency}',
+                    style: UcraftTypography.mono.copyWith(
+                      color: colors.foreground,
+                    ),
                   ),
                 ),
-              ),
-        ],
-      ),
+            ],
+          ),
+      ],
     );
   }
 
@@ -494,6 +517,7 @@ final class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
           BusinessPermission.sendAnnouncements,
         )) {
           return UcraftEmptyState(
+            icon: LucideIcons.shieldAlert,
             title: strings.analyticsNoAccessTitle,
             description: strings.announcementsNoAccessDesc,
           );
@@ -514,31 +538,20 @@ final class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
                 ),
               ),
               const SizedBox(height: UcraftSpacing.space3),
-              Wrap(
-                spacing: UcraftSpacing.space2,
-                children: [
-                  UcraftButton(
+              UcraftSegmentedTabs<AnnouncementChannel>(
+                items: const [
+                  UcraftSegmentedTabItem(
+                    value: AnnouncementChannel.push,
                     label: 'Push',
-                    variant: _channel == AnnouncementChannel.push
-                        ? UcraftButtonVariant.primary
-                        : UcraftButtonVariant.secondary,
-                    onPressed: canSend && !_submitting
-                        ? () => setState(
-                            () => _channel = AnnouncementChannel.push,
-                          )
-                        : null,
                   ),
-                  UcraftButton(
+                  UcraftSegmentedTabItem(
+                    value: AnnouncementChannel.sms,
                     label: 'SMS',
-                    variant: _channel == AnnouncementChannel.sms
-                        ? UcraftButtonVariant.primary
-                        : UcraftButtonVariant.secondary,
-                    onPressed: canSend && !_submitting
-                        ? () =>
-                              setState(() => _channel = AnnouncementChannel.sms)
-                        : null,
                   ),
                 ],
+                selected: _channel,
+                enabled: canSend && !_submitting,
+                onSelected: (channel) => setState(() => _channel = channel),
               ),
               const SizedBox(height: UcraftSpacing.space3),
               UcraftTextField(
@@ -663,13 +676,14 @@ final class _BillingStatusScreenState extends State<BillingStatusScreen> {
     final strings = BusinessStringsScope.of(context);
     if (!widget.sessionController.canView(BusinessPermission.viewBilling)) {
       return UcraftEmptyState(
+        icon: LucideIcons.shieldAlert,
         title: strings.analyticsNoAccessTitle,
         description: strings.billingNoAccessDesc,
       );
     }
 
     if (_loading) {
-      return UcraftLoadingState(message: strings.billingLoading);
+      return const UcraftLoadingState(isSkeleton: true, skeletonCount: 3);
     }
 
     if (_errorMessage != null) {
@@ -685,76 +699,130 @@ final class _BillingStatusScreenState extends State<BillingStatusScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (sub != null)
-          UcraftCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  '${strings.billingStatusPrefix}${_statusLabel(sub.status, strings)}',
-                  style: UcraftTypography.title.copyWith(
-                    color: sub.isReadOnly
-                        ? colors.destructive
-                        : colors.foreground,
-                  ),
+        if (sub != null) ...[
+          Builder(
+            builder: (context) {
+              final (statusIcon, statusTone) = switch (sub.status) {
+                CompanySubscriptionStatus.active => (
+                  LucideIcons.circleCheck,
+                  UcraftStatusTone.success,
                 ),
-                const SizedBox(height: UcraftSpacing.space1),
-                Text(
-                  '${strings.billingValidUntilPrefix}${DateFormatter.formatDateTime(sub.endsAt, offset: DateFormatter.dushanbeOffset)}',
-                  style: UcraftTypography.body.copyWith(
-                    color: colors.foregroundSecondary,
-                  ),
+                CompanySubscriptionStatus.trial => (
+                  LucideIcons.clock,
+                  UcraftStatusTone.info,
                 ),
-                if (sub.isReadOnly) ...[
-                  const SizedBox(height: UcraftSpacing.space2),
-                  Text(
-                    strings.billingReadOnlyHint,
-                    style: UcraftTypography.caption.copyWith(
-                      color: colors.destructive,
+                CompanySubscriptionStatus.expired => (
+                  LucideIcons.triangleAlert,
+                  UcraftStatusTone.destructive,
+                ),
+              };
+              final totalSeconds = sub.endsAt
+                  .difference(sub.startsAt)
+                  .inSeconds;
+              final remainingSeconds = totalSeconds > 0
+                  ? sub.endsAt
+                        .difference(DateTime.now().toUtc())
+                        .inSeconds
+                        .clamp(0, totalSeconds)
+                  : 0;
+              final progress = totalSeconds > 0
+                  ? remainingSeconds / totalSeconds
+                  : 0.0;
+              final remainingDays = (remainingSeconds / 86400).ceil();
+
+              return UcraftCard(
+                variant: UcraftCardVariant.highlight,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: UcraftStatusPill(
+                        icon: statusIcon,
+                        label: _statusLabel(sub.status, strings),
+                        tone: statusTone,
+                      ),
                     ),
-                  ),
-                ],
-              ],
-            ),
+                    const SizedBox(height: UcraftSpacing.space2),
+                    Text(
+                      '${strings.billingStatusPrefix}${_statusLabel(sub.status, strings)}',
+                      style: UcraftTypography.titleLarge.copyWith(
+                        color: sub.isReadOnly
+                            ? colors.destructive
+                            : colors.foreground,
+                      ),
+                    ),
+                    const SizedBox(height: UcraftSpacing.space1),
+                    Text(
+                      '${strings.billingValidUntilPrefix}${DateFormatter.formatDateTime(sub.endsAt, offset: DateFormatter.dushanbeOffset)}',
+                      style: UcraftTypography.body.copyWith(
+                        color: colors.foregroundSecondary,
+                        fontFeatures: const [FontFeature.tabularFigures()],
+                      ),
+                    ),
+                    if (totalSeconds > 0) ...[
+                      const SizedBox(height: UcraftSpacing.space3),
+                      UcraftProgressBar(
+                        value: progress,
+                        leadingLabel: sub.isReadOnly
+                            ? '0 дн.'
+                            : '$remainingDays дн.',
+                        trailingLabel: DateFormatter.formatDate(
+                          sub.endsAt,
+                          offset: DateFormatter.dushanbeOffset,
+                        ),
+                      ),
+                    ],
+                    if (sub.isReadOnly) ...[
+                      const SizedBox(height: UcraftSpacing.space2),
+                      Text(
+                        strings.billingReadOnlyHint,
+                        style: UcraftTypography.caption.copyWith(
+                          color: colors.destructive,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              );
+            },
           ),
-        const SizedBox(height: UcraftSpacing.space3),
-        UcraftCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                strings.billingPlansTitle,
-                style: UcraftTypography.title.copyWith(
-                  color: colors.foreground,
-                ),
+          const SizedBox(height: UcraftSpacing.sectionGap),
+        ],
+        UcraftSectionHeader(title: strings.billingPlansTitle),
+        const SizedBox(height: UcraftSpacing.space2),
+        if (_plans.isEmpty)
+          UcraftCard(
+            child: Text(
+              strings.billingPlansEmpty,
+              style: UcraftTypography.caption.copyWith(
+                color: colors.foregroundSecondary,
               ),
-              const SizedBox(height: UcraftSpacing.space2),
-              if (_plans.isEmpty)
-                Text(
-                  strings.billingPlansEmpty,
-                  style: UcraftTypography.caption.copyWith(
-                    color: colors.foregroundSecondary,
+            ),
+          )
+        else
+          UcraftListSection(
+            children: [
+              for (final plan in _plans)
+                UcraftListRow(
+                  title:
+                      '${plan.name} (${plan.period.apiValue}) — ${(plan.priceMinor / 100).toStringAsFixed(2)} ${plan.currency}',
+                  subtitle:
+                      'Лимиты: до ${plan.maxGyms} залов, до ${plan.maxStaff} сотрудников',
+                  trailing: UcraftStatusPill(
+                    icon: plan.isActive
+                        ? LucideIcons.circleCheck
+                        : LucideIcons.pause,
+                    label: plan.isActive
+                        ? strings.planStatusActive
+                        : strings.planStatusArchived,
+                    tone: plan.isActive
+                        ? UcraftStatusTone.success
+                        : UcraftStatusTone.neutral,
                   ),
-                )
-              else
-                for (final plan in _plans) ...[
-                  Text(
-                    '${plan.name} (${plan.period.apiValue}) — ${(plan.priceMinor / 100).toStringAsFixed(2)} ${plan.currency}',
-                    style: UcraftTypography.bodyMedium.copyWith(
-                      color: colors.foreground,
-                    ),
-                  ),
-                  Text(
-                    'Лимиты: до ${plan.maxGyms} залов, до ${plan.maxStaff} сотрудников',
-                    style: UcraftTypography.caption.copyWith(
-                      color: colors.foregroundSecondary,
-                    ),
-                  ),
-                  const SizedBox(height: UcraftSpacing.space2),
-                ],
+                ),
             ],
           ),
-        ),
       ],
     );
   }

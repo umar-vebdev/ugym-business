@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:ugym_core/ugym_core.dart';
 
@@ -262,32 +263,20 @@ final class _StaffManagementScreenState extends State<StaffManagementScreen> {
                     enabled: canMutate && !_inviting,
                   ),
                   const SizedBox(height: UcraftSpacing.space2),
-                  Wrap(
-                    spacing: UcraftSpacing.space2,
-                    children: [
-                      UcraftButton(
+                  UcraftSegmentedTabs<StaffRoleValue>(
+                    items: [
+                      UcraftSegmentedTabItem(
+                        value: StaffRoleValue.admin,
                         label: strings.staffRoleAdmin,
-                        variant: _inviteRole == StaffRoleValue.admin
-                            ? UcraftButtonVariant.primary
-                            : UcraftButtonVariant.secondary,
-                        onPressed: canMutate && !_inviting
-                            ? () => setState(
-                                () => _inviteRole = StaffRoleValue.admin,
-                              )
-                            : null,
                       ),
-                      UcraftButton(
+                      UcraftSegmentedTabItem(
+                        value: StaffRoleValue.trainer,
                         label: strings.staffRoleTrainer,
-                        variant: _inviteRole == StaffRoleValue.trainer
-                            ? UcraftButtonVariant.primary
-                            : UcraftButtonVariant.secondary,
-                        onPressed: canMutate && !_inviting
-                            ? () => setState(
-                                () => _inviteRole = StaffRoleValue.trainer,
-                              )
-                            : null,
                       ),
                     ],
+                    selected: _inviteRole,
+                    enabled: canMutate && !_inviting,
+                    onSelected: (role) => setState(() => _inviteRole = role),
                   ),
                   if (_inviteError != null) ...[
                     const SizedBox(height: UcraftSpacing.space2),
@@ -319,11 +308,8 @@ final class _StaffManagementScreenState extends State<StaffManagementScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: UcraftSpacing.space4),
-            Text(
-              strings.staffListTitle,
-              style: UcraftTypography.title.copyWith(color: colors.foreground),
-            ),
+            const SizedBox(height: UcraftSpacing.sectionGap),
+            UcraftSectionHeader(title: strings.staffListTitle),
             if (_errorMessage != null && _staff.isNotEmpty) ...[
               const SizedBox(height: UcraftSpacing.space2),
               Text(
@@ -333,9 +319,9 @@ final class _StaffManagementScreenState extends State<StaffManagementScreen> {
                 ),
               ),
             ],
-            const SizedBox(height: UcraftSpacing.space3),
+            const SizedBox(height: UcraftSpacing.space2),
             if (_loading)
-              UcraftLoadingState(message: strings.staffLoading)
+              const UcraftLoadingState(isSkeleton: true, skeletonCount: 3)
             else if (_errorMessage != null && _staff.isEmpty)
               UcraftErrorState(
                 title: strings.posLoadErrorTitle,
@@ -345,15 +331,15 @@ final class _StaffManagementScreenState extends State<StaffManagementScreen> {
               )
             else if (_staff.isEmpty)
               UcraftEmptyState(
+                icon: LucideIcons.users,
                 title: strings.staffEmptyTitle,
                 description: strings.staffEmptyDesc,
               )
             else
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+              UcraftListSection(
                 children: [
-                  for (final member in _staff) ...[
-                    _StaffCard(
+                  for (final member in _staff)
+                    _StaffRow(
                       member: member,
                       canMutate:
                           canMutate && member.role != StaffRoleValue.owner,
@@ -361,8 +347,6 @@ final class _StaffManagementScreenState extends State<StaffManagementScreen> {
                       onToggleRole: () => unawaited(_toggleRole(member)),
                       onDelete: () => unawaited(_deleteMember(member)),
                     ),
-                    const SizedBox(height: UcraftSpacing.space3),
-                  ],
                 ],
               ),
           ],
@@ -372,8 +356,8 @@ final class _StaffManagementScreenState extends State<StaffManagementScreen> {
   }
 }
 
-final class _StaffCard extends StatelessWidget {
-  const _StaffCard({
+final class _StaffRow extends StatelessWidget {
+  const _StaffRow({
     required this.member,
     required this.canMutate,
     required this.isBusy,
@@ -393,46 +377,50 @@ final class _StaffCard extends StatelessWidget {
     final strings = BusinessStringsScope.of(context);
     final displayName =
         member.name ?? member.email ?? 'Пользователь №${member.userId}';
-    final roleLabel = switch (member.role) {
-      StaffRoleValue.owner => strings.staffRoleOwner,
-      StaffRoleValue.admin => strings.staffRoleAdmin,
-      StaffRoleValue.trainer => strings.staffRoleTrainer,
+    final initial = displayName.trim().isEmpty
+        ? '?'
+        : displayName.trim().substring(0, 1).toUpperCase();
+    final (roleLabel, roleIcon, roleTone) = switch (member.role) {
+      StaffRoleValue.owner => (
+        strings.staffRoleOwner,
+        LucideIcons.crown,
+        UcraftStatusTone.info,
+      ),
+      StaffRoleValue.admin => (
+        strings.staffRoleAdmin,
+        LucideIcons.shield,
+        UcraftStatusTone.success,
+      ),
+      StaffRoleValue.trainer => (
+        strings.staffRoleTrainer,
+        LucideIcons.dumbbell,
+        UcraftStatusTone.neutral,
+      ),
     };
 
-    return UcraftCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  displayName,
-                  style: UcraftTypography.bodyMedium.copyWith(
-                    color: colors.foreground,
-                  ),
-                ),
-              ),
-              Text(
-                roleLabel,
-                style: UcraftTypography.caption.copyWith(
-                  color: colors.foregroundSecondary,
-                ),
-              ),
-            ],
-          ),
-          if (member.email != null) ...[
-            const SizedBox(height: UcraftSpacing.space1),
-            Text(
-              member.email!,
-              style: UcraftTypography.caption.copyWith(
-                color: colors.foregroundSecondary,
-              ),
-            ),
-          ],
-          if (canMutate) ...[
-            const SizedBox(height: UcraftSpacing.space3),
-            Wrap(
+    return UcraftListRow(
+      leading: Container(
+        width: UcraftSpacing.space10,
+        height: UcraftSpacing.space10,
+        decoration: BoxDecoration(
+          color: colors.primarySubtle,
+          shape: BoxShape.circle,
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          initial,
+          style: UcraftTypography.bodyMedium.copyWith(color: colors.primary),
+        ),
+      ),
+      title: displayName,
+      subtitle: member.email,
+      trailing: UcraftStatusPill(
+        icon: roleIcon,
+        label: roleLabel,
+        tone: roleTone,
+      ),
+      bottom: canMutate
+          ? Wrap(
               spacing: UcraftSpacing.space2,
               runSpacing: UcraftSpacing.space2,
               alignment: WrapAlignment.end,
@@ -452,10 +440,8 @@ final class _StaffCard extends StatelessWidget {
                   onPressed: isBusy ? null : onDelete,
                 ),
               ],
-            ),
-          ],
-        ],
-      ),
+            )
+          : null,
     );
   }
 }

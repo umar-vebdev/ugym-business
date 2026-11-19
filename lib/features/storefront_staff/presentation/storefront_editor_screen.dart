@@ -359,33 +359,49 @@ final class _StorefrontEditorScreenState extends State<StorefrontEditorScreen> {
         final canEdit =
             !widget.sessionController.isReadOnly && !_isPending && !_submitting;
         final isPublic = _profile?.isPublic ?? false;
+        final (moderationIcon, moderationTone) = switch (_status) {
+          ModerationStatus.approved => (
+            LucideIcons.circleCheck,
+            UcraftStatusTone.success,
+          ),
+          ModerationStatus.pending => (
+            LucideIcons.clock,
+            UcraftStatusTone.warning,
+          ),
+          ModerationStatus.rejected => (
+            LucideIcons.circleX,
+            UcraftStatusTone.destructive,
+          ),
+          ModerationStatus.draft => (
+            LucideIcons.filePen,
+            UcraftStatusTone.neutral,
+          ),
+        };
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             UcraftCard(
+              variant: UcraftCardVariant.highlight,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
                         child: Text(
                           '${strings.storefrontTitlePrefix} • ${gym.name}',
-                          style: UcraftTypography.title.copyWith(
+                          style: UcraftTypography.titleLarge.copyWith(
                             color: colors.foreground,
                           ),
                         ),
                       ),
-                      Text(
-                        _moderationLabel(_status, strings),
-                        style: UcraftTypography.caption.copyWith(
-                          color: _isApproved
-                              ? colors.success
-                              : _status == ModerationStatus.rejected
-                              ? colors.destructive
-                              : colors.foregroundSecondary,
-                        ),
+                      const SizedBox(width: UcraftSpacing.space2),
+                      UcraftStatusPill(
+                        icon: moderationIcon,
+                        label: _moderationLabel(_status, strings),
+                        tone: moderationTone,
                       ),
                     ],
                   ),
@@ -417,7 +433,14 @@ final class _StorefrontEditorScreenState extends State<StorefrontEditorScreen> {
                       ),
                     ),
                   ],
-                  const SizedBox(height: UcraftSpacing.space3),
+                ],
+              ),
+            ),
+            const SizedBox(height: UcraftSpacing.sectionGap),
+            UcraftCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
                   UcraftTextField(
                     controller: _descriptionController,
                     label: strings.storefrontDescriptionLabel,
@@ -539,7 +562,7 @@ final class _StorefrontEditorScreenState extends State<StorefrontEditorScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: UcraftSpacing.space4),
+            const SizedBox(height: UcraftSpacing.sectionGap),
             GymPhotosManager(
               gymId: gym.id,
               repository: widget.repository,
@@ -754,6 +777,7 @@ final class _GymPhotosManagerState extends State<GymPhotosManager> {
               ),
               UcraftButton(
                 label: strings.galleryUploadButton,
+                variant: UcraftButtonVariant.secondary,
                 isLoading: _busy,
                 onPressed: !widget.isLocked && !atLimit && !_busy
                     ? () => unawaited(_pickAndUpload())
@@ -779,64 +803,43 @@ final class _GymPhotosManagerState extends State<GymPhotosManager> {
               ),
             )
           else
-            for (final photo in widget.photos) ...[
-              Row(
-                children: [
-                  ClipRRect(
-                    borderRadius: UcraftRadius.borderSm,
-                    child: Image.network(
-                      photo.url,
-                      width: 56,
-                      height: 56,
-                      fit: BoxFit.cover,
-                      semanticLabel: 'Фото зала №${photo.id}',
-                      errorBuilder: (_, _, _) => Container(
+            UcraftListSection(
+              children: [
+                for (final photo in widget.photos)
+                  UcraftListRow(
+                    leading: ClipRRect(
+                      borderRadius: UcraftRadius.borderSm,
+                      child: Image.network(
+                        photo.url,
                         width: 56,
                         height: 56,
-                        color: colors.surfaceSecondary,
-                        alignment: Alignment.center,
-                        child: Icon(
-                          LucideIcons.image,
-                          size: 20,
-                          color: colors.foregroundSecondary,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: UcraftSpacing.space3),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Фото №${photo.id}',
-                          style: UcraftTypography.bodyMedium.copyWith(
-                            color: colors.foreground,
-                          ),
-                        ),
-                        Text(
-                          photo.url,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: UcraftTypography.caption.copyWith(
+                        fit: BoxFit.cover,
+                        semanticLabel: 'Фото зала №${photo.id}',
+                        errorBuilder: (_, _, _) => Container(
+                          width: 56,
+                          height: 56,
+                          color: colors.surfaceSecondary,
+                          alignment: Alignment.center,
+                          child: Icon(
+                            LucideIcons.image,
+                            size: 20,
                             color: colors.foregroundSecondary,
                           ),
                         ),
-                      ],
+                      ),
+                    ),
+                    title: 'Фото №${photo.id}',
+                    subtitle: photo.url,
+                    trailing: UcraftButton(
+                      label: strings.deleteLabel,
+                      variant: UcraftButtonVariant.destructive,
+                      onPressed: !widget.isLocked && !_busy
+                          ? () => unawaited(_deletePhoto(photo))
+                          : null,
                     ),
                   ),
-                  const SizedBox(width: UcraftSpacing.space2),
-                  UcraftButton(
-                    label: strings.deleteLabel,
-                    variant: UcraftButtonVariant.destructive,
-                    onPressed: !widget.isLocked && !_busy
-                        ? () => unawaited(_deletePhoto(photo))
-                        : null,
-                  ),
-                ],
-              ),
-              const SizedBox(height: UcraftSpacing.space2),
-            ],
+              ],
+            ),
         ],
       ),
     );
