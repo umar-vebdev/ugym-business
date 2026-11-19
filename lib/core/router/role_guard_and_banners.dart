@@ -107,6 +107,7 @@ final class RoleGuard extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(UcraftSpacing.space6),
               child: UcraftCard(
+                variant: UcraftCardVariant.highlight,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,

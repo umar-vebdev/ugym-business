@@ -273,7 +273,7 @@ void main() {
 
       await tester.tap(find.text('Ещё'));
       await tester.pumpAndSettle();
-      await tester.tap(find.widgetWithText(UcraftButton, 'Витрина'));
+      await tester.tap(find.text('Витрина'));
       await tester.pumpAndSettle();
 
       await tester.ensureVisible(find.text('Загрузить фото'));

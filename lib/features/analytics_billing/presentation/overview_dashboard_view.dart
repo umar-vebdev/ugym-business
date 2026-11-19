@@ -214,101 +214,67 @@ final class _OverviewDashboardViewState extends State<OverviewDashboardView> {
         final gymName =
             widget.sessionController.selectedGym?.name ??
             strings.branchNotSelected;
-
-        final hasQuickActions =
-            widget.onOpenScanner != null ||
-            widget.onOpenKiosk != null ||
-            widget.onOpenPos != null;
+        final canScan = widget.sessionController.canMutate(
+          BusinessPermission.manageReceptionQrAndVisits,
+        );
+        final canPos =
+            widget.onOpenPos != null &&
+            widget.sessionController.canMutate(
+              BusinessPermission.manageMembershipRequestsAndSales,
+            );
+        final hasSecondaryActions = widget.onOpenKiosk != null || canPos;
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            UcraftCard(
-              child: Wrap(
-                spacing: UcraftSpacing.space3,
+            _buildHeroSummaryCard(
+              context,
+              strings: strings,
+              role: role,
+              gymName: gymName,
+            ),
+            if (widget.onOpenScanner != null) ...[
+              const SizedBox(height: UcraftSpacing.space4),
+              UcraftButton(
+                label: strings.scanClientQrButton,
+                leadingIcon: LucideIcons.qrCode,
+                fullWidth: true,
+                onPressed: canScan ? widget.onOpenScanner : null,
+              ),
+            ],
+            if (hasSecondaryActions || _hasAnyDataSource) ...[
+              const SizedBox(height: UcraftSpacing.space2),
+              Wrap(
+                spacing: UcraftSpacing.space2,
                 runSpacing: UcraftSpacing.space2,
                 alignment: WrapAlignment.spaceBetween,
-                crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.appTitle,
-                        style: UcraftTypography.title.copyWith(
-                          color: colors.foreground,
-                        ),
-                      ),
-                      const SizedBox(height: UcraftSpacing.space1),
-                      Text(
-                        '${strings.roleLabel}: ${role?.name ?? strings.roleUnset} • ${strings.branchLabel}: $gymName',
-                        style: UcraftTypography.body.copyWith(
-                          color: colors.foregroundSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
+                  if (widget.onOpenKiosk != null)
+                    UcraftButton(
+                      label: strings.kioskQrButton,
+                      leadingIcon: LucideIcons.monitorSmartphone,
+                      variant: UcraftButtonVariant.secondary,
+                      onPressed: widget.onOpenKiosk,
+                    ),
+                  if (canPos)
+                    UcraftButton(
+                      label: strings.openPosButton,
+                      leadingIcon: LucideIcons.shoppingBag,
+                      variant: UcraftButtonVariant.secondary,
+                      onPressed: widget.onOpenPos,
+                    ),
                   if (_hasAnyDataSource)
                     UcraftButton(
                       label: strings.refreshLabel,
-                      variant: UcraftButtonVariant.secondary,
+                      variant: UcraftButtonVariant.tertiary,
                       isLoading: _loading,
                       onPressed: _loading ? null : () => unawaited(_load()),
                     ),
                 ],
               ),
-            ),
-            if (hasQuickActions) ...[
-              const SizedBox(height: UcraftSpacing.space3),
-              UcraftCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text(
-                      strings.quickActionsTitle,
-                      style: UcraftTypography.title.copyWith(
-                        color: colors.foreground,
-                      ),
-                    ),
-                    const SizedBox(height: UcraftSpacing.space3),
-                    Wrap(
-                      spacing: UcraftSpacing.space2,
-                      runSpacing: UcraftSpacing.space2,
-                      children: [
-                        if (widget.onOpenScanner != null)
-                          UcraftButton(
-                            label: strings.scanClientQrButton,
-                            onPressed:
-                                widget.sessionController.canMutate(
-                                  BusinessPermission.manageReceptionQrAndVisits,
-                                )
-                                ? widget.onOpenScanner
-                                : null,
-                          ),
-                        if (widget.onOpenKiosk != null)
-                          UcraftButton(
-                            label: strings.kioskQrButton,
-                            variant: UcraftButtonVariant.secondary,
-                            onPressed: widget.onOpenKiosk,
-                          ),
-                        if (widget.onOpenPos != null &&
-                            widget.sessionController.canMutate(
-                              BusinessPermission
-                                  .manageMembershipRequestsAndSales,
-                            ))
-                          UcraftButton(
-                            label: strings.openPosButton,
-                            variant: UcraftButtonVariant.secondary,
-                            onPressed: widget.onOpenPos,
-                          ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
             ],
             if (_hasAnyDataSource) ...[
-              const SizedBox(height: UcraftSpacing.space3),
+              const SizedBox(height: UcraftSpacing.sectionGap),
               if (_loading &&
                   _overview == null &&
                   _pendingRequestsCount == null &&
@@ -316,13 +282,14 @@ final class _OverviewDashboardViewState extends State<OverviewDashboardView> {
                 const UcraftLoadingState(isSkeleton: true, skeletonCount: 2)
               else if (_errorMessage != null)
                 UcraftErrorState(
+                  icon: LucideIcons.circleAlert,
                   title: strings.overviewErrorTitle,
                   message: _errorMessage!,
                   retryLabel: strings.retryLabel,
                   onRetry: () => unawaited(_load()),
                 )
               else
-                _buildMetricsGrid(context, strings),
+                _buildOperationalSection(context, strings, colors),
             ],
           ],
         );
@@ -330,80 +297,74 @@ final class _OverviewDashboardViewState extends State<OverviewDashboardView> {
     );
   }
 
-  Widget _buildMetricsGrid(BuildContext context, BusinessStrings strings) {
-    final cards = <Widget>[
-      if (_overview != null) _buildRevenueKpiCard(context, _overview!, strings),
-      if (_overview != null) _buildVisitsKpiCard(context, _overview!, strings),
-      if (_pendingRequestsCount != null)
-        _buildOperationalAlertCard(
-          context,
-          title: strings.pendingRequestsTitle,
-          value: '$_pendingRequestsCount',
-          subtitle: _pendingRequestsCount == 0
-              ? strings.pendingRequestsEmpty
-              : strings.pendingRequestsHint,
-          highlightWarning: _pendingRequestsCount! > 0,
-          actionLabel: widget.onOpenPendingRequests != null
-              ? strings.goToRequestsButton
-              : null,
-          onAction: widget.onOpenPendingRequests,
-        ),
-      if (_expiringMembershipsCount != null)
-        _buildOperationalAlertCard(
-          context,
-          title: strings.expiringSoonTitle,
-          value: '$_expiringMembershipsCount',
-          subtitle: _expiringMembershipsCount == 0
-              ? strings.expiringSoonEmpty
-              : strings.expiringSoonHint,
-          highlightWarning: _expiringMembershipsCount! > 0,
-          actionLabel: widget.onOpenExpiringMemberships != null
-              ? strings.goToExpiringButton
-              : null,
-          onAction: widget.onOpenExpiringMemberships,
-        ),
-    ];
+  Widget _buildHeroSummaryCard(
+    BuildContext context, {
+    required BusinessStrings strings,
+    required BusinessRole? role,
+    required String gymName,
+  }) {
+    final colors = context.ucraftColors;
+    final overview = _overview;
+    final roleLabel = role?.name ?? strings.roleUnset;
 
-    if (cards.isEmpty) {
-      return const SizedBox.shrink();
-    }
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final bool twoColumns = constraints.maxWidth >= 600 && cards.length > 1;
-        if (!twoColumns) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+    return UcraftCard(
+      variant: UcraftCardVariant.highlight,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
             children: [
-              for (var i = 0; i < cards.length; i++) ...[
-                cards[i],
-                if (i + 1 < cards.length)
-                  const SizedBox(height: UcraftSpacing.cardGap),
-              ],
+              Expanded(
+                child: Text(
+                  widget.appTitle.toUpperCase(),
+                  style: UcraftTypography.overline.copyWith(
+                    color: colors.foregroundMuted,
+                  ),
+                ),
+              ),
+              UcraftStatusPill(
+                icon: LucideIcons.shieldCheck,
+                label: '${strings.roleLabel}: $roleLabel',
+                tone: UcraftStatusTone.info,
+              ),
             ],
-          );
-        }
-
-        final double cardWidth =
-            (constraints.maxWidth - UcraftSpacing.cardGap) / 2;
-        return Wrap(
-          spacing: UcraftSpacing.cardGap,
-          runSpacing: UcraftSpacing.cardGap,
-          children: [
-            for (final card in cards) SizedBox(width: cardWidth, child: card),
+          ),
+          const SizedBox(height: UcraftSpacing.space1),
+          Text(
+            gymName,
+            style: UcraftTypography.titleLarge.copyWith(
+              color: colors.foreground,
+            ),
+          ),
+          if (overview != null) ...[
+            const SizedBox(height: UcraftSpacing.space4),
+            _buildOwnerKpiStrip(context, overview, strings),
+            if (widget.onOpenAnalytics != null) ...[
+              const SizedBox(height: UcraftSpacing.space2),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: UcraftButton(
+                  label: strings.openAnalyticsButton,
+                  variant: UcraftButtonVariant.tertiary,
+                  onPressed: widget.onOpenAnalytics,
+                ),
+              ),
+            ],
           ],
-        );
-      },
+        ],
+      ),
     );
   }
 
-  Widget _buildRevenueKpiCard(
+  Widget _buildOwnerKpiStrip(
     BuildContext context,
     OverviewAnalytics overview,
     BusinessStrings strings,
   ) {
     final colors = context.ucraftColors;
     final revenue = overview.revenue;
+    final visits = overview.visits;
+    final clients = overview.clients;
     final total = MoneyFormatter.format(
       revenue.totalMinor,
       currency: revenue.currency,
@@ -418,143 +379,172 @@ final class _OverviewDashboardViewState extends State<OverviewDashboardView> {
       currency: revenue.currency,
     );
 
-    return UcraftCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            strings.revenueTodayTitle,
-            style: UcraftTypography.label.copyWith(
-              color: colors.foregroundSecondary,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final metricRevenue = Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              strings.revenueTodayTitle,
+              style: UcraftTypography.caption.copyWith(
+                color: colors.foregroundSecondary,
+              ),
             ),
-          ),
-          const SizedBox(height: UcraftSpacing.space2),
-          Text(
-            total,
-            style: UcraftTypography.headline.copyWith(
-              fontFamily: UcraftTypography.monoFontFamily,
-              fontFeatures: const [FontFeature.tabularFigures()],
-              color: colors.foreground,
+            const SizedBox(height: UcraftSpacing.space1),
+            Text(
+              total,
+              style: UcraftTypography.headline.copyWith(
+                fontFamily: UcraftTypography.monoFontFamily,
+                fontFeatures: const [FontFeature.tabularFigures()],
+                color: colors.foreground,
+              ),
             ),
-          ),
-          const SizedBox(height: UcraftSpacing.space2),
-          Text(
-            '${strings.receiptsCountLabel}: ${revenue.salesCount} • ${strings.membershipsLabel}: $memberships • ${strings.subTabProducts}: $products',
-            style: UcraftTypography.caption.copyWith(
-              color: colors.foregroundSecondary,
-            ),
-          ),
-          if (widget.onOpenAnalytics != null) ...[
-            const SizedBox(height: UcraftSpacing.space3),
-            UcraftButton(
-              label: strings.openAnalyticsButton,
-              variant: UcraftButtonVariant.secondary,
-              onPressed: widget.onOpenAnalytics,
+            const SizedBox(height: UcraftSpacing.space1),
+            Text(
+              '${strings.receiptsCountLabel}: ${revenue.salesCount} • ${strings.membershipsLabel}: $memberships • ${strings.subTabProducts}: $products',
+              style: UcraftTypography.caption.copyWith(
+                color: colors.foregroundSecondary,
+              ),
             ),
           ],
-        ],
-      ),
+        );
+
+        final metricVisits = Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              strings.visitsTodayTitle,
+              style: UcraftTypography.caption.copyWith(
+                color: colors.foregroundSecondary,
+              ),
+            ),
+            const SizedBox(height: UcraftSpacing.space1),
+            Text(
+              '${visits.totalVisits}',
+              style: UcraftTypography.headline.copyWith(
+                fontFamily: UcraftTypography.monoFontFamily,
+                fontFeatures: const [FontFeature.tabularFigures()],
+                color: colors.foreground,
+              ),
+            ),
+            const SizedBox(height: UcraftSpacing.space1),
+            Text(
+              'QR: ${visits.qrVisits} • ${strings.manualVisitsLabel}: ${visits.manualVisits} • ${strings.newClientsLabel}: ${clients.newClients}',
+              style: UcraftTypography.caption.copyWith(
+                color: colors.foregroundSecondary,
+              ),
+            ),
+          ],
+        );
+
+        if (constraints.maxWidth >= 520) {
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(child: metricRevenue),
+              const SizedBox(width: UcraftSpacing.space4),
+              Expanded(child: metricVisits),
+            ],
+          );
+        }
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            metricRevenue,
+            const SizedBox(height: UcraftSpacing.space3),
+            metricVisits,
+          ],
+        );
+      },
     );
   }
 
-  Widget _buildVisitsKpiCard(
+  Widget _buildOperationalSection(
     BuildContext context,
-    OverviewAnalytics overview,
     BusinessStrings strings,
+    UcraftColors colors,
   ) {
-    final colors = context.ucraftColors;
-    final visits = overview.visits;
-    final clients = overview.clients;
+    final rows = <Widget>[
+      if (_pendingRequestsCount != null)
+        _buildOperationalRow(
+          context,
+          colors: colors,
+          title: strings.pendingRequestsTitle,
+          count: _pendingRequestsCount!,
+          subtitle: _pendingRequestsCount == 0
+              ? strings.pendingRequestsEmpty
+              : strings.pendingRequestsHint,
+          actionLabel: widget.onOpenPendingRequests != null
+              ? strings.goToRequestsButton
+              : null,
+          onAction: widget.onOpenPendingRequests,
+        ),
+      if (_expiringMembershipsCount != null)
+        _buildOperationalRow(
+          context,
+          colors: colors,
+          title: strings.expiringSoonTitle,
+          count: _expiringMembershipsCount!,
+          subtitle: _expiringMembershipsCount == 0
+              ? strings.expiringSoonEmpty
+              : strings.expiringSoonHint,
+          actionLabel: widget.onOpenExpiringMemberships != null
+              ? strings.goToExpiringButton
+              : null,
+          onAction: widget.onOpenExpiringMemberships,
+        ),
+    ];
 
-    return UcraftCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            strings.visitsTodayTitle,
-            style: UcraftTypography.label.copyWith(
-              color: colors.foregroundSecondary,
-            ),
-          ),
-          const SizedBox(height: UcraftSpacing.space2),
-          Text(
-            '${visits.totalVisits}',
-            style: UcraftTypography.headline.copyWith(
-              fontFamily: UcraftTypography.monoFontFamily,
-              fontFeatures: const [FontFeature.tabularFigures()],
-              color: colors.foreground,
-            ),
-          ),
-          const SizedBox(height: UcraftSpacing.space2),
-          Text(
-            'QR: ${visits.qrVisits} • ${strings.manualVisitsLabel}: ${visits.manualVisits} • ${strings.newClientsLabel}: ${clients.newClients}',
-            style: UcraftTypography.caption.copyWith(
-              color: colors.foregroundSecondary,
-            ),
-          ),
-        ],
-      ),
+    if (rows.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        UcraftSectionHeader(title: strings.quickActionsTitle),
+        const SizedBox(height: UcraftSpacing.space2),
+        UcraftListSection(children: rows),
+      ],
     );
   }
 
-  Widget _buildOperationalAlertCard(
+  Widget _buildOperationalRow(
     BuildContext context, {
+    required UcraftColors colors,
     required String title,
-    required String value,
+    required int count,
     required String subtitle,
-    required bool highlightWarning,
     String? actionLabel,
     VoidCallback? onAction,
   }) {
-    final colors = context.ucraftColors;
-    return UcraftCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            children: [
-              Icon(
-                highlightWarning ? LucideIcons.bell : LucideIcons.circleCheck,
-                size: 20,
-                color: highlightWarning ? colors.warning : colors.success,
-              ),
-              const SizedBox(width: UcraftSpacing.iconLabelGap),
-              Expanded(
-                child: Text(
-                  title,
-                  style: UcraftTypography.label.copyWith(
-                    color: colors.foregroundSecondary,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: UcraftSpacing.space2),
-          Text(
-            value,
-            style: UcraftTypography.headline.copyWith(
-              fontFamily: UcraftTypography.monoFontFamily,
-              fontFeatures: const [FontFeature.tabularFigures()],
-              color: highlightWarning ? colors.warning : colors.foreground,
-            ),
-          ),
-          const SizedBox(height: UcraftSpacing.space1),
-          Text(
-            subtitle,
-            style: UcraftTypography.caption.copyWith(
-              color: colors.foregroundSecondary,
-            ),
-          ),
-          if (actionLabel != null && onAction != null) ...[
-            const SizedBox(height: UcraftSpacing.space3),
-            UcraftButton(
-              label: actionLabel,
-              variant: UcraftButtonVariant.secondary,
-              onPressed: onAction,
-            ),
-          ],
-        ],
+    final bool warn = count > 0;
+    return UcraftListRow(
+      monoLeadingWidth: true,
+      onTap: onAction,
+      leading: Text(
+        '$count',
+        style: UcraftTypography.headline.copyWith(
+          fontFamily: UcraftTypography.monoFontFamily,
+          fontFeatures: const [FontFeature.tabularFigures()],
+          color: warn ? colors.warning : colors.foreground,
+        ),
       ),
+      title: title,
+      subtitle: subtitle,
+      trailing: actionLabel != null && onAction != null
+          ? UcraftButton(
+              label: actionLabel,
+              leadingIcon: warn ? LucideIcons.bell : LucideIcons.circleCheck,
+              variant: UcraftButtonVariant.tertiary,
+              onPressed: onAction,
+            )
+          : Icon(
+              warn ? LucideIcons.bell : LucideIcons.circleCheck,
+              size: 16,
+              color: warn ? colors.warning : colors.success,
+            ),
     );
   }
 }

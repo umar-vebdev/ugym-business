@@ -435,4 +435,60 @@ void main() {
       expect(find.text('Заявки в ожидании'), findsOneWidget);
     },
   );
+
+  testWidgets(
+    'OverviewDashboardView follows uCraft 1.1: single highlight hero card, single Primary CTA, status pill, and UcraftListSection',
+    (tester) async {
+      final prefs = AppPreferences(storage: InMemoryTokenStorage());
+      final session = BusinessSessionController(
+        preferences: prefs,
+        initialRole: BusinessRole.owner,
+      );
+      await session.setGyms(const [GymSummary(id: 10, name: 'Центр')]);
+      addTearDown(session.dispose);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: UcraftTheme.light(),
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: OverviewDashboardView(
+                appTitle: 'uGym Business',
+                sessionController: session,
+                analyticsRepository: _FakeAnalyticsRepo(),
+                salesRepository: _FakeSalesRepo(),
+                membershipsRepository: _FakeMembershipsRepo(),
+                onOpenScanner: () {},
+                onOpenKiosk: () {},
+                onOpenPos: () {},
+                onOpenPendingRequests: () {},
+                onOpenExpiringMemberships: () {},
+                onOpenAnalytics: () {},
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Exactly 1 hero highlight card and 1 UcraftListSection with 2 UcraftListRow items.
+      final heroCards = tester
+          .widgetList<UcraftCard>(find.byType(UcraftCard))
+          .where((c) => c.variant == UcraftCardVariant.highlight)
+          .toList();
+      expect(heroCards, hasLength(1));
+      expect(find.byType(UcraftStatusPill), findsOneWidget);
+      expect(find.byType(UcraftListSection), findsOneWidget);
+      expect(find.byType(UcraftListRow), findsNWidgets(2));
+
+      // Exactly 1 Primary UcraftButton visible on screen.
+      final primaryButtons = tester
+          .widgetList<UcraftButton>(find.byType(UcraftButton))
+          .where((b) => b.variant == UcraftButtonVariant.primary)
+          .toList();
+      expect(primaryButtons, hasLength(1));
+      expect(primaryButtons.single.label, 'Сканер QR клиента');
+      expect(primaryButtons.single.fullWidth, isTrue);
+    },
+  );
 }

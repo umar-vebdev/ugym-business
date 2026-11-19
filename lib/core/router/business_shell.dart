@@ -232,7 +232,7 @@ final class _BusinessShellState extends State<BusinessShell> {
                               ),
                           ],
                         ),
-                        const SizedBox(height: UcraftSpacing.space4),
+                        const SizedBox(height: UcraftSpacing.sectionGap),
                         _buildDestinationBody(
                           context,
                           activeDestination,
@@ -280,22 +280,34 @@ final class _BusinessShellState extends State<BusinessShell> {
                   )
                 : Scaffold(
                     body: content,
-                    bottomNavigationBar: NavigationBar(
-                      backgroundColor: colors.surface,
-                      selectedIndex: selectedIndex,
-                      onDestinationSelected: (index) {
-                        setState(() {
-                          _selected = destinations[index];
-                        });
-                      },
-                      destinations: [
-                        for (final dest in destinations)
-                          NavigationDestination(
-                            icon: Icon(_iconFor(dest, selected: false)),
-                            selectedIcon: Icon(_iconFor(dest, selected: true)),
-                            label: _labelFor(dest, strings),
+                    bottomNavigationBar: DecoratedBox(
+                      decoration: BoxDecoration(
+                        border: Border(
+                          top: BorderSide(
+                            color: colors.border,
+                            width: UcraftElevation.dividerWidth,
                           ),
-                      ],
+                        ),
+                      ),
+                      child: NavigationBar(
+                        backgroundColor: colors.surface,
+                        selectedIndex: selectedIndex,
+                        onDestinationSelected: (index) {
+                          setState(() {
+                            _selected = destinations[index];
+                          });
+                        },
+                        destinations: [
+                          for (final dest in destinations)
+                            NavigationDestination(
+                              icon: Icon(_iconFor(dest, selected: false)),
+                              selectedIcon: Icon(
+                                _iconFor(dest, selected: true),
+                              ),
+                              label: _labelFor(dest, strings),
+                            ),
+                        ],
+                      ),
                     ),
                   );
 
@@ -402,38 +414,26 @@ final class _BusinessShellState extends State<BusinessShell> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Wrap(
-          spacing: UcraftSpacing.space2,
-          runSpacing: UcraftSpacing.space2,
-          children: [
+        UcraftSegmentedTabs<_MembersSubTab>(
+          items: [
             if (clientsRepo != null)
-              UcraftButton(
+              UcraftSegmentedTabItem(
+                value: _MembersSubTab.clients,
                 label: strings.subTabClients,
-                variant: _membersTab == _MembersSubTab.clients
-                    ? UcraftButtonVariant.primary
-                    : UcraftButtonVariant.secondary,
-                onPressed: () =>
-                    setState(() => _membersTab = _MembersSubTab.clients),
               ),
             if (membershipsRepo != null) ...[
-              UcraftButton(
+              UcraftSegmentedTabItem(
+                value: _MembersSubTab.expiring,
                 label: strings.subTabExpiring,
-                variant: _membersTab == _MembersSubTab.expiring
-                    ? UcraftButtonVariant.primary
-                    : UcraftButtonVariant.secondary,
-                onPressed: () =>
-                    setState(() => _membersTab = _MembersSubTab.expiring),
               ),
-              UcraftButton(
+              UcraftSegmentedTabItem(
+                value: _MembersSubTab.types,
                 label: strings.subTabTypes,
-                variant: _membersTab == _MembersSubTab.types
-                    ? UcraftButtonVariant.primary
-                    : UcraftButtonVariant.secondary,
-                onPressed: () =>
-                    setState(() => _membersTab = _MembersSubTab.types),
               ),
             ],
           ],
+          selected: _membersTab,
+          onSelected: (tab) => setState(() => _membersTab = tab),
         ),
         const SizedBox(height: UcraftSpacing.space4),
         switch (_membersTab) {
@@ -464,7 +464,6 @@ final class _BusinessShellState extends State<BusinessShell> {
   }
 
   Widget _buildOperations(BuildContext context, BusinessStrings strings) {
-    final colors = context.ucraftColors;
     final visitsRepo = widget.visitsRepository;
     final salesRepo = widget.salesRepository;
     final membershipsRepo = widget.membershipsRepository;
@@ -537,120 +536,84 @@ final class _BusinessShellState extends State<BusinessShell> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (showReceptionCard)
-          UcraftCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+        if (showReceptionCard) ...[
+          if (visitsRepo != null)
+            UcraftButton(
+              label: strings.scanClientQrButton,
+              leadingIcon: LucideIcons.qrCode,
+              fullWidth: true,
+              onPressed: canScan
+                  ? () => unawaited(
+                      _openClientScanner(context, visitsRepo, selectedGym.id),
+                    )
+                  : null,
+            ),
+          if (canOpenKiosk || canPos) ...[
+            if (visitsRepo != null)
+              const SizedBox(height: UcraftSpacing.space2),
+            Wrap(
+              spacing: UcraftSpacing.space2,
+              runSpacing: UcraftSpacing.space2,
               children: [
-                Text(
-                  strings.receptionAndPosTitle,
-                  style: UcraftTypography.title.copyWith(
-                    color: colors.foreground,
+                if (canOpenKiosk)
+                  UcraftButton(
+                    label: strings.kioskQrButton,
+                    leadingIcon: LucideIcons.monitorSmartphone,
+                    variant: UcraftButtonVariant.secondary,
+                    onPressed: () => unawaited(
+                      _openKiosk(context, visitsRepo, selectedGym.id),
+                    ),
                   ),
-                ),
-                const SizedBox(height: UcraftSpacing.space3),
-                Wrap(
-                  spacing: UcraftSpacing.space2,
-                  runSpacing: UcraftSpacing.space2,
-                  children: [
-                    if (visitsRepo != null)
-                      UcraftButton(
-                        label: strings.scanClientQrButton,
-                        onPressed: canScan
-                            ? () => unawaited(
-                                _openClientScanner(
-                                  context,
-                                  visitsRepo,
-                                  selectedGym.id,
-                                ),
-                              )
-                            : null,
-                      ),
-                    if (canOpenKiosk)
-                      UcraftButton(
-                        label: strings.kioskQrButton,
-                        variant: UcraftButtonVariant.secondary,
-                        onPressed: () => unawaited(
-                          _openKiosk(context, visitsRepo, selectedGym.id),
-                        ),
-                      ),
-                    if (canPos)
-                      UcraftButton(
-                        label: strings.openPosButton,
-                        variant: UcraftButtonVariant.secondary,
-                        onPressed: () => unawaited(
-                          _openPosCheckout(context, salesRepo, membershipsRepo),
-                        ),
-                      ),
-                  ],
-                ),
+                if (canPos)
+                  UcraftButton(
+                    label: strings.openPosButton,
+                    leadingIcon: LucideIcons.shoppingBag,
+                    variant: UcraftButtonVariant.secondary,
+                    onPressed: () => unawaited(
+                      _openPosCheckout(context, salesRepo, membershipsRepo),
+                    ),
+                  ),
               ],
             ),
-          ),
+          ],
+        ],
         if (showTabBar && availableTabs.isNotEmpty) ...[
-          if (showReceptionCard) const SizedBox(height: UcraftSpacing.space3),
-          Wrap(
-            spacing: UcraftSpacing.space2,
-            runSpacing: UcraftSpacing.space2,
-            children: [
+          if (showReceptionCard)
+            const SizedBox(height: UcraftSpacing.sectionGap),
+          UcraftSegmentedTabs<_OperationsSubTab>(
+            items: [
               if (visitsRepo != null)
-                UcraftButton(
+                UcraftSegmentedTabItem(
+                  value: _OperationsSubTab.visits,
                   label: strings.subTabVisits,
-                  variant: effectiveTab == _OperationsSubTab.visits
-                      ? UcraftButtonVariant.primary
-                      : UcraftButtonVariant.secondary,
-                  onPressed: () =>
-                      setState(() => _operationsTab = _OperationsSubTab.visits),
                 ),
               if (showSalesTabs) ...[
-                UcraftButton(
+                UcraftSegmentedTabItem(
+                  value: _OperationsSubTab.requests,
                   label: strings.subTabRequests,
-                  variant: effectiveTab == _OperationsSubTab.requests
-                      ? UcraftButtonVariant.primary
-                      : UcraftButtonVariant.secondary,
-                  onPressed: () => setState(
-                    () => _operationsTab = _OperationsSubTab.requests,
-                  ),
                 ),
-                UcraftButton(
+                UcraftSegmentedTabItem(
+                  value: _OperationsSubTab.sales,
                   label: strings.subTabSales,
-                  variant: effectiveTab == _OperationsSubTab.sales
-                      ? UcraftButtonVariant.primary
-                      : UcraftButtonVariant.secondary,
-                  onPressed: () =>
-                      setState(() => _operationsTab = _OperationsSubTab.sales),
                 ),
-                UcraftButton(
+                UcraftSegmentedTabItem(
+                  value: _OperationsSubTab.products,
                   label: strings.subTabProducts,
-                  variant: effectiveTab == _OperationsSubTab.products
-                      ? UcraftButtonVariant.primary
-                      : UcraftButtonVariant.secondary,
-                  onPressed: () => setState(
-                    () => _operationsTab = _OperationsSubTab.products,
-                  ),
                 ),
               ],
               if (showScheduleTab)
-                UcraftButton(
+                UcraftSegmentedTabItem(
+                  value: _OperationsSubTab.schedule,
                   label: strings.subTabSchedule,
-                  variant: effectiveTab == _OperationsSubTab.schedule
-                      ? UcraftButtonVariant.primary
-                      : UcraftButtonVariant.secondary,
-                  onPressed: () => setState(
-                    () => _operationsTab = _OperationsSubTab.schedule,
-                  ),
                 ),
               if (showTrainersTab)
-                UcraftButton(
+                UcraftSegmentedTabItem(
+                  value: _OperationsSubTab.trainers,
                   label: strings.subTabTrainers,
-                  variant: effectiveTab == _OperationsSubTab.trainers
-                      ? UcraftButtonVariant.primary
-                      : UcraftButtonVariant.secondary,
-                  onPressed: () => setState(
-                    () => _operationsTab = _OperationsSubTab.trainers,
-                  ),
                 ),
             ],
+            selected: effectiveTab,
+            onSelected: (tab) => setState(() => _operationsTab = tab),
           ),
         ],
         const SizedBox(height: UcraftSpacing.space4),
@@ -762,54 +725,35 @@ final class _BusinessShellState extends State<BusinessShell> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (showSubTabs) ...[
-          Wrap(
-            spacing: UcraftSpacing.space2,
-            runSpacing: UcraftSpacing.space2,
-            children: [
-              UcraftButton(
+          UcraftSegmentedTabs<_MoreSubTab>(
+            items: [
+              UcraftSegmentedTabItem(
+                value: _MoreSubTab.settings,
                 label: strings.subTabSettings,
-                variant: effectiveTab == _MoreSubTab.settings
-                    ? UcraftButtonVariant.primary
-                    : UcraftButtonVariant.secondary,
-                onPressed: () =>
-                    setState(() => _moreTab = _MoreSubTab.settings),
               ),
               if (canStorefront)
-                UcraftButton(
+                UcraftSegmentedTabItem(
+                  value: _MoreSubTab.storefront,
                   label: strings.subTabStorefront,
-                  variant: effectiveTab == _MoreSubTab.storefront
-                      ? UcraftButtonVariant.primary
-                      : UcraftButtonVariant.secondary,
-                  onPressed: () =>
-                      setState(() => _moreTab = _MoreSubTab.storefront),
                 ),
               if (canStaff)
-                UcraftButton(
+                UcraftSegmentedTabItem(
+                  value: _MoreSubTab.staff,
                   label: strings.subTabStaff,
-                  variant: effectiveTab == _MoreSubTab.staff
-                      ? UcraftButtonVariant.primary
-                      : UcraftButtonVariant.secondary,
-                  onPressed: () => setState(() => _moreTab = _MoreSubTab.staff),
                 ),
               if (canAnnouncements)
-                UcraftButton(
+                UcraftSegmentedTabItem(
+                  value: _MoreSubTab.announcements,
                   label: strings.subTabAnnouncements,
-                  variant: effectiveTab == _MoreSubTab.announcements
-                      ? UcraftButtonVariant.primary
-                      : UcraftButtonVariant.secondary,
-                  onPressed: () =>
-                      setState(() => _moreTab = _MoreSubTab.announcements),
                 ),
               if (canBilling)
-                UcraftButton(
+                UcraftSegmentedTabItem(
+                  value: _MoreSubTab.billing,
                   label: strings.subTabBilling,
-                  variant: effectiveTab == _MoreSubTab.billing
-                      ? UcraftButtonVariant.primary
-                      : UcraftButtonVariant.secondary,
-                  onPressed: () =>
-                      setState(() => _moreTab = _MoreSubTab.billing),
                 ),
             ],
+            selected: effectiveTab,
+            onSelected: (tab) => setState(() => _moreTab = tab),
           ),
           const SizedBox(height: UcraftSpacing.space4),
         ],
@@ -862,23 +806,18 @@ final class _BusinessShellState extends State<BusinessShell> {
                       ),
                     ),
                     const SizedBox(height: UcraftSpacing.space4),
-                    Wrap(
-                      spacing: UcraftSpacing.space2,
-                      runSpacing: UcraftSpacing.space2,
-                      children: [
+                    UcraftSegmentedTabs<AppLocale>(
+                      items: [
                         for (final locale in AppLocale.values)
-                          UcraftButton(
+                          UcraftSegmentedTabItem(
+                            value: locale,
                             label: locale.shortLabel,
-                            variant: widget.localeController.locale == locale
-                                ? UcraftButtonVariant.primary
-                                : UcraftButtonVariant.secondary,
-                            onPressed: () {
-                              unawaited(
-                                widget.localeController.setLocale(locale),
-                              );
-                            },
                           ),
                       ],
+                      selected: widget.localeController.locale,
+                      onSelected: (locale) {
+                        unawaited(widget.localeController.setLocale(locale));
+                      },
                     ),
                     const SizedBox(height: UcraftSpacing.space4),
                     UcraftButton(
@@ -899,37 +838,26 @@ final class _BusinessShellState extends State<BusinessShell> {
                       const SizedBox(height: UcraftSpacing.space3),
                       UcraftButton(
                         label: strings.checkHealth,
+                        variant: UcraftButtonVariant.secondary,
                         isLoading: _checkingHealth,
                         fullWidth: true,
                         onPressed: _runHealthCheck,
                       ),
                       if (_healthOk != null) ...[
                         const SizedBox(height: UcraftSpacing.space3),
-                        Row(
-                          children: [
-                            Icon(
-                              _healthOk!
-                                  ? LucideIcons.circleCheck
-                                  : LucideIcons.circleAlert,
-                              size: 20,
-                              color: _healthOk!
-                                  ? colors.success
-                                  : colors.destructive,
-                            ),
-                            const SizedBox(width: UcraftSpacing.iconLabelGap),
-                            Expanded(
-                              child: Text(
-                                _healthOk!
-                                    ? strings.healthOk
-                                    : strings.healthError,
-                                style: UcraftTypography.bodyMedium.copyWith(
-                                  color: _healthOk!
-                                      ? colors.successForeground
-                                      : colors.destructiveForeground,
-                                ),
-                              ),
-                            ),
-                          ],
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: UcraftStatusPill(
+                            icon: _healthOk!
+                                ? LucideIcons.circleCheck
+                                : LucideIcons.circleAlert,
+                            label: _healthOk!
+                                ? strings.healthOk
+                                : strings.healthError,
+                            tone: _healthOk!
+                                ? UcraftStatusTone.success
+                                : UcraftStatusTone.destructive,
+                          ),
                         ),
                       ],
                     ],

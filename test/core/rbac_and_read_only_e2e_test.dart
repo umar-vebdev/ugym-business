@@ -557,14 +557,14 @@ void main() {
       await tester.tap(find.text('Ещё'));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.widgetWithText(UcraftButton, 'Витрина'));
+      await tester.tap(find.text('Витрина'));
       await tester.pumpAndSettle();
       final saveStorefrontBtn = tester.widget<UcraftButton>(
         find.widgetWithText(UcraftButton, 'Сохранить витрину'),
       );
       expect(saveStorefrontBtn.onPressed, isNull);
 
-      await tester.tap(find.widgetWithText(UcraftButton, 'Штат'));
+      await tester.tap(find.text('Штат'));
       await tester.pumpAndSettle();
       expect(find.text('Алишер'), findsOneWidget);
       expect(find.text('Сделать тренером'), findsNothing);

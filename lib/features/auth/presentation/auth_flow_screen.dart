@@ -119,7 +119,7 @@ final class _AuthFlowScreenState extends State<AuthFlowScreen> {
                           color: colors.foregroundSecondary,
                         ),
                       ),
-                      const SizedBox(height: UcraftSpacing.space6),
+                      const SizedBox(height: UcraftSpacing.sectionGap),
                       if (controller.infoMessage != null) ...[
                         _FeedbackBanner(
                           message: controller.infoMessage!,

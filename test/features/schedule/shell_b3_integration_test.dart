@@ -301,12 +301,12 @@ void main() {
       expect(find.byType(ScheduleTab), findsOneWidget);
       expect(find.text('Йога'), findsOneWidget);
 
-      await tester.tap(find.widgetWithText(UcraftButton, 'Тренеры'));
+      await tester.tap(find.text('Тренеры'));
       await tester.pumpAndSettle();
       expect(find.byType(TrainersScreen), findsOneWidget);
       expect(find.text('Иван Петров'), findsOneWidget);
 
-      await tester.tap(find.widgetWithText(UcraftButton, 'Расписание'));
+      await tester.tap(find.text('Расписание'));
       await tester.pumpAndSettle();
       expect(find.byType(ScheduleTab), findsOneWidget);
 
@@ -320,21 +320,21 @@ void main() {
       await tester.tap(find.text('Ещё'));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.widgetWithText(UcraftButton, 'Витрина'));
+      await tester.tap(find.text('Витрина'));
       await tester.pumpAndSettle();
       expect(find.byType(StorefrontEditorScreen), findsOneWidget);
       expect(find.text('Витрина зала • Центр'), findsOneWidget);
 
-      await tester.tap(find.widgetWithText(UcraftButton, 'Штат'));
+      await tester.tap(find.text('Штат'));
       await tester.pumpAndSettle();
       expect(find.byType(StaffManagementScreen), findsOneWidget);
       expect(find.text('Алишер'), findsOneWidget);
 
-      await tester.tap(find.widgetWithText(UcraftButton, 'Рассылки'));
+      await tester.tap(find.text('Рассылки'));
       await tester.pumpAndSettle();
       expect(find.byType(AnnouncementsScreen), findsOneWidget);
 
-      await tester.tap(find.widgetWithText(UcraftButton, 'Подписка'));
+      await tester.tap(find.text('Подписка'));
       await tester.pumpAndSettle();
       expect(find.byType(BillingStatusScreen), findsOneWidget);
       expect(find.text('Подписка платформы: Активна (active)'), findsOneWidget);
@@ -362,12 +362,12 @@ void main() {
       await tester.tap(find.text('Ещё'));
       await tester.pumpAndSettle();
 
-      expect(find.widgetWithText(UcraftButton, 'Витрина'), findsNothing);
-      expect(find.widgetWithText(UcraftButton, 'Штат'), findsNothing);
-      expect(find.widgetWithText(UcraftButton, 'Рассылки'), findsOneWidget);
-      expect(find.widgetWithText(UcraftButton, 'Подписка'), findsOneWidget);
+      expect(find.text('Витрина'), findsNothing);
+      expect(find.text('Штат'), findsNothing);
+      expect(find.text('Рассылки'), findsOneWidget);
+      expect(find.text('Подписка'), findsOneWidget);
 
-      await tester.tap(find.widgetWithText(UcraftButton, 'Подписка'));
+      await tester.tap(find.text('Подписка'));
       await tester.pumpAndSettle();
       expect(find.byType(BillingStatusScreen), findsOneWidget);
     },
@@ -403,10 +403,10 @@ void main() {
 
       await tester.tap(find.text('Ещё'));
       await tester.pumpAndSettle();
-      expect(find.widgetWithText(UcraftButton, 'Витрина'), findsNothing);
-      expect(find.widgetWithText(UcraftButton, 'Штат'), findsNothing);
-      expect(find.widgetWithText(UcraftButton, 'Рассылки'), findsNothing);
-      expect(find.widgetWithText(UcraftButton, 'Подписка'), findsNothing);
+      expect(find.text('Витрина'), findsNothing);
+      expect(find.text('Штат'), findsNothing);
+      expect(find.text('Рассылки'), findsNothing);
+      expect(find.text('Подписка'), findsNothing);
     },
   );
 }
