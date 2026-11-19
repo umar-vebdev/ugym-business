@@ -617,7 +617,19 @@ final class _GymPhotosManagerState extends State<GymPhotosManager> {
       return;
     }
 
-    final picked = await picker();
+    PickedGymPhoto? picked;
+    try {
+      picked = await picker();
+    } on Object {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _errorMessage =
+            'Не удалось выбрать фото. Проверьте доступ к фотогалерее.';
+      });
+      return;
+    }
     if (picked == null || !mounted) {
       return;
     }
@@ -766,14 +778,50 @@ final class _GymPhotosManagerState extends State<GymPhotosManager> {
             for (final photo in widget.photos) ...[
               Row(
                 children: [
-                  Expanded(
-                    child: Text(
-                      'Фото №${photo.id} • ${photo.url}',
-                      style: UcraftTypography.caption.copyWith(
-                        color: colors.foreground,
+                  ClipRRect(
+                    borderRadius: UcraftRadius.borderSm,
+                    child: Image.network(
+                      photo.url,
+                      width: 56,
+                      height: 56,
+                      fit: BoxFit.cover,
+                      semanticLabel: 'Фото зала №${photo.id}',
+                      errorBuilder: (_, _, _) => Container(
+                        width: 56,
+                        height: 56,
+                        color: colors.surfaceSecondary,
+                        alignment: Alignment.center,
+                        child: Icon(
+                          Icons.photo_outlined,
+                          size: 20,
+                          color: colors.foregroundSecondary,
+                        ),
                       ),
                     ),
                   ),
+                  const SizedBox(width: UcraftSpacing.space3),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Фото №${photo.id}',
+                          style: UcraftTypography.bodyMedium.copyWith(
+                            color: colors.foreground,
+                          ),
+                        ),
+                        Text(
+                          photo.url,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: UcraftTypography.caption.copyWith(
+                            color: colors.foregroundSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: UcraftSpacing.space2),
                   UcraftButton(
                     label: 'Удалить',
                     variant: UcraftButtonVariant.destructive,

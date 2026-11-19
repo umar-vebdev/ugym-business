@@ -1,6 +1,6 @@
 # uGym Business — чек-лист задач
 
-**Текущий этап:** `B5` — Боевая готовность к реальному серверу и устройствам
+**Текущий этап:** Все этапы (`B0`–`B5`) завершены ✓
 **Статусы:** `[ ]` не начата · `[~]` в работе · `[x]` готова · `[!]` заблокирована (причина в заметках)
 
 ## Правила ведения файла
@@ -47,10 +47,10 @@
 - [x] **B5-01** (заметка: проба роли тренера зафиксирована как `D-005` `[ASSUMPTION]` в `DECISIONS.md`) Добавлены `AppConfig.fromEnvironment()` / `AppConfig.resolve(...)` (`FLAVOR`, `API_BASE_URL`, `ENABLE_KIOSK_MODE`) с подключением в `lib/main.dart` и `BusinessShell`, а также автоопределение роли `trainer` в `BusinessSessionController.bootstrapFromApi` через `GET /business/schedule/sessions/1/bookings` + 5 тестов в `test/core/app_config_and_trainer_bootstrap_test.dart`; 105 тестов зелёные (`format ✓`, `analyze ✓`, `test ✓`).
 - [x] **B5-02** Реализован живой дашборд `OverviewDashboardView` (`lib/features/analytics_billing/presentation/overview_dashboard_view.dart`) и подключён в `BusinessShell`: для `owner` — KPI выручки (`MoneyFormatter`) и посещений за сегодня, счётчики заявок `pending` и истекающих за 7 дней абонементов, быстрые переходы и кнопки ресепшна; для `admin` — операционные счётчики и быстрые действия без вызова `analytics/*`; уважение режима `isReadOnly`, скелетоны и ретрай при ошибках + 3 теста в `test/features/analytics_billing/overview_dashboard_view_test.dart`; 108 тестов зелёные (`format ✓`, `analyze ✓`, `test ✓`).
 - [x] **B5-03** Подключены живые переходы из `ScanClientQrScreen` в кассу `PosCheckoutScreen` (при `NO_ACTIVE_MEMBERSHIP`) и во вкладку «Клиенты» (при отказах по абонементу) через `BusinessShell._openClientScanner` с безопасным закрытием камеры до навигации, а в `PosCheckoutScreen` добавлены `SubscriptionReadOnlyBanner` и блокировка проведения продажи при `isReadOnly` + 2 теста в `test/features/reception_qr/scanner_navigation_and_pos_readonly_test.dart`; 110 тестов зелёные (`format ✓`, `analyze ✓`, `test ✓`).
+- [x] **B5-04** Добавлен `image_picker` (`D-006`), реализована обёртка `pickGymPhotoFromGallery` / `normalizePickedPhotoFilename` (`lib/features/storefront_staff/presentation/gym_photo_picker.dart`, нативное сжатие до `1920x1920`, `quality: 85`), подключена в `BusinessShell`, а в `GymPhotosManager` добавлены превью фотографий (`Image.network` с fallback) и обработка ошибок доступа к галерее + 2 теста в `test/features/storefront_staff/storefront_editor_screen_test.dart`; 112 тестов зелёные (`format ✓`, `analyze ✓`, `test ✓`).
 
 ---
 
-## Текущий этап: `B5` — Боевая готовность к реальному серверу и устройствам
+## Текущий этап: `B5` — Боевая готовность к реальному серверу и устройствам (Завершён)
 
-- [ ] **B5-04** Выбор и сжатие фото витрины с устройства (`image_picker` + запись решения в `DECISIONS.md`), подключение `PlatformGymPhotoPicker` в `BusinessShell` и превью фотографий в `GymPhotosManager`.
-  - ТЗ: `uGym_Business_Mobile_TZ.md` §5.7.3, §6.3.2; API: `docs/api/gym-photos.yaml`.
+Все задачи этапов `B0`–`B5` выполнены и проверены (`dart format`, `flutter analyze`, `flutter test`).

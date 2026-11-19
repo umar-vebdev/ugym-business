@@ -28,6 +28,7 @@ import '../../features/schedule/domain/trainers_schedule_models.dart';
 import '../../features/schedule/presentation/schedule_tab.dart';
 import '../../features/schedule/presentation/trainers_screen.dart';
 import '../../features/storefront_staff/domain/storefront_and_staff_models.dart';
+import '../../features/storefront_staff/presentation/gym_photo_picker.dart';
 import '../../features/storefront_staff/presentation/staff_management_screen.dart';
 import '../../features/storefront_staff/presentation/storefront_editor_screen.dart';
 import '../config/app_config.dart';
@@ -69,6 +70,7 @@ final class BusinessShell extends StatefulWidget {
     this.kioskPinGuard,
     this.kioskWakeLock = const PlatformKioskWakeLock(),
     this.qrScannerBuilder = buildMobileQrScanner,
+    this.gymPhotoPicker = pickGymPhotoFromGallery,
   });
 
   final AppConfig config;
@@ -88,6 +90,7 @@ final class BusinessShell extends StatefulWidget {
   final KioskPinGuard? kioskPinGuard;
   final KioskWakeLock kioskWakeLock;
   final QrScannerBuilder qrScannerBuilder;
+  final GymPhotoPicker gymPhotoPicker;
 
   static List<BusinessDestination> visibleDestinationsFor(BusinessRole? role) {
     return switch (role) {
@@ -812,6 +815,7 @@ final class _BusinessShellState extends State<BusinessShell> {
             StorefrontEditorScreen(
               repository: storefrontRepo,
               sessionController: widget.sessionController,
+              photoPicker: widget.gymPhotoPicker,
             ),
           _MoreSubTab.staff when storefrontRepo != null =>
             StaffManagementScreen(
