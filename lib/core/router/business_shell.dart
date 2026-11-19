@@ -457,6 +457,7 @@ final class _BusinessShellState extends State<BusinessShell> {
           BusinessPermission.manageReceptionQrAndVisits,
         );
     final canOpenKiosk =
+        widget.config.enableKioskMode &&
         visitsRepo != null &&
         selectedGym != null &&
         (role == BusinessRole.owner || role == BusinessRole.admin);

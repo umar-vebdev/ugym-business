@@ -48,3 +48,13 @@
 - Затронутые разделы ТЗ: `uGym_Business_Mobile_TZ.md` (разделы 5.2.2, 6.1), `B1-06a`
 - Статус: принято
 
+
+### D-005 — Автоопределение роли тренера при входе через `GET /business/schedule/sessions/1/bookings`
+- Дата: 2026-11-19
+- Тип: [ASSUMPTION]
+- Решение: в `BusinessSessionController.bootstrapFromApi` после получения `403 FORBIDDEN` от `/business/staff` и `/business/gyms` выполняется проба `GET /business/schedule/sessions/1/bookings`. Ответ `200`, `404 NOT_FOUND` или `403 SUBSCRIPTION_EXPIRED` означает, что пользователь прошёл проверку принадлежности к штату компании и является тренером (`BusinessRole.trainer`); ответ `403 FORBIDDEN` означает, что пользователь не состоит в компании (`BusinessRole.noCompany`).
+- Причина: в текущей OpenAPI-спецификации (`identity-auth.yaml`, `schedule.yaml`) `/api/v1/user` не возвращает роль в компании, а единственный эндпоинт `/business/*`, доступный тренеру — `GET /business/schedule/sessions/{session}/bookings`. Решение обратимо: при появлении отдельного поля роли в `/user` пробу можно заменить без изменения интерфейса.
+- Затронутые разделы ТЗ: `uGym_Business_Mobile_TZ.md` (раздел 1), `docs/api/schedule.yaml`, `B5-01`
+- Статус: принято
+
+

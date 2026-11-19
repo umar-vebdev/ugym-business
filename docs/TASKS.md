@@ -1,6 +1,6 @@
 # uGym Business — чек-лист задач
 
-**Текущий этап:** Все этапы (`B0`–`B4`) завершены ✓
+**Текущий этап:** `B5` — Боевая готовность к реальному серверу и устройствам
 **Статусы:** `[ ]` не начата · `[~]` в работе · `[x]` готова · `[!]` заблокирована (причина в заметках)
 
 ## Правила ведения файла
@@ -44,9 +44,15 @@
 - [x] **B4-02** (заметка: также обновлён `ugym_core` — парсинг `Retry-After` и `isRateLimited` в `UgymApiException`) Реализованы извлечение `Retry-After` при `429`, сохранение `Idempotency-Key` при `429`/`5xx`/сетевых сбоях в `ReceptionScanController` и при закрытии/повторном открытии диалога оплаты в `MembershipRequestsQueueTab`, вывод времени ожидания в `ScanClientQrScreen`, сохранение QR при сбое обновления в `GymQrKioskScreen` + 5 тестов в `test/core/network_resilience_and_idempotency_test.dart`; 92 теста зелёные (`format ✓`, `analyze ✓`, `test ✓`).
 - [x] **B4-03** Добавлены расширенный `NavigationRail` (`extended: true`) и ограничение ширины `1040dp` в `BusinessShell` для `>=840dp`, двухколоночная раскладка киоска в `GymQrKioskScreen`, синхронизированы ключи `app_{ru,tg,en}.arb` (`themeLightLabel`, `themeDarkLabel`, `signOutLabel`) и перевод баннера/выхода в `BusinessStrings` + 5 тестов в `test/core/responsive_theme_and_l10n_test.dart`; 97 тестов зелёные (`format ✓`, `analyze ✓`, `test ✓`).
 - [x] **B4-04** Обновлён `ios/Runner/Info.plist` (`NSCameraUsageDescription`, `NSPhotoLibraryUsageDescription`), создан `ios/Runner/PrivacyInfo.xcprivacy` (`NSPrivacyTracking: false`, `CA92.1`), добавлены `INTERNET` и `hardware.camera (required=false)` в `android/app/src/main/AndroidManifest.xml`, подтверждено отсутствие IAP/ссылок оплаты и пройдены тесты релизной готовности и п. 7.2 ТЗ (`test/core/release_readiness_and_acceptance_test.dart`); 100 тестов зелёные (`format ✓`, `analyze ✓`, `test ✓`).
+- [x] **B5-01** (заметка: проба роли тренера зафиксирована как `D-005` `[ASSUMPTION]` в `DECISIONS.md`) Добавлены `AppConfig.fromEnvironment()` / `AppConfig.resolve(...)` (`FLAVOR`, `API_BASE_URL`, `ENABLE_KIOSK_MODE`) с подключением в `lib/main.dart` и `BusinessShell`, а также автоопределение роли `trainer` в `BusinessSessionController.bootstrapFromApi` через `GET /business/schedule/sessions/1/bookings` + 5 тестов в `test/core/app_config_and_trainer_bootstrap_test.dart`; 105 тестов зелёные (`format ✓`, `analyze ✓`, `test ✓`).
 
 ---
 
-## Текущий этап: `B4` — Полировка UX, Режим чтения, QA и Релиз (Завершён)
+## Текущий этап: `B5` — Боевая готовность к реальному серверу и устройствам
 
-Все задачи этапов `B0`–`B4` выполнены и проверены (`dart format`, `flutter analyze`, `flutter test`).
+- [ ] **B5-02** Живой дашборд «Обзор» (`OverviewDashboardView`) для `owner` (KPI выручки/визитов за сегодня, заявки `pending`, истекающие абонементы, быстрые переходы) и `admin` (операционные счётчики заявок и истекающих, быстрые кнопки ресепшна без обращения к `analytics/*`).
+  - ТЗ: `uGym_Business_Mobile_TZ.md` §4, §5.4, §5.5, §5.8; Дизайн: `uCraft_Design_System.md` §12, §14, §16.
+- [ ] **B5-03** Живые переходы из сканера QR клиента (`ScanClientQrScreen` -> Касса `PosCheckoutScreen` / раздел «Клиенты») и учёт режима «только чтение» (`isReadOnly`) в `PosCheckoutScreen`.
+  - ТЗ: `uGym_Business_Mobile_TZ.md` §3.2, §5.2.2, §5.5.2.
+- [ ] **B5-04** Выбор и сжатие фото витрины с устройства (`image_picker` + запись решения в `DECISIONS.md`), подключение `PlatformGymPhotoPicker` в `BusinessShell` и превью фотографий в `GymPhotosManager`.
+  - ТЗ: `uGym_Business_Mobile_TZ.md` §5.7.3, §6.3.2; API: `docs/api/gym-photos.yaml`.

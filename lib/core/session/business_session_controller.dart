@@ -127,8 +127,10 @@ final class BusinessSessionController extends ChangeNotifier {
       }
     }
 
-    _role = isTrainerHint ? BusinessRole.trainer : BusinessRole.noCompany;
-    if (isTrainerHint) {
+    final bool isTrainer =
+        isTrainerHint || await _probeTrainerAccess(httpClient);
+    _role = isTrainer ? BusinessRole.trainer : BusinessRole.noCompany;
+    if (isTrainer) {
       final savedGymId = await preferences.readSelectedGymId();
       if (savedGymId != null) {
         final timezone = await preferences.readSelectedGymTimezone();
@@ -149,6 +151,28 @@ final class BusinessSessionController extends ChangeNotifier {
     }
     notifyListeners();
     return _role!;
+  }
+
+  Future<bool> _probeTrainerAccess(UgymHttpClient httpClient) async {
+    try {
+      await httpClient.dio.get<Object?>(
+        '/business/schedule/sessions/1/bookings',
+      );
+      return true;
+    } on DioException catch (error) {
+      final apiError = _extractApiError(error);
+      if (apiError.isSubscriptionExpired) {
+        _isReadOnly = true;
+        return true;
+      }
+      if (apiError.statusCode == 404 || apiError.code == 'NOT_FOUND') {
+        return true;
+      }
+      if (apiError.isForbidden) {
+        return false;
+      }
+      rethrow;
+    }
   }
 
   Future<void> _loadGyms(UgymHttpClient httpClient) async {

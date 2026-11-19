@@ -32,7 +32,7 @@ import 'features/storefront_staff/data/remote_storefront_and_staff_repository.da
 import 'features/storefront_staff/domain/storefront_and_staff_models.dart';
 
 void main() {
-  const config = AppConfig.dev();
+  final config = AppConfig.fromEnvironment();
   const storage = SecureTokenStorage();
   const preferences = AppPreferences(storage: storage);
 
