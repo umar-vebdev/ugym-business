@@ -6,6 +6,7 @@ import 'package:ugym_core/ugym_core.dart';
 import '../../../core/session/business_role.dart';
 import '../../../core/session/business_session_controller.dart';
 import '../domain/analytics_and_billing_models.dart';
+import 'analytics_charts.dart';
 
 /// Owner-only analytics dashboard showing revenue, clients, visits, and top items.
 final class AnalyticsScreen extends StatefulWidget {
@@ -285,6 +286,11 @@ final class _AnalyticsScreenState extends State<AnalyticsScreen> {
               color: colors.foregroundSecondary,
             ),
           ),
+          const SizedBox(height: UcraftSpacing.space3),
+          RevenuePaymentMixBar(
+            byPaymentMethod: summary.byPaymentMethod,
+            currency: c,
+          ),
         ],
       ),
     );
@@ -324,15 +330,8 @@ final class _AnalyticsScreenState extends State<AnalyticsScreen> {
               color: colors.foregroundSecondary,
             ),
           ),
-          if (overview.visits.byDay.isNotEmpty) ...[
-            const SizedBox(height: UcraftSpacing.space2),
-            Text(
-              'По дням: ${overview.visits.byDay.entries.map((e) => '${e.key}: ${e.value}').join(', ')}',
-              style: UcraftTypography.caption.copyWith(
-                color: colors.foregroundSecondary,
-              ),
-            ),
-          ],
+          const SizedBox(height: UcraftSpacing.space3),
+          VisitsByDayBarChart(byDay: overview.visits.byDay),
         ],
       ),
     );

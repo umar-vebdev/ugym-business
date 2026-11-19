@@ -1,6 +1,6 @@
 # uGym Business — чек-лист задач
 
-**Текущий этап:** Все этапы (`B0`–`B5`) завершены ✓
+**Текущий этап:** `B6` — Локализация (`ru`/`tg`/`en`) и полировка по uCraft Design System 1.0
 **Статусы:** `[ ]` не начата · `[~]` в работе · `[x]` готова · `[!]` заблокирована (причина в заметках)
 
 ## Правила ведения файла
@@ -48,9 +48,12 @@
 - [x] **B5-02** Реализован живой дашборд `OverviewDashboardView` (`lib/features/analytics_billing/presentation/overview_dashboard_view.dart`) и подключён в `BusinessShell`: для `owner` — KPI выручки (`MoneyFormatter`) и посещений за сегодня, счётчики заявок `pending` и истекающих за 7 дней абонементов, быстрые переходы и кнопки ресепшна; для `admin` — операционные счётчики и быстрые действия без вызова `analytics/*`; уважение режима `isReadOnly`, скелетоны и ретрай при ошибках + 3 теста в `test/features/analytics_billing/overview_dashboard_view_test.dart`; 108 тестов зелёные (`format ✓`, `analyze ✓`, `test ✓`).
 - [x] **B5-03** Подключены живые переходы из `ScanClientQrScreen` в кассу `PosCheckoutScreen` (при `NO_ACTIVE_MEMBERSHIP`) и во вкладку «Клиенты» (при отказах по абонементу) через `BusinessShell._openClientScanner` с безопасным закрытием камеры до навигации, а в `PosCheckoutScreen` добавлены `SubscriptionReadOnlyBanner` и блокировка проведения продажи при `isReadOnly` + 2 теста в `test/features/reception_qr/scanner_navigation_and_pos_readonly_test.dart`; 110 тестов зелёные (`format ✓`, `analyze ✓`, `test ✓`).
 - [x] **B5-04** Добавлен `image_picker` (`D-006`), реализована обёртка `pickGymPhotoFromGallery` / `normalizePickedPhotoFilename` (`lib/features/storefront_staff/presentation/gym_photo_picker.dart`, нативное сжатие до `1920x1920`, `quality: 85`), подключена в `BusinessShell`, а в `GymPhotosManager` добавлены превью фотографий (`Image.network` с fallback) и обработка ошибок доступа к галерее + 2 теста в `test/features/storefront_staff/storefront_editor_screen_test.dart`; 112 тестов зелёные (`format ✓`, `analyze ✓`, `test ✓`).
+- [x] **B6-01** Реализованы визуальные графики `VisitsByDayBarChart` и `RevenuePaymentMixBar` (`lib/features/analytics_billing/presentation/analytics_charts.dart`) по uCraft 1.0 §15 (семантические токены, горизонтальная сетка `border`, табличный `GeistMono`, `Semantics`, пустые состояния, Light/Dark) и подключены в `AnalyticsScreen` + 3 теста в `test/features/analytics_billing/analytics_charts_test.dart`; 115 тестов зелёные (`format ✓`, `analyze ✓`, `test ✓`).
 
 ---
 
-## Текущий этап: `B5` — Боевая готовность к реальному серверу и устройствам (Завершён)
+## Текущий этап: `B6` — Локализация (`ru`/`tg`/`en`) и полировка по uCraft Design System 1.0
 
-Все задачи этапов `B0`–`B5` выполнены и проверены (`dart format`, `flutter analyze`, `flutter test`).
+- [ ] **B6-02** Иконки Lucide (`lucide_icons_flutter` + запись `D-007` в `DECISIONS.md`) и подключение офлайн-шрифтов `Inter` и `Geist Mono` в `assets/fonts/` + `pubspec.yaml` по uCraft 1.0 §5, §9.
+- [ ] **B6-03** Контекстная локализация (`BusinessStringsScope` в `UgymBusinessApp`, расширение `app_{ru,tg,en}.arb`) и перевод `BusinessShell`, `RoleGuard` / `SubscriptionReadOnlyBanner`, `OverviewDashboardView` и `AuthFlowScreen`.
+- [ ] **B6-04** Полная локализация (`ru`/`tg`/`en`) экранов ресепшна, киоска, кассы, аналитики, рассылок и подписки (`ScanClientQrScreen`, `GymQrKioskScreen`, `PosCheckoutScreen`, `AnalyticsScreen`, `AnnouncementsScreen`, `BillingStatusScreen`).
