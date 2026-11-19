@@ -4,6 +4,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:ugym_core/ugym_core.dart';
 
+import '../../../core/l10n/business_localizations.dart';
 import '../../../core/session/business_role.dart';
 import '../../../core/session/business_session_controller.dart';
 import '../domain/storefront_and_staff_models.dart';
@@ -337,20 +338,21 @@ final class _StorefrontEditorScreenState extends State<StorefrontEditorScreen> {
       listenable: widget.sessionController,
       builder: (context, _) {
         final colors = context.ucraftColors;
+        final strings = BusinessStringsScope.of(context);
         if (!widget.sessionController.canView(
           BusinessPermission.manageStorefront,
         )) {
-          return const UcraftEmptyState(
-            title: 'Недостаточно прав',
-            description: 'Редактирование витрины доступно только владельцу.',
+          return UcraftEmptyState(
+            title: strings.analyticsNoAccessTitle,
+            description: strings.storefrontOwnerOnlyDesc,
           );
         }
 
         final gym = widget.sessionController.selectedGym;
         if (gym == null) {
-          return const UcraftEmptyState(
-            title: 'Филиал не выбран',
-            description: 'Выберите зал, чтобы настроить его витрину.',
+          return UcraftEmptyState(
+            title: strings.branchNotSelected,
+            description: strings.storefrontSelectBranchDesc,
           );
         }
 
@@ -369,14 +371,14 @@ final class _StorefrontEditorScreenState extends State<StorefrontEditorScreen> {
                     children: [
                       Expanded(
                         child: Text(
-                          'Витрина зала • ${gym.name}',
+                          '${strings.storefrontTitlePrefix} • ${gym.name}',
                           style: UcraftTypography.title.copyWith(
                             color: colors.foreground,
                           ),
                         ),
                       ),
                       Text(
-                        _moderationLabel(_status),
+                        _moderationLabel(_status, strings),
                         style: UcraftTypography.caption.copyWith(
                           color: _isApproved
                               ? colors.success
@@ -390,7 +392,7 @@ final class _StorefrontEditorScreenState extends State<StorefrontEditorScreen> {
                   if (_isApproved) ...[
                     const SizedBox(height: UcraftSpacing.space2),
                     Text(
-                      'Внимание: сохранение или изменение фото переведёт витрину в статус draft и снимет её с публикации.',
+                      strings.storefrontApprovedWarning,
                       style: UcraftTypography.caption.copyWith(
                         color: colors.destructive,
                       ),
@@ -399,7 +401,7 @@ final class _StorefrontEditorScreenState extends State<StorefrontEditorScreen> {
                   if (_isPending) ...[
                     const SizedBox(height: UcraftSpacing.space2),
                     Text(
-                      'Витрина на модерации: редактирование и загрузка фото временно заблокированы.',
+                      strings.storefrontPendingHint,
                       style: UcraftTypography.caption.copyWith(
                         color: colors.foregroundSecondary,
                       ),
@@ -418,20 +420,20 @@ final class _StorefrontEditorScreenState extends State<StorefrontEditorScreen> {
                   const SizedBox(height: UcraftSpacing.space3),
                   UcraftTextField(
                     controller: _descriptionController,
-                    label: 'Описание зала',
+                    label: strings.storefrontDescriptionLabel,
                     maxLines: 3,
                     enabled: canEdit,
                   ),
                   const SizedBox(height: UcraftSpacing.space3),
                   UcraftTextField(
                     controller: _addressController,
-                    label: 'Адрес',
+                    label: strings.storefrontAddressLabel,
                     enabled: canEdit,
                   ),
                   const SizedBox(height: UcraftSpacing.space3),
                   UcraftTextField(
                     controller: _districtController,
-                    label: 'Район',
+                    label: strings.storefrontDistrictLabel,
                     enabled: canEdit,
                   ),
                   const SizedBox(height: UcraftSpacing.space3),
@@ -440,7 +442,7 @@ final class _StorefrontEditorScreenState extends State<StorefrontEditorScreen> {
                       Expanded(
                         child: UcraftTextField(
                           controller: _latitudeController,
-                          label: 'Широта',
+                          label: strings.storefrontLatitudeLabel,
                           keyboardType: const TextInputType.numberWithOptions(
                             decimal: true,
                             signed: true,
@@ -452,7 +454,7 @@ final class _StorefrontEditorScreenState extends State<StorefrontEditorScreen> {
                       Expanded(
                         child: UcraftTextField(
                           controller: _longitudeController,
-                          label: 'Долгота',
+                          label: strings.storefrontLongitudeLabel,
                           keyboardType: const TextInputType.numberWithOptions(
                             decimal: true,
                             signed: true,
@@ -465,19 +467,19 @@ final class _StorefrontEditorScreenState extends State<StorefrontEditorScreen> {
                   const SizedBox(height: UcraftSpacing.space3),
                   UcraftTextField(
                     controller: _phoneController,
-                    label: 'Телефон зала',
+                    label: strings.storefrontPhoneLabel,
                     enabled: canEdit,
                   ),
                   const SizedBox(height: UcraftSpacing.space3),
                   UcraftTextField(
                     controller: _hoursController,
-                    label: 'Часы работы (пн–вс)',
+                    label: strings.storefrontHoursLabel,
                     enabled: canEdit,
                   ),
                   const SizedBox(height: UcraftSpacing.space3),
                   UcraftTextField(
                     controller: _amenitiesController,
-                    label: 'Удобства (через запятую, до 30)',
+                    label: strings.storefrontAmenitiesLabel,
                     hintText: 'душ, парковка, сауна',
                     enabled: canEdit,
                   ),
@@ -505,14 +507,14 @@ final class _StorefrontEditorScreenState extends State<StorefrontEditorScreen> {
                     runSpacing: UcraftSpacing.space2,
                     children: [
                       UcraftButton(
-                        label: 'Сохранить витрину',
+                        label: strings.storefrontSaveButton,
                         isLoading: _submitting,
                         onPressed: canEdit
                             ? () => unawaited(_saveProfile(gym.id))
                             : null,
                       ),
                       UcraftButton(
-                        label: 'На модерацию',
+                        label: strings.storefrontSubmitModerationButton,
                         variant: UcraftButtonVariant.secondary,
                         onPressed: canEdit
                             ? () => unawaited(_submitForModeration(gym.id))
@@ -520,8 +522,8 @@ final class _StorefrontEditorScreenState extends State<StorefrontEditorScreen> {
                       ),
                       UcraftButton(
                         label: isPublic
-                            ? 'Снять с публикации'
-                            : 'Опубликовать в каталоге',
+                            ? strings.storefrontUnpublishButton
+                            : strings.storefrontPublishButton,
                         variant: UcraftButtonVariant.secondary,
                         onPressed:
                             !widget.sessionController.isReadOnly &&
@@ -557,12 +559,12 @@ final class _StorefrontEditorScreenState extends State<StorefrontEditorScreen> {
     );
   }
 
-  String _moderationLabel(ModerationStatus status) {
+  String _moderationLabel(ModerationStatus status, BusinessStrings strings) {
     return switch (status) {
-      ModerationStatus.draft => 'Черновик (draft)',
-      ModerationStatus.pending => 'На модерации (pending)',
-      ModerationStatus.approved => 'Одобрено (approved)',
-      ModerationStatus.rejected => 'Отклонено (rejected)',
+      ModerationStatus.draft => strings.storefrontModerationDraft,
+      ModerationStatus.pending => strings.storefrontModerationPending,
+      ModerationStatus.approved => strings.storefrontModerationApproved,
+      ModerationStatus.rejected => strings.storefrontModerationRejected,
     };
   }
 }
@@ -733,6 +735,7 @@ final class _GymPhotosManagerState extends State<GymPhotosManager> {
   @override
   Widget build(BuildContext context) {
     final colors = context.ucraftColors;
+    final strings = BusinessStringsScope.of(context);
     final atLimit = widget.photos.length >= GymPhotosManager.maxPhotos;
 
     return UcraftCard(
@@ -743,14 +746,14 @@ final class _GymPhotosManagerState extends State<GymPhotosManager> {
             children: [
               Expanded(
                 child: Text(
-                  'Фотогалерея (${widget.photos.length}/${GymPhotosManager.maxPhotos})',
+                  '${strings.galleryTitlePrefix} (${widget.photos.length}/${GymPhotosManager.maxPhotos})',
                   style: UcraftTypography.title.copyWith(
                     color: colors.foreground,
                   ),
                 ),
               ),
               UcraftButton(
-                label: 'Загрузить фото',
+                label: strings.galleryUploadButton,
                 isLoading: _busy,
                 onPressed: !widget.isLocked && !atLimit && !_busy
                     ? () => unawaited(_pickAndUpload())
@@ -770,7 +773,7 @@ final class _GymPhotosManagerState extends State<GymPhotosManager> {
           const SizedBox(height: UcraftSpacing.space3),
           if (widget.photos.isEmpty)
             Text(
-              'Фотографий пока нет (до 10 файлов JPEG/PNG/WEBP до 5 МБ).',
+              strings.galleryEmptyHint,
               style: UcraftTypography.caption.copyWith(
                 color: colors.foregroundSecondary,
               ),
@@ -824,7 +827,7 @@ final class _GymPhotosManagerState extends State<GymPhotosManager> {
                   ),
                   const SizedBox(width: UcraftSpacing.space2),
                   UcraftButton(
-                    label: 'Удалить',
+                    label: strings.deleteLabel,
                     variant: UcraftButtonVariant.destructive,
                     onPressed: !widget.isLocked && !_busy
                         ? () => unawaited(_deletePhoto(photo))

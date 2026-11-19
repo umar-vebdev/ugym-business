@@ -326,6 +326,86 @@ final class BusinessStrings {
     required this.productCreateButton,
     required this.productActiveAtPosCheckbox,
     required this.saveLabel,
+    required this.trainersSelectBranchDesc,
+    required this.trainersTitle,
+    required this.trainersAddButton,
+    required this.trainersLoading,
+    required this.trainersEmptyTitle,
+    required this.trainersEmptyDesc,
+    required this.trainerStatusInactive,
+    required this.trainerEditDialogTitle,
+    required this.trainerNewDialogTitle,
+    required this.trainerBioOptionalLabel,
+    required this.scheduleSelectBranchDesc,
+    required this.scheduleGenerateButton,
+    required this.scheduleNewTemplateButton,
+    required this.scheduleSessionsTab,
+    required this.scheduleTemplatesTab,
+    required this.scheduleLoading,
+    required this.scheduleNoSessionsTitle,
+    required this.scheduleNoSessionsDesc,
+    required this.scheduleSessionCancelled,
+    required this.scheduleBookingsButton,
+    required this.scheduleCancelSessionTitle,
+    required this.scheduleCancelSessionDesc,
+    required this.scheduleNoTemplatesTitle,
+    required this.scheduleNoTemplatesDesc,
+    required this.scheduleTrainerLookupTitle,
+    required this.scheduleTrainerLookupDesc,
+    required this.scheduleSessionIdLabel,
+    required this.scheduleOpenRosterButton,
+    required this.bookingsLoading,
+    required this.bookingsEmptyTitle,
+    required this.bookingsEmptyDesc,
+    required this.bookingStatusBooked,
+    required this.bookingStatusCancelled,
+    required this.scheduleGenerateDialogTitle,
+    required this.scheduleStartDateLabel,
+    required this.scheduleEndDateLabel,
+    required this.scheduleNewTemplateDialogTitle,
+    required this.scheduleWeekdayLabel,
+    required this.scheduleStartTimeLabel,
+    required this.scheduleDurationMinLabel,
+    required this.scheduleCapacityLabel,
+    required this.storefrontOwnerOnlyDesc,
+    required this.storefrontTitlePrefix,
+    required this.storefrontSelectBranchDesc,
+    required this.storefrontApprovedWarning,
+    required this.storefrontPendingHint,
+    required this.storefrontDescriptionLabel,
+    required this.storefrontAddressLabel,
+    required this.storefrontDistrictLabel,
+    required this.storefrontLatitudeLabel,
+    required this.storefrontLongitudeLabel,
+    required this.storefrontPhoneLabel,
+    required this.storefrontHoursLabel,
+    required this.storefrontAmenitiesLabel,
+    required this.storefrontSaveButton,
+    required this.storefrontSubmitModerationButton,
+    required this.storefrontUnpublishButton,
+    required this.storefrontPublishButton,
+    required this.storefrontModerationDraft,
+    required this.storefrontModerationPending,
+    required this.storefrontModerationApproved,
+    required this.storefrontModerationRejected,
+    required this.galleryTitlePrefix,
+    required this.galleryUploadButton,
+    required this.galleryEmptyHint,
+    required this.deleteLabel,
+    required this.staffOwnerOnlyDesc,
+    required this.staffAddTitle,
+    required this.staffEmailLabel,
+    required this.staffRoleOwner,
+    required this.staffRoleAdmin,
+    required this.staffRoleTrainer,
+    required this.staffOtpOnboardingHint,
+    required this.staffAddButton,
+    required this.staffListTitle,
+    required this.staffLoading,
+    required this.staffEmptyTitle,
+    required this.staffEmptyDesc,
+    required this.staffMakeTrainerButton,
+    required this.staffMakeAdminButton,
   });
 
   final String appTitle;
@@ -628,6 +708,86 @@ final class BusinessStrings {
   final String productCreateButton;
   final String productActiveAtPosCheckbox;
   final String saveLabel;
+  final String trainersSelectBranchDesc;
+  final String trainersTitle;
+  final String trainersAddButton;
+  final String trainersLoading;
+  final String trainersEmptyTitle;
+  final String trainersEmptyDesc;
+  final String trainerStatusInactive;
+  final String trainerEditDialogTitle;
+  final String trainerNewDialogTitle;
+  final String trainerBioOptionalLabel;
+  final String scheduleSelectBranchDesc;
+  final String scheduleGenerateButton;
+  final String scheduleNewTemplateButton;
+  final String scheduleSessionsTab;
+  final String scheduleTemplatesTab;
+  final String scheduleLoading;
+  final String scheduleNoSessionsTitle;
+  final String scheduleNoSessionsDesc;
+  final String scheduleSessionCancelled;
+  final String scheduleBookingsButton;
+  final String scheduleCancelSessionTitle;
+  final String scheduleCancelSessionDesc;
+  final String scheduleNoTemplatesTitle;
+  final String scheduleNoTemplatesDesc;
+  final String scheduleTrainerLookupTitle;
+  final String scheduleTrainerLookupDesc;
+  final String scheduleSessionIdLabel;
+  final String scheduleOpenRosterButton;
+  final String bookingsLoading;
+  final String bookingsEmptyTitle;
+  final String bookingsEmptyDesc;
+  final String bookingStatusBooked;
+  final String bookingStatusCancelled;
+  final String scheduleGenerateDialogTitle;
+  final String scheduleStartDateLabel;
+  final String scheduleEndDateLabel;
+  final String scheduleNewTemplateDialogTitle;
+  final String scheduleWeekdayLabel;
+  final String scheduleStartTimeLabel;
+  final String scheduleDurationMinLabel;
+  final String scheduleCapacityLabel;
+  final String storefrontOwnerOnlyDesc;
+  final String storefrontTitlePrefix;
+  final String storefrontSelectBranchDesc;
+  final String storefrontApprovedWarning;
+  final String storefrontPendingHint;
+  final String storefrontDescriptionLabel;
+  final String storefrontAddressLabel;
+  final String storefrontDistrictLabel;
+  final String storefrontLatitudeLabel;
+  final String storefrontLongitudeLabel;
+  final String storefrontPhoneLabel;
+  final String storefrontHoursLabel;
+  final String storefrontAmenitiesLabel;
+  final String storefrontSaveButton;
+  final String storefrontSubmitModerationButton;
+  final String storefrontUnpublishButton;
+  final String storefrontPublishButton;
+  final String storefrontModerationDraft;
+  final String storefrontModerationPending;
+  final String storefrontModerationApproved;
+  final String storefrontModerationRejected;
+  final String galleryTitlePrefix;
+  final String galleryUploadButton;
+  final String galleryEmptyHint;
+  final String deleteLabel;
+  final String staffOwnerOnlyDesc;
+  final String staffAddTitle;
+  final String staffEmailLabel;
+  final String staffRoleOwner;
+  final String staffRoleAdmin;
+  final String staffRoleTrainer;
+  final String staffOtpOnboardingHint;
+  final String staffAddButton;
+  final String staffListTitle;
+  final String staffLoading;
+  final String staffEmptyTitle;
+  final String staffEmptyDesc;
+  final String staffMakeTrainerButton;
+  final String staffMakeAdminButton;
 
   static const BusinessStrings ru = BusinessStrings._(
     appTitle: 'uGym Business',
@@ -940,6 +1100,90 @@ final class BusinessStrings {
     productCreateButton: 'Создать',
     productActiveAtPosCheckbox: 'Активен на кассе',
     saveLabel: 'Сохранить',
+    trainersSelectBranchDesc: 'Выберите зал, чтобы просматривать тренеров.',
+    trainersTitle: 'Тренеры зала',
+    trainersAddButton: 'Добавить тренера',
+    trainersLoading: 'Загружаем тренеров...',
+    trainersEmptyTitle: 'Тренеров пока нет',
+    trainersEmptyDesc:
+        'Добавьте тренера, чтобы создавать шаблоны групповых занятий.',
+    trainerStatusInactive: 'Неактивен',
+    trainerEditDialogTitle: 'Редактировать тренера',
+    trainerNewDialogTitle: 'Новый тренер',
+    trainerBioOptionalLabel: 'О тренере (необязательно)',
+    scheduleSelectBranchDesc: 'Выберите зал, чтобы работать с расписанием.',
+    scheduleGenerateButton: 'Сгенерировать',
+    scheduleNewTemplateButton: 'Новый шаблон',
+    scheduleSessionsTab: 'Занятия',
+    scheduleTemplatesTab: 'Шаблоны',
+    scheduleLoading: 'Загружаем расписание...',
+    scheduleNoSessionsTitle: 'Занятий за период нет',
+    scheduleNoSessionsDesc: 'Создайте шаблон и сгенерируйте расписание.',
+    scheduleSessionCancelled: 'Отменено',
+    scheduleBookingsButton: 'Записавшиеся',
+    scheduleCancelSessionTitle: 'Отменить занятие',
+    scheduleCancelSessionDesc: 'Занятие будет отменено, а всем записавшимся клиентам автоматически вернутся списанные посещения.',
+    scheduleNoTemplatesTitle: 'Шаблонов нет',
+    scheduleNoTemplatesDesc: 'Добавьте еженедельный шаблон занятия.',
+    scheduleTrainerLookupTitle: 'Список группы по занятию',
+    scheduleTrainerLookupDesc:
+        'Укажите ID занятия, чтобы просмотреть записавшихся клиентов.',
+    scheduleSessionIdLabel: 'ID занятия',
+    scheduleOpenRosterButton: 'Открыть список группы',
+    bookingsLoading: 'Загружаем записи...',
+    bookingsEmptyTitle: 'Записей пока нет',
+    bookingsEmptyDesc: 'Клиенты ещё не записались на это занятие.',
+    bookingStatusBooked: 'Записан',
+    bookingStatusCancelled: 'Отменена',
+    scheduleGenerateDialogTitle: 'Сгенерировать расписание',
+    scheduleStartDateLabel: 'Дата начала (ГГГГ-ММ-ДД)',
+    scheduleEndDateLabel: 'Дата окончания (до 62 дней)',
+    scheduleNewTemplateDialogTitle: 'Новый шаблон занятия',
+    scheduleWeekdayLabel: 'День недели',
+    scheduleStartTimeLabel: 'Начало (ЧЧ:ММ)',
+    scheduleDurationMinLabel: 'Длительность (15–240 мин)',
+    scheduleCapacityLabel: 'Вместимость (1–200)',
+    storefrontOwnerOnlyDesc:
+        'Редактирование витрины доступно только владельцу.',
+    storefrontTitlePrefix: 'Витрина зала',
+    storefrontSelectBranchDesc: 'Выберите зал, чтобы настроить его витрину.',
+    storefrontApprovedWarning: 'Внимание: сохранение или изменение фото переведёт витрину в статус draft и снимет её с публикации.',
+    storefrontPendingHint: 'Витрина на модерации: редактирование и загрузка фото временно заблокированы.',
+    storefrontDescriptionLabel: 'Описание зала',
+    storefrontAddressLabel: 'Адрес',
+    storefrontDistrictLabel: 'Район',
+    storefrontLatitudeLabel: 'Широта',
+    storefrontLongitudeLabel: 'Долгота',
+    storefrontPhoneLabel: 'Телефон зала',
+    storefrontHoursLabel: 'Часы работы (пн–вс)',
+    storefrontAmenitiesLabel: 'Удобства (через запятую, до 30)',
+    storefrontSaveButton: 'Сохранить витрину',
+    storefrontSubmitModerationButton: 'На модерацию',
+    storefrontUnpublishButton: 'Снять с публикации',
+    storefrontPublishButton: 'Опубликовать в каталоге',
+    storefrontModerationDraft: 'Черновик (draft)',
+    storefrontModerationPending: 'На модерации (pending)',
+    storefrontModerationApproved: 'Одобрено (approved)',
+    storefrontModerationRejected: 'Отклонено (rejected)',
+    galleryTitlePrefix: 'Фотогалерея',
+    galleryUploadButton: 'Загрузить фото',
+    galleryEmptyHint:
+        'Фотографий пока нет (до 10 файлов JPEG/PNG/WEBP до 5 МБ).',
+    deleteLabel: 'Удалить',
+    staffOwnerOnlyDesc: 'Управление штатом доступно только владельцу.',
+    staffAddTitle: 'Добавить сотрудника',
+    staffEmailLabel: 'Email сотрудника',
+    staffRoleOwner: 'Владелец',
+    staffRoleAdmin: 'Администратор',
+    staffRoleTrainer: 'Тренер',
+    staffOtpOnboardingHint: 'Памятка: сотрудник должен установить uGym/uGym Business, зарегистрироваться с этим email и ввести OTP-код подтверждения.',
+    staffAddButton: 'Добавить в штат',
+    staffListTitle: 'Штат компании',
+    staffLoading: 'Загружаем штат...',
+    staffEmptyTitle: 'Сотрудников нет',
+    staffEmptyDesc: 'Добавьте администратора или тренера по email.',
+    staffMakeTrainerButton: 'Сделать тренером',
+    staffMakeAdminButton: 'Сделать админом',
   );
 
   static const BusinessStrings tg = BusinessStrings._(
@@ -1253,6 +1497,88 @@ final class BusinessStrings {
     productCreateButton: 'Сохтан',
     productActiveAtPosCheckbox: 'Дар хазина фаъол',
     saveLabel: 'Нигоҳ доштан',
+    trainersSelectBranchDesc: 'Барои дидани мураббиён толорро интихоб кунед.',
+    trainersTitle: 'Мураббиёни толор',
+    trainersAddButton: 'Иловаи мураббӣ',
+    trainersLoading: 'Мураббиён бор мешаванд...',
+    trainersEmptyTitle: 'Ҳоло мураббӣ нест',
+    trainersEmptyDesc:
+        'Барои сохтани қолабҳои машғулиятҳои гурӯҳӣ мураббӣ илова кунед.',
+    trainerStatusInactive: 'Ғайрифаъол',
+    trainerEditDialogTitle: 'Таҳрири мураббӣ',
+    trainerNewDialogTitle: 'Мураббии нав',
+    trainerBioOptionalLabel: 'Дар бораи мураббӣ (ихтиёрӣ)',
+    scheduleSelectBranchDesc: 'Барои кор бо ҷадвал толорро интихоб кунед.',
+    scheduleGenerateButton: 'Тавлид кардан',
+    scheduleNewTemplateButton: 'Қолаби нав',
+    scheduleSessionsTab: 'Машғулиятҳо',
+    scheduleTemplatesTab: 'Қолабҳо',
+    scheduleLoading: 'Ҷадвал бор мешавад...',
+    scheduleNoSessionsTitle: 'Дар ин давра машғулият нест',
+    scheduleNoSessionsDesc: 'Қолаб созед ва ҷадвалро тавлид кунед.',
+    scheduleSessionCancelled: 'Бекор шуд',
+    scheduleBookingsButton: 'Номнависшудагон',
+    scheduleCancelSessionTitle: 'Бекор кардани машғулият',
+    scheduleCancelSessionDesc: 'Машғулият бекор карда мешавад ва ба ҳамаи мизоҷони номнависшуда ташрифҳо худкор баргардонида мешаванд.',
+    scheduleNoTemplatesTitle: 'Қолаб нест',
+    scheduleNoTemplatesDesc: 'Қолаби ҳафтаинаи машғулиятро илова кунед.',
+    scheduleTrainerLookupTitle: 'Рӯйхати гурӯҳ аз рӯи машғулият',
+    scheduleTrainerLookupDesc:
+        'Барои дидани мизоҷони номнависшуда ID-и машғулиятро ворид кунед.',
+    scheduleSessionIdLabel: 'ID машғулият',
+    scheduleOpenRosterButton: 'Кушодани рӯйхати гурӯҳ',
+    bookingsLoading: 'Номнависҳо бор мешаванд...',
+    bookingsEmptyTitle: 'Ҳоло номнавис нест',
+    bookingsEmptyDesc: 'Мизоҷон ҳоло ба ин машғулият номнавис нашудаанд.',
+    bookingStatusBooked: 'Номнавис шуд',
+    bookingStatusCancelled: 'Бекор шуд',
+    scheduleGenerateDialogTitle: 'Тавлиди ҷадвал',
+    scheduleStartDateLabel: 'Санаи оғоз (СССС-ММ-РР)',
+    scheduleEndDateLabel: 'Санаи анҷом (то 62 рӯз)',
+    scheduleNewTemplateDialogTitle: 'Қолаби нави машғулият',
+    scheduleWeekdayLabel: 'Рӯзи ҳафта',
+    scheduleStartTimeLabel: 'Оғоз (СС:ДД)',
+    scheduleDurationMinLabel: 'Давомнокӣ (15–240 дақ)',
+    scheduleCapacityLabel: 'Ғунҷоиш (1–200)',
+    storefrontOwnerOnlyDesc: 'Таҳрири витрина танҳо барои соҳиб дастрас аст.',
+    storefrontTitlePrefix: 'Витринаи толор',
+    storefrontSelectBranchDesc: 'Барои танзими витрина толорро интихоб кунед.',
+    storefrontApprovedWarning: 'Диққат: нигоҳ доштан ё иваз кардани акс витринаро ба ҳолати draft мегузаронад ва аз нашр мегирад.',
+    storefrontPendingHint: 'Витрина дар модератсия аст: таҳрир ва боргузории акс муваққатан маҳдуд аст.',
+    storefrontDescriptionLabel: 'Тавсифи толор',
+    storefrontAddressLabel: 'Суроға',
+    storefrontDistrictLabel: 'Ноҳия',
+    storefrontLatitudeLabel: 'Арзи ҷуғрофӣ',
+    storefrontLongitudeLabel: 'Тӯли ҷуғрофӣ',
+    storefrontPhoneLabel: 'Телефони толор',
+    storefrontHoursLabel: 'Соатҳои корӣ (дш–як)',
+    storefrontAmenitiesLabel: 'Имкониятҳо (бо вергул, то 30)',
+    storefrontSaveButton: 'Нигоҳ доштани витрина',
+    storefrontSubmitModerationButton: 'Ба модератсия',
+    storefrontUnpublishButton: 'Аз нашр гирифтан',
+    storefrontPublishButton: 'Дар каталог нашр кардан',
+    storefrontModerationDraft: 'Сиёҳнавис (draft)',
+    storefrontModerationPending: 'Дар модератсия (pending)',
+    storefrontModerationApproved: 'Тасдиқ шуд (approved)',
+    storefrontModerationRejected: 'Рад шуд (rejected)',
+    galleryTitlePrefix: 'Галереяи аксҳо',
+    galleryUploadButton: 'Боргузории акс',
+    galleryEmptyHint: 'Ҳоло акс нест (то 10 файли JPEG/PNG/WEBP то 5 МБ).',
+    deleteLabel: 'Нест кардан',
+    staffOwnerOnlyDesc: 'Идоракунии кормандон танҳо барои соҳиб дастрас аст.',
+    staffAddTitle: 'Иловаи корманд',
+    staffEmailLabel: 'Email-и корманд',
+    staffRoleOwner: 'Соҳиб',
+    staffRoleAdmin: 'Маъмур',
+    staffRoleTrainer: 'Мураббӣ',
+    staffOtpOnboardingHint: 'Ёдрас: корманд бояд uGym/uGym Business-ро насб кунад, бо ин email сабти ном шавад ва рамзи тасдиқи OTP-ро ворид намояд.',
+    staffAddButton: 'Ба штат илова кардан',
+    staffListTitle: 'Кормандони ширкат',
+    staffLoading: 'Кормандон бор мешаванд...',
+    staffEmptyTitle: 'Корманд нест',
+    staffEmptyDesc: 'Маъмур ё мураббиро тавассути email илова кунед.',
+    staffMakeTrainerButton: 'Мураббӣ кардан',
+    staffMakeAdminButton: 'Маъмур кардан',
   );
 
   static const BusinessStrings en = BusinessStrings._(
@@ -1564,6 +1890,88 @@ final class BusinessStrings {
     productCreateButton: 'Create',
     productActiveAtPosCheckbox: 'Active at POS',
     saveLabel: 'Save',
+    trainersSelectBranchDesc: 'Select a gym to view trainers.',
+    trainersTitle: 'Gym trainers',
+    trainersAddButton: 'Add trainer',
+    trainersLoading: 'Loading trainers...',
+    trainersEmptyTitle: 'No trainers yet',
+    trainersEmptyDesc: 'Add a trainer to create group class templates.',
+    trainerStatusInactive: 'Inactive',
+    trainerEditDialogTitle: 'Edit trainer',
+    trainerNewDialogTitle: 'New trainer',
+    trainerBioOptionalLabel: 'About trainer (optional)',
+    scheduleSelectBranchDesc: 'Select a gym to manage the schedule.',
+    scheduleGenerateButton: 'Generate',
+    scheduleNewTemplateButton: 'New template',
+    scheduleSessionsTab: 'Sessions',
+    scheduleTemplatesTab: 'Templates',
+    scheduleLoading: 'Loading schedule...',
+    scheduleNoSessionsTitle: 'No sessions in period',
+    scheduleNoSessionsDesc: 'Create a template and generate the schedule.',
+    scheduleSessionCancelled: 'Cancelled',
+    scheduleBookingsButton: 'Bookings',
+    scheduleCancelSessionTitle: 'Cancel session',
+    scheduleCancelSessionDesc: 'The session will be cancelled and booked clients will have their visits refunded automatically.',
+    scheduleNoTemplatesTitle: 'No templates',
+    scheduleNoTemplatesDesc: 'Add a weekly class template.',
+    scheduleTrainerLookupTitle: 'Class roster by session',
+    scheduleTrainerLookupDesc: 'Enter a session ID to view booked clients.',
+    scheduleSessionIdLabel: 'Session ID',
+    scheduleOpenRosterButton: 'Open class roster',
+    bookingsLoading: 'Loading bookings...',
+    bookingsEmptyTitle: 'No bookings yet',
+    bookingsEmptyDesc: 'No clients have booked this session yet.',
+    bookingStatusBooked: 'Booked',
+    bookingStatusCancelled: 'Cancelled',
+    scheduleGenerateDialogTitle: 'Generate schedule',
+    scheduleStartDateLabel: 'Start date (YYYY-MM-DD)',
+    scheduleEndDateLabel: 'End date (up to 62 days)',
+    scheduleNewTemplateDialogTitle: 'New class template',
+    scheduleWeekdayLabel: 'Weekday',
+    scheduleStartTimeLabel: 'Start time (HH:MM)',
+    scheduleDurationMinLabel: 'Duration (15–240 min)',
+    scheduleCapacityLabel: 'Capacity (1–200)',
+    storefrontOwnerOnlyDesc:
+        'Storefront editing is available to the owner only.',
+    storefrontTitlePrefix: 'Gym storefront',
+    storefrontSelectBranchDesc: 'Select a gym to configure its storefront.',
+    storefrontApprovedWarning: 'Warning: saving or changing photos resets the storefront to draft and unpublishes it.',
+    storefrontPendingHint: 'Storefront is under review: editing and photo uploads are temporarily locked.',
+    storefrontDescriptionLabel: 'Gym description',
+    storefrontAddressLabel: 'Address',
+    storefrontDistrictLabel: 'District',
+    storefrontLatitudeLabel: 'Latitude',
+    storefrontLongitudeLabel: 'Longitude',
+    storefrontPhoneLabel: 'Gym phone',
+    storefrontHoursLabel: 'Working hours (Mon–Sun)',
+    storefrontAmenitiesLabel: 'Amenities (comma-separated, up to 30)',
+    storefrontSaveButton: 'Save storefront',
+    storefrontSubmitModerationButton: 'Submit for review',
+    storefrontUnpublishButton: 'Unpublish',
+    storefrontPublishButton: 'Publish to catalog',
+    storefrontModerationDraft: 'Draft (draft)',
+    storefrontModerationPending: 'Under review (pending)',
+    storefrontModerationApproved: 'Approved (approved)',
+    storefrontModerationRejected: 'Rejected (rejected)',
+    galleryTitlePrefix: 'Photo gallery',
+    galleryUploadButton: 'Upload photo',
+    galleryEmptyHint:
+        'No photos yet (up to 10 JPEG/PNG/WEBP files, max 5 MB each).',
+    deleteLabel: 'Delete',
+    staffOwnerOnlyDesc: 'Staff management is available to the owner only.',
+    staffAddTitle: 'Add staff member',
+    staffEmailLabel: 'Staff email',
+    staffRoleOwner: 'Owner',
+    staffRoleAdmin: 'Admin',
+    staffRoleTrainer: 'Trainer',
+    staffOtpOnboardingHint: 'Note: the staff member must install uGym/uGym Business, register with this email, and verify it with the OTP code.',
+    staffAddButton: 'Add to staff',
+    staffListTitle: 'Company staff',
+    staffLoading: 'Loading staff...',
+    staffEmptyTitle: 'No staff members',
+    staffEmptyDesc: 'Invite an admin or trainer by email.',
+    staffMakeTrainerButton: 'Make trainer',
+    staffMakeAdminButton: 'Make admin',
   );
 
   static BusinessStrings of(AppLocale locale) {

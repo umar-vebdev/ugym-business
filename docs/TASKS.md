@@ -56,10 +56,10 @@
 - [x] **B6-04b** Расширены `BusinessStrings` и синхронизированы `app_{ru,tg,en}.arb` (всего 167 ключей, 100% паритет), локализованы `PosCheckoutScreen`, `paymentMethodLabel`, `AnalyticsScreen`, `VisitsByDayBarChart`, `RevenuePaymentMixBar`, `AnnouncementsScreen` и `BillingStatusScreen` на `ru`/`tg`/`en` + тест в `test/features/analytics_billing/analytics_charts_test.dart`; 121 тест зелёный (`format ✓`, `analyze ✓`, `test ✓`).
 - [x] **B7-01** Расширены `BusinessStrings` и синхронизированы `app_{ru,tg,en}.arb` (+66 ключей, всего 233), локализованы `CompanyOnboardingCard`, `CompanyBranchesAndCurrencyCard`, `VisitsLogScreen`, `ManualCheckInSheet`, `ClientsListScreen`, `CreateClientSheet` и `ClientDetailScreen` на `ru`/`tg`/`en` + тест в `test/features/clients/clients_list_screen_test.dart`; 122 теста зелёные (`format ✓`, `analyze ✓`, `test ✓`).
 - [x] **B7-02** Расширены `BusinessStrings` и синхронизированы `app_{ru,tg,en}.arb` (+67 ключей, всего 300), локализованы `MembershipTypesScreen`, `CreateMembershipTypeScreen`, `ExpiringMembershipsTab`, `MembershipRequestsQueueTab`, `SalesHistoryTab` и `ProductsScreen` на `ru`/`tg`/`en` + тест в `test/features/memberships/memberships_screens_test.dart`; 123 теста зелёные (`format ✓`, `analyze ✓`, `test ✓`).
+- [x] **B7-03** Расширены `BusinessStrings` и синхронизированы `app_{ru,tg,en}.arb` (+80 ключей, всего 380, 100% паритет), локализованы `TrainersScreen`, `ScheduleTab`, `SessionBookingsScreen`, `StorefrontEditorScreen`, `GymPhotosManager` и `StaffManagementScreen` на `ru`/`tg`/`en` + тест в `test/features/storefront_staff/staff_management_screen_test.dart`; 124 теста зелёные (`format ✓`, `analyze ✓`, `test ✓`).
 
 ---
 
 ## Текущий этап: `B7` — Полная локализация модулей (`ru`/`tg`/`en`) и релизная сборка Android
 
-- [ ] **B7-03** Локализация (`ru`/`tg`/`en`) экранов тренеров, расписания, витрины и штата (`TrainersScreen`, `ScheduleTab`, `StorefrontEditorScreen`, `StaffManagementScreen`) с синхронизацией `app_{ru,tg,en}.arb`.
 - [ ] **B7-04** Настройка релизной подписи Android (`signingConfig` через `android/key.properties` + `android/key.properties.example`, защита `.gitignore`), тест конфигурации и проверка релизной сборки `APK`/`AAB` (`--dart-define=FLAVOR=prod`).

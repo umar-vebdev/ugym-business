@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:material_ui/material_ui.dart';
 import 'package:ugym_core/ugym_core.dart';
 
+import '../../../core/l10n/business_localizations.dart';
 import '../../../core/session/business_role.dart';
 import '../../../core/session/business_session_controller.dart';
 import '../domain/trainers_schedule_models.dart';
@@ -194,20 +195,19 @@ final class _ScheduleTabState extends State<ScheduleTab> {
   }
 
   Future<void> _cancelSession(ClassSession session) async {
+    final strings = BusinessStringsScope.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Отменить занятие'),
-        content: const Text(
-          'Занятие будет отменено, а всем записавшимся клиентам автоматически вернутся списанные посещения.',
-        ),
+        title: Text(strings.scheduleCancelSessionTitle),
+        content: Text(strings.scheduleCancelSessionDesc),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('Назад'),
+            child: Text(strings.backLabel),
           ),
           UcraftButton(
-            label: 'Отменить занятие',
+            label: strings.scheduleCancelSessionTitle,
             variant: UcraftButtonVariant.destructive,
             onPressed: () => Navigator.of(dialogContext).pop(true),
           ),
@@ -299,17 +299,18 @@ final class _ScheduleTabState extends State<ScheduleTab> {
 
   Widget _buildTrainerSessionLookup(BuildContext context) {
     final colors = context.ucraftColors;
+    final strings = BusinessStringsScope.of(context);
     return UcraftCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            'Список группы по занятию',
+            strings.scheduleTrainerLookupTitle,
             style: UcraftTypography.title.copyWith(color: colors.foreground),
           ),
           const SizedBox(height: UcraftSpacing.space1),
           Text(
-            'Укажите ID занятия, чтобы просмотреть записавшихся клиентов.',
+            strings.scheduleTrainerLookupDesc,
             style: UcraftTypography.caption.copyWith(
               color: colors.foregroundSecondary,
             ),
@@ -318,14 +319,14 @@ final class _ScheduleTabState extends State<ScheduleTab> {
           UcraftTextField(
             key: const ValueKey<String>('trainer_session_id_input'),
             controller: _sessionIdController,
-            label: 'ID занятия',
-            hintText: 'Например, 101',
+            label: strings.scheduleSessionIdLabel,
+            hintText: '101',
             keyboardType: TextInputType.number,
             errorText: _trainerLookupError,
           ),
           const SizedBox(height: UcraftSpacing.space3),
           UcraftButton(
-            label: 'Открыть список группы',
+            label: strings.scheduleOpenRosterButton,
             fullWidth: true,
             onPressed: () => unawaited(_openTrainerSessionById()),
           ),
@@ -340,14 +341,15 @@ final class _ScheduleTabState extends State<ScheduleTab> {
       listenable: widget.sessionController,
       builder: (context, _) {
         final colors = context.ucraftColors;
+        final strings = BusinessStringsScope.of(context);
         final gym = widget.sessionController.selectedGym;
         if (gym == null) {
           if (widget.sessionController.role == BusinessRole.trainer) {
             return _buildTrainerSessionLookup(context);
           }
-          return const UcraftEmptyState(
-            title: 'Филиал не выбран',
-            description: 'Выберите зал, чтобы работать с расписанием.',
+          return UcraftEmptyState(
+            title: strings.branchNotSelected,
+            description: strings.scheduleSelectBranchDesc,
           );
         }
 
@@ -368,7 +370,7 @@ final class _ScheduleTabState extends State<ScheduleTab> {
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 Text(
-                  'Расписание',
+                  strings.subTabSchedule,
                   style: UcraftTypography.title.copyWith(
                     color: colors.foreground,
                   ),
@@ -378,12 +380,12 @@ final class _ScheduleTabState extends State<ScheduleTab> {
                     spacing: UcraftSpacing.space2,
                     children: [
                       UcraftButton(
-                        label: 'Сгенерировать',
+                        label: strings.scheduleGenerateButton,
                         variant: UcraftButtonVariant.secondary,
                         onPressed: () => unawaited(_openGenerateDialog(gym.id)),
                       ),
                       UcraftButton(
-                        label: 'Новый шаблон',
+                        label: strings.scheduleNewTemplateButton,
                         onPressed: () => unawaited(_openCreateTemplate(gym.id)),
                       ),
                     ],
@@ -396,7 +398,7 @@ final class _ScheduleTabState extends State<ScheduleTab> {
                 spacing: UcraftSpacing.space2,
                 children: [
                   UcraftButton(
-                    label: 'Занятия',
+                    label: strings.scheduleSessionsTab,
                     variant: _view == _ScheduleSubView.sessions
                         ? UcraftButtonVariant.primary
                         : UcraftButtonVariant.secondary,
@@ -404,7 +406,7 @@ final class _ScheduleTabState extends State<ScheduleTab> {
                         setState(() => _view = _ScheduleSubView.sessions),
                   ),
                   UcraftButton(
-                    label: 'Шаблоны',
+                    label: strings.scheduleTemplatesTab,
                     variant: _view == _ScheduleSubView.templates
                         ? UcraftButtonVariant.primary
                         : UcraftButtonVariant.secondary,
@@ -425,11 +427,11 @@ final class _ScheduleTabState extends State<ScheduleTab> {
             ],
             const SizedBox(height: UcraftSpacing.space3),
             if (_loading)
-              const UcraftLoadingState(message: 'Загружаем расписание...')
+              UcraftLoadingState(message: strings.scheduleLoading)
             else if (_view == _ScheduleSubView.templates && canManage)
-              _buildTemplatesList(colors)
+              _buildTemplatesList(colors, strings)
             else
-              _buildSessionsList(colors, canManage, canViewBookings),
+              _buildSessionsList(colors, strings, canManage, canViewBookings),
           ],
         );
       },
@@ -438,13 +440,14 @@ final class _ScheduleTabState extends State<ScheduleTab> {
 
   Widget _buildSessionsList(
     dynamic colors,
+    BusinessStrings strings,
     bool canManage,
     bool canViewBookings,
   ) {
     if (_sessions.isEmpty) {
-      return const UcraftEmptyState(
-        title: 'Занятий за период нет',
-        description: 'Создайте шаблон и сгенерируйте расписание.',
+      return UcraftEmptyState(
+        title: strings.scheduleNoSessionsTitle,
+        description: strings.scheduleNoSessionsDesc,
       );
     }
 
@@ -466,7 +469,7 @@ final class _ScheduleTabState extends State<ScheduleTab> {
                     ),
                     Text(
                       session.status == ClassSessionStatus.cancelled
-                          ? 'Отменено'
+                          ? strings.scheduleSessionCancelled
                           : '${session.bookedCount}/${session.capacity}',
                       style: UcraftTypography.caption,
                     ),
@@ -488,14 +491,14 @@ final class _ScheduleTabState extends State<ScheduleTab> {
                   children: [
                     if (canViewBookings)
                       UcraftButton(
-                        label: 'Записавшиеся',
+                        label: strings.scheduleBookingsButton,
                         variant: UcraftButtonVariant.secondary,
                         onPressed: () => unawaited(_openBookings(session)),
                       ),
                     if (canManage &&
                         session.status == ClassSessionStatus.scheduled)
                       UcraftButton(
-                        label: 'Отменить',
+                        label: strings.membershipCancelButton,
                         variant: UcraftButtonVariant.destructive,
                         isLoading: _cancellingSessionId == session.id,
                         onPressed: _cancellingSessionId == session.id
@@ -513,11 +516,11 @@ final class _ScheduleTabState extends State<ScheduleTab> {
     );
   }
 
-  Widget _buildTemplatesList(dynamic colors) {
+  Widget _buildTemplatesList(dynamic colors, BusinessStrings strings) {
     if (_templates.isEmpty) {
-      return const UcraftEmptyState(
-        title: 'Шаблонов нет',
-        description: 'Добавьте еженедельный шаблон занятия.',
+      return UcraftEmptyState(
+        title: strings.scheduleNoTemplatesTitle,
+        description: strings.scheduleNoTemplatesDesc,
       );
     }
 
@@ -535,7 +538,7 @@ final class _ScheduleTabState extends State<ScheduleTab> {
                 ),
                 const SizedBox(height: UcraftSpacing.space1),
                 Text(
-                  '${tmpl.durationMinutes} мин • до ${tmpl.capacity} мест • ${tmpl.isActive ? 'Активен' : 'Архив'}',
+                  '${tmpl.durationMinutes} мин • до ${tmpl.capacity} мест • ${tmpl.isActive ? strings.planStatusActive : strings.planStatusArchived}',
                   style: UcraftTypography.caption,
                 ),
               ],
@@ -626,6 +629,7 @@ final class _SessionBookingsScreenState extends State<SessionBookingsScreen> {
   @override
   Widget build(BuildContext context) {
     final colors = context.ucraftColors;
+    final strings = BusinessStringsScope.of(context);
 
     return Scaffold(
       appBar: AppBar(title: Text(widget.session.title)),
@@ -646,18 +650,18 @@ final class _SessionBookingsScreenState extends State<SessionBookingsScreen> {
               const SizedBox(height: UcraftSpacing.space3),
               Expanded(
                 child: _loading
-                    ? const UcraftLoadingState(message: 'Загружаем записи...')
+                    ? UcraftLoadingState(message: strings.bookingsLoading)
                     : _errorMessage != null
                     ? UcraftErrorState(
-                        title: 'Ошибка загрузки',
+                        title: strings.posLoadErrorTitle,
                         message: _errorMessage!,
+                        retryLabel: strings.retryLabel,
                         onRetry: () => unawaited(_load()),
                       )
                     : _bookings.isEmpty
-                    ? const UcraftEmptyState(
-                        title: 'Записей пока нет',
-                        description:
-                            'Клиенты ещё не записались на это занятие.',
+                    ? UcraftEmptyState(
+                        title: strings.bookingsEmptyTitle,
+                        description: strings.bookingsEmptyDesc,
                       )
                     : ListView.separated(
                         itemCount: _bookings.length,
@@ -676,8 +680,8 @@ final class _SessionBookingsScreenState extends State<SessionBookingsScreen> {
                                 ),
                                 Text(
                                   booking.status == ClassBookingStatus.cancelled
-                                      ? 'Отменена'
-                                      : 'Записан',
+                                      ? strings.bookingStatusCancelled
+                                      : strings.bookingStatusBooked,
                                   style: UcraftTypography.caption.copyWith(
                                     color:
                                         booking.status ==
@@ -797,20 +801,21 @@ final class _GenerateSessionsDialogState
   @override
   Widget build(BuildContext context) {
     final colors = context.ucraftColors;
+    final strings = BusinessStringsScope.of(context);
     return AlertDialog(
-      title: const Text('Сгенерировать расписание'),
+      title: Text(strings.scheduleGenerateDialogTitle),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           UcraftTextField(
             controller: _fromController,
-            label: 'Дата начала (ГГГГ-ММ-ДД)',
+            label: strings.scheduleStartDateLabel,
           ),
           const SizedBox(height: UcraftSpacing.space2),
           UcraftTextField(
             controller: _toController,
-            label: 'Дата окончания (до 62 дней)',
+            label: strings.scheduleEndDateLabel,
           ),
           if (_errorText != null) ...[
             const SizedBox(height: UcraftSpacing.space2),
@@ -828,10 +833,10 @@ final class _GenerateSessionsDialogState
           onPressed: _submitting
               ? null
               : () => Navigator.of(context).pop(false),
-          child: const Text('Отмена'),
+          child: Text(strings.cancelLabel),
         ),
         UcraftButton(
-          label: 'Сгенерировать',
+          label: strings.scheduleGenerateButton,
           isLoading: _submitting,
           onPressed: _submitting ? null : () => unawaited(_submit()),
         ),
@@ -955,18 +960,22 @@ final class _TemplateFormDialogState extends State<_TemplateFormDialog> {
   @override
   Widget build(BuildContext context) {
     final colors = context.ucraftColors;
+    final strings = BusinessStringsScope.of(context);
     return AlertDialog(
-      title: const Text('Новый шаблон занятия'),
+      title: Text(strings.scheduleNewTemplateDialogTitle),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            UcraftTextField(controller: _titleController, label: 'Название'),
+            UcraftTextField(
+              controller: _titleController,
+              label: strings.planNameLabel,
+            ),
             const SizedBox(height: UcraftSpacing.space2),
             DropdownButtonFormField<int>(
               initialValue: _trainerId,
-              decoration: const InputDecoration(labelText: 'Тренер'),
+              decoration: InputDecoration(labelText: strings.staffRoleTrainer),
               items: [
                 for (final t in widget.trainers)
                   DropdownMenuItem<int>(value: t.id, child: Text(t.name)),
@@ -980,7 +989,9 @@ final class _TemplateFormDialogState extends State<_TemplateFormDialog> {
             const SizedBox(height: UcraftSpacing.space2),
             DropdownButtonFormField<int>(
               initialValue: _weekday,
-              decoration: const InputDecoration(labelText: 'День недели'),
+              decoration: InputDecoration(
+                labelText: strings.scheduleWeekdayLabel,
+              ),
               items: const [
                 DropdownMenuItem(value: 1, child: Text('Понедельник')),
                 DropdownMenuItem(value: 2, child: Text('Вторник')),
@@ -999,18 +1010,18 @@ final class _TemplateFormDialogState extends State<_TemplateFormDialog> {
             const SizedBox(height: UcraftSpacing.space2),
             UcraftTextField(
               controller: _timeController,
-              label: 'Начало (ЧЧ:ММ)',
+              label: strings.scheduleStartTimeLabel,
             ),
             const SizedBox(height: UcraftSpacing.space2),
             UcraftTextField(
               controller: _durationController,
-              label: 'Длительность (15–240 мин)',
+              label: strings.scheduleDurationMinLabel,
               keyboardType: TextInputType.number,
             ),
             const SizedBox(height: UcraftSpacing.space2),
             UcraftTextField(
               controller: _capacityController,
-              label: 'Вместимость (1–200)',
+              label: strings.scheduleCapacityLabel,
               keyboardType: TextInputType.number,
             ),
             if (_errorText != null) ...[
@@ -1030,10 +1041,10 @@ final class _TemplateFormDialogState extends State<_TemplateFormDialog> {
           onPressed: _submitting
               ? null
               : () => Navigator.of(context).pop(false),
-          child: const Text('Отмена'),
+          child: Text(strings.cancelLabel),
         ),
         UcraftButton(
-          label: 'Создать',
+          label: strings.productCreateButton,
           isLoading: _submitting,
           onPressed: _submitting ? null : () => unawaited(_submit()),
         ),

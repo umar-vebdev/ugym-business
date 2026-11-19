@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:ugym_business/core/l10n/business_localizations.dart';
 import 'package:ugym_business/core/session/business_role.dart';
 import 'package:ugym_business/core/session/business_session_controller.dart';
 import 'package:ugym_business/core/storage/app_preferences.dart';
@@ -182,6 +183,57 @@ void main() {
       await tester.pumpAndSettle();
       expect(repo.lastDeletedStaffId, 2);
       expect(find.text('Мадина'), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'StaffManagementScreen renders localized labels in tg and en via BusinessStringsScope',
+    (tester) async {
+      final repo = _FakeStaffRepo();
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: UcraftTheme.light(),
+          home: BusinessStringsScope(
+            strings: BusinessStrings.tg,
+            child: Scaffold(
+              body: SingleChildScrollView(
+                child: StaffManagementScreen(
+                  repository: repo,
+                  sessionController: _session(BusinessRole.owner),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Иловаи корманд'), findsOneWidget);
+      expect(find.text('Кормандони ширкат'), findsOneWidget);
+      expect(find.text('Мураббӣ кардан'), findsOneWidget);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: UcraftTheme.light(),
+          home: BusinessStringsScope(
+            strings: BusinessStrings.en,
+            child: Scaffold(
+              body: SingleChildScrollView(
+                child: StaffManagementScreen(
+                  repository: repo,
+                  sessionController: _session(BusinessRole.owner),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Add staff member'), findsOneWidget);
+      expect(find.text('Company staff'), findsOneWidget);
+      expect(find.text('Make trainer'), findsOneWidget);
     },
   );
 }

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:material_ui/material_ui.dart';
 import 'package:ugym_core/ugym_core.dart';
 
+import '../../../core/l10n/business_localizations.dart';
 import '../../../core/session/business_role.dart';
 import '../../../core/session/business_session_controller.dart';
 import '../domain/storefront_and_staff_models.dart';
@@ -227,10 +228,11 @@ final class _StaffManagementScreenState extends State<StaffManagementScreen> {
       listenable: widget.sessionController,
       builder: (context, _) {
         final colors = context.ucraftColors;
+        final strings = BusinessStringsScope.of(context);
         if (!widget.sessionController.canView(BusinessPermission.manageStaff)) {
-          return const UcraftEmptyState(
-            title: 'Недостаточно прав',
-            description: 'Управление штатом доступно только владельцу.',
+          return UcraftEmptyState(
+            title: strings.analyticsNoAccessTitle,
+            description: strings.staffOwnerOnlyDesc,
           );
         }
 
@@ -246,7 +248,7 @@ final class _StaffManagementScreenState extends State<StaffManagementScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    'Добавить сотрудника',
+                    strings.staffAddTitle,
                     style: UcraftTypography.title.copyWith(
                       color: colors.foreground,
                     ),
@@ -254,7 +256,7 @@ final class _StaffManagementScreenState extends State<StaffManagementScreen> {
                   const SizedBox(height: UcraftSpacing.space3),
                   UcraftTextField(
                     controller: _emailController,
-                    label: 'Email сотрудника',
+                    label: strings.staffEmailLabel,
                     hintText: 'staff@gym.tj',
                     keyboardType: TextInputType.emailAddress,
                     enabled: canMutate && !_inviting,
@@ -264,7 +266,7 @@ final class _StaffManagementScreenState extends State<StaffManagementScreen> {
                     spacing: UcraftSpacing.space2,
                     children: [
                       UcraftButton(
-                        label: 'Администратор',
+                        label: strings.staffRoleAdmin,
                         variant: _inviteRole == StaffRoleValue.admin
                             ? UcraftButtonVariant.primary
                             : UcraftButtonVariant.secondary,
@@ -275,7 +277,7 @@ final class _StaffManagementScreenState extends State<StaffManagementScreen> {
                             : null,
                       ),
                       UcraftButton(
-                        label: 'Тренер',
+                        label: strings.staffRoleTrainer,
                         variant: _inviteRole == StaffRoleValue.trainer
                             ? UcraftButtonVariant.primary
                             : UcraftButtonVariant.secondary,
@@ -299,7 +301,7 @@ final class _StaffManagementScreenState extends State<StaffManagementScreen> {
                   if (_showOnboardingHint) ...[
                     const SizedBox(height: UcraftSpacing.space2),
                     Text(
-                      'Памятка: сотрудник должен установить uGym/uGym Business, зарегистрироваться с этим email и ввести OTP-код подтверждения.',
+                      strings.staffOtpOnboardingHint,
                       style: UcraftTypography.caption.copyWith(
                         color: colors.foregroundSecondary,
                       ),
@@ -307,7 +309,7 @@ final class _StaffManagementScreenState extends State<StaffManagementScreen> {
                   ],
                   const SizedBox(height: UcraftSpacing.space3),
                   UcraftButton(
-                    label: 'Добавить в штат',
+                    label: strings.staffAddButton,
                     fullWidth: true,
                     isLoading: _inviting,
                     onPressed: canMutate && !_inviting
@@ -319,7 +321,7 @@ final class _StaffManagementScreenState extends State<StaffManagementScreen> {
             ),
             const SizedBox(height: UcraftSpacing.space4),
             Text(
-              'Штат компании',
+              strings.staffListTitle,
               style: UcraftTypography.title.copyWith(color: colors.foreground),
             ),
             if (_errorMessage != null && _staff.isNotEmpty) ...[
@@ -333,17 +335,18 @@ final class _StaffManagementScreenState extends State<StaffManagementScreen> {
             ],
             const SizedBox(height: UcraftSpacing.space3),
             if (_loading)
-              const UcraftLoadingState(message: 'Загружаем штат...')
+              UcraftLoadingState(message: strings.staffLoading)
             else if (_errorMessage != null && _staff.isEmpty)
               UcraftErrorState(
-                title: 'Ошибка загрузки',
+                title: strings.posLoadErrorTitle,
                 message: _errorMessage!,
+                retryLabel: strings.retryLabel,
                 onRetry: () => unawaited(_load()),
               )
             else if (_staff.isEmpty)
-              const UcraftEmptyState(
-                title: 'Сотрудников нет',
-                description: 'Добавьте администратора или тренера по email.',
+              UcraftEmptyState(
+                title: strings.staffEmptyTitle,
+                description: strings.staffEmptyDesc,
               )
             else
               Column(
@@ -387,12 +390,13 @@ final class _StaffCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.ucraftColors;
+    final strings = BusinessStringsScope.of(context);
     final displayName =
         member.name ?? member.email ?? 'Пользователь №${member.userId}';
     final roleLabel = switch (member.role) {
-      StaffRoleValue.owner => 'Владелец',
-      StaffRoleValue.admin => 'Администратор',
-      StaffRoleValue.trainer => 'Тренер',
+      StaffRoleValue.owner => strings.staffRoleOwner,
+      StaffRoleValue.admin => strings.staffRoleAdmin,
+      StaffRoleValue.trainer => strings.staffRoleTrainer,
     };
 
     return UcraftCard(
@@ -435,14 +439,14 @@ final class _StaffCard extends StatelessWidget {
               children: [
                 UcraftButton(
                   label: member.role == StaffRoleValue.admin
-                      ? 'Сделать тренером'
-                      : 'Сделать админом',
+                      ? strings.staffMakeTrainerButton
+                      : strings.staffMakeAdminButton,
                   variant: UcraftButtonVariant.secondary,
                   isLoading: isBusy,
                   onPressed: isBusy ? null : onToggleRole,
                 ),
                 UcraftButton(
-                  label: 'Удалить',
+                  label: strings.deleteLabel,
                   variant: UcraftButtonVariant.destructive,
                   isLoading: isBusy,
                   onPressed: isBusy ? null : onDelete,

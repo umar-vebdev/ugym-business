@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:material_ui/material_ui.dart';
 import 'package:ugym_core/ugym_core.dart';
 
+import '../../../core/l10n/business_localizations.dart';
 import '../../../core/session/business_role.dart';
 import '../../../core/session/business_session_controller.dart';
 import '../domain/trainers_schedule_models.dart';
@@ -125,11 +126,12 @@ final class _TrainersScreenState extends State<TrainersScreen> {
       listenable: widget.sessionController,
       builder: (context, _) {
         final colors = context.ucraftColors;
+        final strings = BusinessStringsScope.of(context);
         final gym = widget.sessionController.selectedGym;
         if (gym == null) {
-          return const UcraftEmptyState(
-            title: 'Филиал не выбран',
-            description: 'Выберите зал, чтобы просматривать тренеров.',
+          return UcraftEmptyState(
+            title: strings.branchNotSelected,
+            description: strings.trainersSelectBranchDesc,
           );
         }
 
@@ -147,31 +149,32 @@ final class _TrainersScreenState extends State<TrainersScreen> {
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 Text(
-                  'Тренеры зала',
+                  strings.trainersTitle,
                   style: UcraftTypography.title.copyWith(
                     color: colors.foreground,
                   ),
                 ),
                 if (canManage)
                   UcraftButton(
-                    label: 'Добавить тренера',
+                    label: strings.trainersAddButton,
                     onPressed: () => unawaited(_openCreate(gym.id)),
                   ),
               ],
             ),
             const SizedBox(height: UcraftSpacing.space3),
             if (_loading)
-              const UcraftLoadingState(message: 'Загружаем тренеров...')
+              UcraftLoadingState(message: strings.trainersLoading)
             else if (_errorMessage != null && _trainers.isEmpty)
               UcraftErrorState(
-                title: 'Ошибка загрузки',
+                title: strings.posLoadErrorTitle,
                 message: _errorMessage!,
+                retryLabel: strings.retryLabel,
                 onRetry: () => unawaited(_load()),
               )
             else if (_trainers.isEmpty)
-              const UcraftEmptyState(
-                title: 'Тренеров пока нет',
-                description: 'Добавьте тренера, чтобы создавать шаблоны групповых занятий.',
+              UcraftEmptyState(
+                title: strings.trainersEmptyTitle,
+                description: strings.trainersEmptyDesc,
               )
             else
               Column(
@@ -203,7 +206,9 @@ final class _TrainersScreenState extends State<TrainersScreen> {
                                 ],
                                 const SizedBox(height: UcraftSpacing.space1),
                                 Text(
-                                  trainer.isActive ? 'Активен' : 'Неактивен',
+                                  trainer.isActive
+                                      ? strings.planStatusActive
+                                      : strings.trainerStatusInactive,
                                   style: UcraftTypography.caption.copyWith(
                                     color: trainer.isActive
                                         ? colors.success
@@ -215,7 +220,7 @@ final class _TrainersScreenState extends State<TrainersScreen> {
                           ),
                           if (canManage)
                             UcraftButton(
-                              label: 'Изменить',
+                              label: strings.productEditButton,
                               variant: UcraftButtonVariant.secondary,
                               onPressed: () => unawaited(_openEdit(trainer)),
                             ),
@@ -326,26 +331,32 @@ final class _TrainerFormDialogState extends State<_TrainerFormDialog> {
   @override
   Widget build(BuildContext context) {
     final colors = context.ucraftColors;
+    final strings = BusinessStringsScope.of(context);
     final isEdit = widget.existing != null;
 
     return AlertDialog(
-      title: Text(isEdit ? 'Редактировать тренера' : 'Новый тренер'),
+      title: Text(
+        isEdit ? strings.trainerEditDialogTitle : strings.trainerNewDialogTitle,
+      ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          UcraftTextField(controller: _nameController, label: 'Имя'),
+          UcraftTextField(
+            controller: _nameController,
+            label: strings.clientNameLabel,
+          ),
           const SizedBox(height: UcraftSpacing.space2),
           UcraftTextField(
             controller: _bioController,
-            label: 'О тренере (необязательно)',
+            label: strings.trainerBioOptionalLabel,
             maxLines: 2,
           ),
           if (isEdit)
             CheckboxListTile(
               value: _isActive,
               contentPadding: EdgeInsets.zero,
-              title: const Text('Активен'),
+              title: Text(strings.planStatusActive),
               onChanged: (v) => setState(() => _isActive = v ?? true),
             ),
           if (_errorText != null) ...[
@@ -364,10 +375,10 @@ final class _TrainerFormDialogState extends State<_TrainerFormDialog> {
           onPressed: _submitting
               ? null
               : () => Navigator.of(context).pop(false),
-          child: const Text('Отмена'),
+          child: Text(strings.cancelLabel),
         ),
         UcraftButton(
-          label: 'Сохранить',
+          label: strings.saveLabel,
           isLoading: _submitting,
           onPressed: _submitting ? null : () => unawaited(_submit()),
         ),
