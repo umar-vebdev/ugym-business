@@ -7,6 +7,7 @@ import 'package:ugym_core/ugym_core.dart';
 import '../../../core/l10n/business_localizations.dart';
 import '../../../core/session/business_role.dart';
 import '../../../core/session/business_session_controller.dart';
+import '../../../core/theme/business_typography.dart';
 import '../domain/storefront_and_staff_models.dart';
 
 /// Selected image payload passed to [GymPhotosManager].
@@ -386,18 +387,18 @@ final class _StorefrontEditorScreenState extends State<StorefrontEditorScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  Wrap(
+                    spacing: UcraftSpacing.space2,
+                    runSpacing: UcraftSpacing.space1,
+                    alignment: WrapAlignment.spaceBetween,
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
-                      Expanded(
-                        child: Text(
-                          '${strings.storefrontTitlePrefix} • ${gym.name}',
-                          style: UcraftTypography.titleLarge.copyWith(
-                            color: colors.foreground,
-                          ),
+                      Text(
+                        '${strings.storefrontTitlePrefix} • ${gym.name}',
+                        style: BusinessTypography.titleLarge.copyWith(
+                          color: colors.foreground,
                         ),
                       ),
-                      const SizedBox(width: UcraftSpacing.space2),
                       UcraftStatusPill(
                         icon: moderationIcon,
                         label: _moderationLabel(_status, strings),
@@ -428,7 +429,7 @@ final class _StorefrontEditorScreenState extends State<StorefrontEditorScreen> {
                     const SizedBox(height: UcraftSpacing.space2),
                     Text(
                       'Причина отклонения: ${_profile!.rejectionReason}',
-                      style: UcraftTypography.bodyMedium.copyWith(
+                      style: BusinessTypography.bodyMedium.copyWith(
                         color: colors.destructive,
                       ),
                     ),
@@ -436,7 +437,7 @@ final class _StorefrontEditorScreenState extends State<StorefrontEditorScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: UcraftSpacing.sectionGap),
+            const SizedBox(height: UcraftSpacing.space3),
             UcraftCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -510,7 +511,7 @@ final class _StorefrontEditorScreenState extends State<StorefrontEditorScreen> {
                     const SizedBox(height: UcraftSpacing.space3),
                     Text(
                       _errorMessage!,
-                      style: UcraftTypography.bodyMedium.copyWith(
+                      style: BusinessTypography.bodyMedium.copyWith(
                         color: colors.destructive,
                       ),
                     ),
@@ -519,7 +520,7 @@ final class _StorefrontEditorScreenState extends State<StorefrontEditorScreen> {
                     const SizedBox(height: UcraftSpacing.space3),
                     Text(
                       _statusMessage!,
-                      style: UcraftTypography.bodyMedium.copyWith(
+                      style: BusinessTypography.bodyMedium.copyWith(
                         color: colors.success,
                       ),
                     ),
@@ -562,7 +563,7 @@ final class _StorefrontEditorScreenState extends State<StorefrontEditorScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: UcraftSpacing.sectionGap),
+            const SizedBox(height: UcraftSpacing.space3),
             GymPhotosManager(
               gymId: gym.id,
               repository: widget.repository,
@@ -770,7 +771,7 @@ final class _GymPhotosManagerState extends State<GymPhotosManager> {
               Expanded(
                 child: Text(
                   '${strings.galleryTitlePrefix} (${widget.photos.length}/${GymPhotosManager.maxPhotos})',
-                  style: UcraftTypography.title.copyWith(
+                  style: BusinessTypography.title.copyWith(
                     color: colors.foreground,
                   ),
                 ),
@@ -789,7 +790,7 @@ final class _GymPhotosManagerState extends State<GymPhotosManager> {
             const SizedBox(height: UcraftSpacing.space2),
             Text(
               _errorMessage!,
-              style: UcraftTypography.bodyMedium.copyWith(
+              style: BusinessTypography.bodyMedium.copyWith(
                 color: colors.destructive,
               ),
             ),

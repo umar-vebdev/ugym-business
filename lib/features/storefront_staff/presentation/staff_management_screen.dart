@@ -7,6 +7,7 @@ import 'package:ugym_core/ugym_core.dart';
 import '../../../core/l10n/business_localizations.dart';
 import '../../../core/session/business_role.dart';
 import '../../../core/session/business_session_controller.dart';
+import '../../../core/theme/business_typography.dart';
 import '../domain/storefront_and_staff_models.dart';
 
 /// Owner-only screen for managing company staff by verified email.
@@ -250,7 +251,7 @@ final class _StaffManagementScreenState extends State<StaffManagementScreen> {
                 children: [
                   Text(
                     strings.staffAddTitle,
-                    style: UcraftTypography.title.copyWith(
+                    style: BusinessTypography.title.copyWith(
                       color: colors.foreground,
                     ),
                   ),
@@ -282,7 +283,7 @@ final class _StaffManagementScreenState extends State<StaffManagementScreen> {
                     const SizedBox(height: UcraftSpacing.space2),
                     Text(
                       _inviteError!,
-                      style: UcraftTypography.bodyMedium.copyWith(
+                      style: BusinessTypography.bodyMedium.copyWith(
                         color: colors.destructive,
                       ),
                     ),
@@ -308,13 +309,13 @@ final class _StaffManagementScreenState extends State<StaffManagementScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: UcraftSpacing.sectionGap),
+            const SizedBox(height: UcraftSpacing.space3),
             UcraftSectionHeader(title: strings.staffListTitle),
             if (_errorMessage != null && _staff.isNotEmpty) ...[
               const SizedBox(height: UcraftSpacing.space2),
               Text(
                 _errorMessage!,
-                style: UcraftTypography.bodyMedium.copyWith(
+                style: BusinessTypography.bodyMedium.copyWith(
                   color: colors.destructive,
                 ),
               ),
@@ -400,8 +401,8 @@ final class _StaffRow extends StatelessWidget {
 
     return UcraftListRow(
       leading: Container(
-        width: UcraftSpacing.space10,
-        height: UcraftSpacing.space10,
+        width: UcraftSpacing.space8,
+        height: UcraftSpacing.space8,
         decoration: BoxDecoration(
           color: colors.primarySubtle,
           shape: BoxShape.circle,
@@ -409,7 +410,7 @@ final class _StaffRow extends StatelessWidget {
         alignment: Alignment.center,
         child: Text(
           initial,
-          style: UcraftTypography.bodyMedium.copyWith(color: colors.primary),
+          style: BusinessTypography.bodyMedium.copyWith(color: colors.primary),
         ),
       ),
       title: displayName,

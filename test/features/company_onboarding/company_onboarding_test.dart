@@ -342,7 +342,10 @@ void main() {
         expect(find.text('400 м'), findsOneWidget);
         expect(session.gyms, hasLength(2));
 
-        await tester.ensureVisible(find.text('USD (Доллар)'));
+        final currency = find.byKey(const ValueKey('company_currency'));
+        await tester.ensureVisible(currency);
+        await tester.pumpAndSettle();
+        await tester.tap(currency);
         await tester.pumpAndSettle();
         await tester.tap(find.text('USD (Доллар)'));
         await tester.pumpAndSettle();

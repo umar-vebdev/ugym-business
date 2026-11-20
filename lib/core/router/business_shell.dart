@@ -189,7 +189,7 @@ final class _BusinessShellState extends State<BusinessShell> {
             final bool isExpanded = constraints.maxWidth >= 840;
 
             final Widget content = SafeArea(
-              bottom: false,
+              bottom: useRail,
               child: Column(
                 children: [
                   DecoratedBox(
@@ -817,7 +817,7 @@ final class _BusinessShellState extends State<BusinessShell> {
             selected: effectiveTab,
             onSelected: (tab) => setState(() => _moreTab = tab),
           ),
-          const SizedBox(height: UcraftSpacing.space4),
+          const SizedBox(height: UcraftSpacing.space2),
         ],
         switch (effectiveTab) {
           _MoreSubTab.storefront when storefrontRepo != null =>
@@ -848,7 +848,7 @@ final class _BusinessShellState extends State<BusinessShell> {
                   repository: onboardingRepo,
                   sessionController: widget.sessionController,
                 ),
-                const SizedBox(height: UcraftSpacing.space4),
+                const SizedBox(height: UcraftSpacing.space2),
               ],
               UcraftCard(
                 child: Column(
@@ -856,7 +856,7 @@ final class _BusinessShellState extends State<BusinessShell> {
                   children: [
                     Text(
                       strings.appTitle,
-                      style: UcraftTypography.title.copyWith(
+                      style: BusinessTypography.title.copyWith(
                         color: colors.foreground,
                       ),
                     ),
@@ -867,7 +867,7 @@ final class _BusinessShellState extends State<BusinessShell> {
                         color: colors.foregroundSecondary,
                       ),
                     ),
-                    const SizedBox(height: UcraftSpacing.space4),
+                    const SizedBox(height: UcraftSpacing.space2),
                     UcraftSegmentedTabs<AppLocale>(
                       items: [
                         for (final locale in AppLocale.values)
@@ -881,7 +881,7 @@ final class _BusinessShellState extends State<BusinessShell> {
                         unawaited(widget.localeController.setLocale(locale));
                       },
                     ),
-                    const SizedBox(height: UcraftSpacing.space4),
+                    const SizedBox(height: UcraftSpacing.space2),
                     UcraftButton(
                       label: isDark
                           ? strings.themeLightLabel
@@ -897,7 +897,7 @@ final class _BusinessShellState extends State<BusinessShell> {
                       },
                     ),
                     if (widget.healthService != null) ...[
-                      const SizedBox(height: UcraftSpacing.space3),
+                      const SizedBox(height: UcraftSpacing.space2),
                       UcraftButton(
                         label: strings.checkHealth,
                         variant: UcraftButtonVariant.secondary,
@@ -906,7 +906,7 @@ final class _BusinessShellState extends State<BusinessShell> {
                         onPressed: _runHealthCheck,
                       ),
                       if (_healthOk != null) ...[
-                        const SizedBox(height: UcraftSpacing.space3),
+                        const SizedBox(height: UcraftSpacing.space2),
                         Align(
                           alignment: Alignment.centerLeft,
                           child: UcraftStatusPill(
@@ -924,7 +924,7 @@ final class _BusinessShellState extends State<BusinessShell> {
                       ],
                     ],
                     if (widget.authController != null) ...[
-                      const SizedBox(height: UcraftSpacing.space3),
+                      const SizedBox(height: UcraftSpacing.space2),
                       UcraftButton(
                         label: strings.signOutLabel,
                         variant: UcraftButtonVariant.destructive,

@@ -131,14 +131,14 @@ final class _AuthFlowScreenState extends State<AuthFlowScreen> {
                       const SizedBox(height: UcraftSpacing.space2),
                       Text(
                         _subtitleFor(controller.step, strings),
-                        style: UcraftTypography.bodyLarge.copyWith(
+                        style: BusinessTypography.bodyLarge.copyWith(
                           color: BusinessTheme.canvasText(
                             context,
                             secondary: true,
                           ),
                         ),
                       ),
-                      const SizedBox(height: UcraftSpacing.sectionGap),
+                      const SizedBox(height: UcraftSpacing.space3),
                       if (controller.infoMessage != null) ...[
                         _FeedbackBanner(
                           message: controller.infoMessage!,

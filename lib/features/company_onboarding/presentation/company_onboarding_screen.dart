@@ -1,11 +1,13 @@
 import 'dart:async';
 
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:ugym_core/ugym_core.dart';
 
 import '../../../core/l10n/business_localizations.dart';
 import '../../../core/session/business_role.dart';
 import '../../../core/session/business_session_controller.dart';
+import '../../../core/theme/business_typography.dart';
 import '../domain/company_onboarding_models.dart';
 
 /// Onboarding form allowing a user without a company to start a 14-day trial.
@@ -115,7 +117,7 @@ final class _CompanyOnboardingCardState extends State<CompanyOnboardingCard> {
         children: [
           Text(
             strings.onboardingTitle,
-            style: UcraftTypography.title.copyWith(color: colors.foreground),
+            style: BusinessTypography.title.copyWith(color: colors.foreground),
           ),
           const SizedBox(height: UcraftSpacing.space2),
           Text(
@@ -138,7 +140,7 @@ final class _CompanyOnboardingCardState extends State<CompanyOnboardingCard> {
               ),
               child: Text(
                 _errorMessage!,
-                style: UcraftTypography.bodyMedium.copyWith(
+                style: BusinessTypography.bodyMedium.copyWith(
                   color: colors.destructiveForeground,
                 ),
               ),
@@ -153,7 +155,7 @@ final class _CompanyOnboardingCardState extends State<CompanyOnboardingCard> {
             enabled: !_isSubmitting,
             errorText: _fieldErrors['company_name']?.first,
           ),
-          const SizedBox(height: UcraftSpacing.formFieldGap),
+          const SizedBox(height: UcraftSpacing.space2),
           UcraftTextField(
             key: const ValueKey<String>('onboarding_gym_name'),
             label: strings.onboardingGymNameLabel,
@@ -162,7 +164,7 @@ final class _CompanyOnboardingCardState extends State<CompanyOnboardingCard> {
             enabled: !_isSubmitting,
             errorText: _fieldErrors['gym_name']?.first,
           ),
-          const SizedBox(height: UcraftSpacing.formFieldGap),
+          const SizedBox(height: UcraftSpacing.space2),
           UcraftTextField(
             key: const ValueKey<String>('onboarding_gym_address'),
             label: strings.onboardingGymAddressLabel,
@@ -412,6 +414,10 @@ final class _CompanyBranchesAndCurrencyCardState
       BusinessPermission.changeCompanyCurrency,
     );
 
+    final activeCurrency = _currencies
+        .where((currency) => currency.code == _activeCurrencyCode)
+        .firstOrNull;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -425,12 +431,12 @@ final class _CompanyBranchesAndCurrencyCardState
             ),
             child: Text(
               _statusMessage!,
-              style: UcraftTypography.bodyMedium.copyWith(
+              style: BusinessTypography.bodyMedium.copyWith(
                 color: colors.successForeground,
               ),
             ),
           ),
-          const SizedBox(height: UcraftSpacing.space4),
+          const SizedBox(height: UcraftSpacing.space2),
         ],
         if (_errorMessage != null) ...[
           Container(
@@ -442,12 +448,12 @@ final class _CompanyBranchesAndCurrencyCardState
             ),
             child: Text(
               _errorMessage!,
-              style: UcraftTypography.bodyMedium.copyWith(
+              style: BusinessTypography.bodyMedium.copyWith(
                 color: colors.destructiveForeground,
               ),
             ),
           ),
-          const SizedBox(height: UcraftSpacing.space4),
+          const SizedBox(height: UcraftSpacing.space2),
         ],
         UcraftCard(
           child: Column(
@@ -457,11 +463,11 @@ final class _CompanyBranchesAndCurrencyCardState
                 _editingGymId == null
                     ? strings.branchesAddTitle
                     : strings.branchesEditTitle,
-                style: UcraftTypography.title.copyWith(
+                style: BusinessTypography.title.copyWith(
                   color: colors.foreground,
                 ),
               ),
-              const SizedBox(height: UcraftSpacing.space4),
+              const SizedBox(height: UcraftSpacing.space2),
               for (final branch in _branches) ...[
                 UcraftCard(
                   onTap: canMutateGyms ? () => _startEdit(branch) : null,
@@ -474,7 +480,7 @@ final class _CompanyBranchesAndCurrencyCardState
                           children: [
                             Text(
                               branch.name,
-                              style: UcraftTypography.bodyMedium.copyWith(
+                              style: BusinessTypography.bodyMedium.copyWith(
                                 color: colors.foreground,
                               ),
                             ),
@@ -508,7 +514,7 @@ final class _CompanyBranchesAndCurrencyCardState
                 controller: _nameController,
                 enabled: canMutateGyms && !_submitting,
               ),
-              const SizedBox(height: UcraftSpacing.formFieldGap),
+              const SizedBox(height: UcraftSpacing.space2),
               UcraftTextField(
                 key: const ValueKey<String>('gym_branch_address'),
                 label: strings.branchesAddressLabel,
@@ -520,7 +526,7 @@ final class _CompanyBranchesAndCurrencyCardState
                 contentPadding: EdgeInsets.zero,
                 title: Text(
                   strings.branchesGeoCheckSwitch,
-                  style: UcraftTypography.bodyMedium.copyWith(
+                  style: BusinessTypography.bodyMedium.copyWith(
                     color: colors.foreground,
                   ),
                 ),
@@ -543,7 +549,7 @@ final class _CompanyBranchesAndCurrencyCardState
                   enabled: canMutateGyms && !_submitting,
                 ),
               ],
-              const SizedBox(height: UcraftSpacing.space4),
+              const SizedBox(height: UcraftSpacing.space2),
               UcraftButton(
                 label: _editingGymId == null
                     ? strings.branchesAddTitle
@@ -564,35 +570,45 @@ final class _CompanyBranchesAndCurrencyCardState
             ],
           ),
         ),
-        const SizedBox(height: UcraftSpacing.space4),
+        const SizedBox(height: UcraftSpacing.space2),
         UcraftCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                strings.companyCurrencyTitle,
-                style: UcraftTypography.title.copyWith(
+          child: DropdownButtonHideUnderline(
+            child: InputDecorator(
+              decoration: const InputDecoration(
+                isDense: true,
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: UcraftSpacing.space3,
+                ),
+                constraints: BoxConstraints(minHeight: UcraftSpacing.space12),
+              ),
+              child: DropdownButton<CurrencyOption>(
+                key: const ValueKey('company_currency'),
+                value: activeCurrency,
+                hint: Text(strings.companyCurrencyTitle),
+                icon: const Icon(LucideIcons.chevronDown, size: 16),
+                style: BusinessTypography.bodyMedium.copyWith(
                   color: colors.foreground,
                 ),
-              ),
-              const SizedBox(height: UcraftSpacing.space3),
-              Wrap(
-                spacing: UcraftSpacing.space2,
-                runSpacing: UcraftSpacing.space2,
-                children: [
+                isExpanded: true,
+                items: [
                   for (final currency in _currencies)
-                    UcraftButton(
-                      label: '${currency.code} (${currency.name})',
-                      variant: _activeCurrencyCode == currency.code
-                          ? UcraftButtonVariant.primary
-                          : UcraftButtonVariant.secondary,
-                      onPressed: canMutateCurrency && !_submitting
-                          ? () => _selectCurrency(currency)
-                          : null,
+                    DropdownMenuItem(
+                      value: currency,
+                      child: Text(
+                        '${currency.code} (${currency.name})',
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                 ],
+                onChanged: canMutateCurrency && !_submitting
+                    ? (currency) {
+                        if (currency != null) {
+                          unawaited(_selectCurrency(currency));
+                        }
+                      }
+                    : null,
               ),
-            ],
+            ),
           ),
         ),
       ],
