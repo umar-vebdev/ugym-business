@@ -366,7 +366,7 @@ final class _BusinessShellState extends State<BusinessShell> {
     bool isDark,
   ) {
     final body = switch (destination) {
-      BusinessDestination.overview => _buildOverview(context, strings),
+      BusinessDestination.overview => _buildOverview(context),
       BusinessDestination.operations => _buildOperations(context, strings),
       BusinessDestination.members => _buildMembers(context, strings),
       BusinessDestination.analytics =>
@@ -386,12 +386,12 @@ final class _BusinessShellState extends State<BusinessShell> {
     }
 
     return BusinessPageSurface(
-      padding: const EdgeInsets.all(UcraftSpacing.space3),
+      padding: const EdgeInsets.all(UcraftSpacing.space2),
       child: body,
     );
   }
 
-  Widget _buildOverview(BuildContext context, BusinessStrings strings) {
+  Widget _buildOverview(BuildContext context) {
     final role = widget.sessionController.role;
     if (role == BusinessRole.noCompany && widget.onboardingRepository != null) {
       return CompanyOnboardingCard(
@@ -411,7 +411,6 @@ final class _BusinessShellState extends State<BusinessShell> {
         (role == BusinessRole.owner || role == BusinessRole.admin);
 
     return OverviewDashboardView(
-      appTitle: strings.appTitle,
       sessionController: widget.sessionController,
       analyticsRepository: widget.analyticsAndBillingRepository,
       salesRepository: salesRepo,
@@ -484,7 +483,7 @@ final class _BusinessShellState extends State<BusinessShell> {
           selected: _membersTab,
           onSelected: (tab) => setState(() => _membersTab = tab),
         ),
-        const SizedBox(height: UcraftSpacing.space4),
+        const SizedBox(height: UcraftSpacing.space2),
         switch (_membersTab) {
           _MembersSubTab.clients when clientsRepo != null => ClientsListScreen(
             repository: clientsRepo,
@@ -585,50 +584,64 @@ final class _BusinessShellState extends State<BusinessShell> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (showReceptionCard) ...[
-          if (visitsRepo != null)
-            UcraftButton(
-              label: strings.scanClientQrButton,
-              leadingIcon: LucideIcons.qrCode,
-              fullWidth: true,
-              onPressed: canScan
-                  ? () => unawaited(
-                      _openClientScanner(context, visitsRepo, selectedGym.id),
-                    )
-                  : null,
+        if (showReceptionCard)
+          UcraftCard(
+            padding: const EdgeInsets.symmetric(
+              horizontal: UcraftSpacing.space2,
             ),
-          if (canOpenKiosk || canPos) ...[
-            if (visitsRepo != null)
-              const SizedBox(height: UcraftSpacing.space2),
-            Wrap(
-              spacing: UcraftSpacing.space2,
-              runSpacing: UcraftSpacing.space2,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                if (canOpenKiosk)
+                if (visitsRepo != null)
                   UcraftButton(
-                    label: strings.kioskQrButton,
-                    leadingIcon: LucideIcons.monitorSmartphone,
-                    variant: UcraftButtonVariant.secondary,
-                    onPressed: () => unawaited(
-                      _openKiosk(context, visitsRepo, selectedGym.id),
-                    ),
+                    label: strings.scanClientQrButton,
+                    leadingIcon: LucideIcons.qrCode,
+                    fullWidth: true,
+                    onPressed: canScan
+                        ? () => unawaited(
+                            _openClientScanner(
+                              context,
+                              visitsRepo,
+                              selectedGym.id,
+                            ),
+                          )
+                        : null,
                   ),
-                if (canPos)
-                  UcraftButton(
-                    label: strings.openPosButton,
-                    leadingIcon: LucideIcons.shoppingBag,
-                    variant: UcraftButtonVariant.secondary,
-                    onPressed: () => unawaited(
-                      _openPosCheckout(context, salesRepo, membershipsRepo),
-                    ),
+                if (canOpenKiosk || canPos) ...[
+                  Wrap(
+                    spacing: UcraftSpacing.space2,
+                    runSpacing: UcraftSpacing.space2,
+                    children: [
+                      if (canOpenKiosk)
+                        UcraftButton(
+                          label: strings.kioskQrButton,
+                          leadingIcon: LucideIcons.monitorSmartphone,
+                          variant: UcraftButtonVariant.secondary,
+                          onPressed: () => unawaited(
+                            _openKiosk(context, visitsRepo, selectedGym.id),
+                          ),
+                        ),
+                      if (canPos)
+                        UcraftButton(
+                          label: strings.openPosButton,
+                          leadingIcon: LucideIcons.shoppingBag,
+                          variant: UcraftButtonVariant.secondary,
+                          onPressed: () => unawaited(
+                            _openPosCheckout(
+                              context,
+                              salesRepo,
+                              membershipsRepo,
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
+                ],
               ],
             ),
-          ],
-        ],
+          ),
         if (showTabBar && availableTabs.isNotEmpty) ...[
-          if (showReceptionCard)
-            const SizedBox(height: UcraftSpacing.sectionGap),
+          if (showReceptionCard) const SizedBox(height: UcraftSpacing.space2),
           UcraftSegmentedTabs<_OperationsSubTab>(
             items: [
               if (visitsRepo != null)
@@ -665,7 +678,7 @@ final class _BusinessShellState extends State<BusinessShell> {
             onSelected: (tab) => setState(() => _operationsTab = tab),
           ),
         ],
-        const SizedBox(height: UcraftSpacing.space4),
+        const SizedBox(height: UcraftSpacing.space2),
         switch (effectiveTab) {
           _OperationsSubTab.visits when visitsRepo != null => VisitsLogScreen(
             repository: visitsRepo,

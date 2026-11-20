@@ -139,7 +139,6 @@ final class _ClientsListScreenState extends State<ClientsListScreen> {
     return ListenableBuilder(
       listenable: widget.sessionController,
       builder: (context, _) {
-        final colors = context.ucraftColors;
         final strings = BusinessStringsScope.of(context);
         final canMutate = widget.sessionController.canMutate(
           BusinessPermission.manageClientsCrm,
@@ -151,59 +150,56 @@ final class _ClientsListScreenState extends State<ClientsListScreen> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Wrap(
-              spacing: UcraftSpacing.space2,
-              runSpacing: UcraftSpacing.space2,
-              alignment: WrapAlignment.spaceBetween,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: [
-                Text(
-                  strings.subTabClients,
-                  style: UcraftTypography.title.copyWith(
-                    color: colors.foreground,
-                  ),
-                ),
-                Wrap(
-                  spacing: UcraftSpacing.space2,
-                  children: [
-                    if (canMerge)
-                      UcraftButton(
-                        label: strings.clientsMergeDuplicatesButton,
-                        variant: UcraftButtonVariant.secondary,
-                        onPressed: () => unawaited(_openMergeDialog()),
+            UcraftCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Expanded(
+                        child: UcraftTextField(
+                          controller: _searchController,
+                          label: strings.clientsSearchLabel,
+                          hintText: strings.clientsSearchHint,
+                          onSubmitted: (_) =>
+                              unawaited(_loadClients(reset: true)),
+                        ),
                       ),
-                    UcraftButton(
-                      label: strings.clientsAddButton,
-                      onPressed: canMutate
-                          ? () => unawaited(_openCreateClient())
-                          : null,
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            const SizedBox(height: UcraftSpacing.space3),
-            Row(
-              children: [
-                Expanded(
-                  child: UcraftTextField(
-                    controller: _searchController,
-                    label: strings.clientsSearchLabel,
-                    hintText: strings.clientsSearchHint,
-                    onSubmitted: (_) => unawaited(_loadClients(reset: true)),
+                      const SizedBox(width: UcraftSpacing.space2),
+                      UcraftButton(
+                        label: strings.clientsFindButton,
+                        variant: UcraftButtonVariant.secondary,
+                        onPressed: _loading
+                            ? null
+                            : () => unawaited(_loadClients(reset: true)),
+                      ),
+                    ],
                   ),
-                ),
-                const SizedBox(width: UcraftSpacing.space2),
-                UcraftButton(
-                  label: strings.clientsFindButton,
-                  variant: UcraftButtonVariant.secondary,
-                  onPressed: _loading
-                      ? null
-                      : () => unawaited(_loadClients(reset: true)),
-                ),
-              ],
+                  const SizedBox(height: UcraftSpacing.space1),
+                  Wrap(
+                    spacing: UcraftSpacing.space1,
+                    alignment: WrapAlignment.end,
+                    children: [
+                      if (canMerge)
+                        UcraftButton(
+                          label: strings.clientsMergeDuplicatesButton,
+                          variant: UcraftButtonVariant.tertiary,
+                          onPressed: () => unawaited(_openMergeDialog()),
+                        ),
+                      UcraftButton(
+                        label: strings.clientsAddButton,
+                        leadingIcon: LucideIcons.plus,
+                        onPressed: canMutate
+                            ? () => unawaited(_openCreateClient())
+                            : null,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: UcraftSpacing.space3),
+            const SizedBox(height: UcraftSpacing.space2),
             if (_loading)
               const UcraftLoadingState(isSkeleton: true, skeletonCount: 4)
             else if (_errorMessage != null && _clients.isEmpty)
@@ -275,8 +271,8 @@ final class _ClientRow extends StatelessWidget {
     return UcraftListRow(
       onTap: onTap,
       leading: Container(
-        width: UcraftSpacing.space10,
-        height: UcraftSpacing.space10,
+        width: UcraftSpacing.space8,
+        height: UcraftSpacing.space8,
         decoration: BoxDecoration(
           color: colors.primarySubtle,
           borderRadius: UcraftRadius.borderFull,
@@ -295,14 +291,17 @@ final class _ClientRow extends StatelessWidget {
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          UcraftStatusPill(
-            icon: client.linked ? LucideIcons.link2 : LucideIcons.user,
-            label: client.linked
-                ? strings.clientLinkedBadge
-                : strings.clientOfflineBadge,
-            tone: client.linked
-                ? UcraftStatusTone.success
-                : UcraftStatusTone.neutral,
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 116),
+            child: UcraftStatusPill(
+              icon: client.linked ? LucideIcons.link2 : LucideIcons.user,
+              label: client.linked
+                  ? strings.clientLinkedBadge
+                  : strings.clientOfflineBadge,
+              tone: client.linked
+                  ? UcraftStatusTone.success
+                  : UcraftStatusTone.neutral,
+            ),
           ),
           if (onTap != null) ...[
             const SizedBox(width: UcraftSpacing.space2),

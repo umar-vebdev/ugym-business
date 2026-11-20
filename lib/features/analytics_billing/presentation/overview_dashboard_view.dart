@@ -17,7 +17,6 @@ import '../domain/analytics_and_billing_models.dart';
 final class OverviewDashboardView extends StatefulWidget {
   const OverviewDashboardView({
     super.key,
-    required this.appTitle,
     required this.sessionController,
     this.analyticsRepository,
     this.salesRepository,
@@ -31,7 +30,6 @@ final class OverviewDashboardView extends StatefulWidget {
     this.clock,
   });
 
-  final String appTitle;
   final BusinessSessionController sessionController;
   final AnalyticsAndBillingRepository? analyticsRepository;
   final SalesAndRequestsRepository? salesRepository;
@@ -236,9 +234,8 @@ final class _OverviewDashboardViewState extends State<OverviewDashboardView> {
               gymName: gymName,
             ),
             if (widget.onOpenScanner != null) ...[
-              const SizedBox(height: UcraftSpacing.space4),
+              const SizedBox(height: UcraftSpacing.space2),
               BusinessPageSurface(
-                padding: const EdgeInsets.all(UcraftSpacing.space2),
                 child: UcraftButton(
                   label: strings.scanClientQrButton,
                   leadingIcon: LucideIcons.qrCode,
@@ -249,8 +246,10 @@ final class _OverviewDashboardViewState extends State<OverviewDashboardView> {
             ],
             if (hasSecondaryActions || _hasAnyDataSource) ...[
               const SizedBox(height: UcraftSpacing.space2),
-              BusinessPageSurface(
-                padding: const EdgeInsets.all(UcraftSpacing.space2),
+              UcraftCard(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: UcraftSpacing.space2,
+                ),
                 child: Wrap(
                   spacing: UcraftSpacing.space2,
                   runSpacing: UcraftSpacing.space2,
@@ -282,7 +281,7 @@ final class _OverviewDashboardViewState extends State<OverviewDashboardView> {
               ),
             ],
             if (_hasAnyDataSource) ...[
-              const SizedBox(height: UcraftSpacing.sectionGap),
+              const SizedBox(height: UcraftSpacing.space3),
               if (_loading &&
                   _overview == null &&
                   _pendingRequestsCount == null &&
@@ -315,7 +314,12 @@ final class _OverviewDashboardViewState extends State<OverviewDashboardView> {
   }) {
     final colors = context.ucraftColors;
     final overview = _overview;
-    final roleLabel = role?.name ?? strings.roleUnset;
+    final roleLabel = switch (role) {
+      BusinessRole.owner => strings.staffRoleOwner,
+      BusinessRole.admin => strings.staffRoleAdmin,
+      BusinessRole.trainer => strings.staffRoleTrainer,
+      _ => strings.roleUnset,
+    };
 
     return UcraftCard(
       variant: UcraftCardVariant.highlight,
@@ -326,33 +330,28 @@ final class _OverviewDashboardViewState extends State<OverviewDashboardView> {
             children: [
               Expanded(
                 child: Text(
-                  widget.appTitle.toUpperCase(),
-                  style: UcraftTypography.overline.copyWith(
-                    color: colors.foregroundMuted,
+                  gymName,
+                  style: BusinessTypography.titleLarge.copyWith(
+                    color: colors.foreground,
                   ),
                 ),
               ),
-              UcraftStatusPill(
-                icon: LucideIcons.shieldCheck,
-                label: '${strings.roleLabel}: $roleLabel',
-                tone: UcraftStatusTone.info,
+              const SizedBox(width: UcraftSpacing.space2),
+              Flexible(
+                child: UcraftStatusPill(
+                  icon: LucideIcons.shieldCheck,
+                  label: roleLabel,
+                  tone: UcraftStatusTone.info,
+                ),
               ),
             ],
           ),
-          const SizedBox(height: UcraftSpacing.space1),
-          Text(
-            gymName,
-            style: UcraftTypography.titleLarge.copyWith(
-              color: colors.foreground,
-            ),
-          ),
           if (overview != null) ...[
-            const SizedBox(height: UcraftSpacing.space4),
+            const SizedBox(height: UcraftSpacing.space2),
             _buildOwnerKpiStrip(context, overview, strings),
             if (widget.onOpenAnalytics != null) ...[
-              const SizedBox(height: UcraftSpacing.space2),
               Align(
-                alignment: Alignment.centerLeft,
+                alignment: Alignment.centerRight,
                 child: UcraftButton(
                   label: strings.openAnalyticsButton,
                   variant: UcraftButtonVariant.tertiary,
@@ -390,82 +389,99 @@ final class _OverviewDashboardViewState extends State<OverviewDashboardView> {
       alwaysShowDecimals: false,
     );
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final metricRevenue = Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    final captions = UcraftTypography.caption.copyWith(
+      color: colors.foregroundSecondary,
+    );
+    final amounts = BusinessTypography.amount.copyWith(
+      color: colors.foreground,
+    );
+    final metrics = <(int, String)>[
+      (visits.totalVisits, strings.visitsTodayTitle),
+      if (_pendingRequestsCount case final pending?)
+        (pending, strings.subTabRequests),
+      if (_expiringMembershipsCount case final expiring?)
+        (expiring, strings.subTabExpiring),
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(strings.revenueTodayTitle, style: captions),
+        Text(
+          total,
+          style: BusinessTypography.amountLarge.copyWith(
+            color: colors.foreground,
+          ),
+        ),
+        Wrap(
+          spacing: UcraftSpacing.space2,
           children: [
             Text(
-              strings.revenueTodayTitle,
-              style: UcraftTypography.caption.copyWith(
-                color: colors.foregroundSecondary,
-              ),
+              '${strings.receiptsCountLabel}: ${revenue.salesCount}',
+              style: captions,
             ),
-            const SizedBox(height: UcraftSpacing.space1),
-            Text(
-              total,
-              style: BusinessTypography.amountLarge.copyWith(
-                color: colors.foreground,
-              ),
-            ),
-            const SizedBox(height: UcraftSpacing.space1),
-            Text(
-              '${strings.receiptsCountLabel}: ${revenue.salesCount} • ${strings.membershipsLabel}: $memberships • ${strings.subTabProducts}: $products',
-              style: UcraftTypography.caption.copyWith(
-                color: colors.foregroundSecondary,
-              ),
-            ),
+            Text('${strings.membershipsLabel}: $memberships', style: captions),
+            Text('${strings.subTabProducts}: $products', style: captions),
           ],
-        );
-
-        final metricVisits = Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        ),
+        const SizedBox(height: UcraftSpacing.space2),
+        DecoratedBox(
+          decoration: BoxDecoration(
+            color: colors.surfaceSecondary,
+            borderRadius: UcraftRadius.borderSm,
+            border: Border.all(color: colors.border),
+          ),
+          child: IntrinsicHeight(
+            child: Row(
+              children: [
+                for (final (index, metric) in metrics.indexed) ...[
+                  if (index != 0)
+                    VerticalDivider(
+                      width: UcraftElevation.dividerWidth,
+                      color: colors.border,
+                      indent: UcraftSpacing.space2,
+                      endIndent: UcraftSpacing.space2,
+                    ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: UcraftSpacing.space1,
+                        vertical: UcraftSpacing.space2,
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('${metric.$1}', style: amounts),
+                          Text(
+                            metric.$2,
+                            style: captions,
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: UcraftSpacing.space1),
+        Wrap(
+          spacing: UcraftSpacing.space2,
           children: [
+            Text('QR: ${visits.qrVisits}', style: captions),
             Text(
-              strings.visitsTodayTitle,
-              style: UcraftTypography.caption.copyWith(
-                color: colors.foregroundSecondary,
-              ),
+              '${strings.manualVisitsLabel}: ${visits.manualVisits}',
+              style: captions,
             ),
-            const SizedBox(height: UcraftSpacing.space1),
             Text(
-              '${visits.totalVisits}',
-              style: UcraftTypography.headline.copyWith(
-                fontFamily: UcraftTypography.monoFontFamily,
-                fontFeatures: const [FontFeature.tabularFigures()],
-                color: colors.foreground,
-              ),
-            ),
-            const SizedBox(height: UcraftSpacing.space1),
-            Text(
-              'QR: ${visits.qrVisits} • ${strings.manualVisitsLabel}: ${visits.manualVisits} • ${strings.newClientsLabel}: ${clients.newClients}',
-              style: UcraftTypography.caption.copyWith(
-                color: colors.foregroundSecondary,
-              ),
+              '${strings.newClientsLabel}: ${clients.newClients}',
+              style: captions,
             ),
           ],
-        );
-
-        if (constraints.maxWidth >= 520) {
-          return Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(child: metricRevenue),
-              const SizedBox(width: UcraftSpacing.space4),
-              Expanded(child: metricVisits),
-            ],
-          );
-        }
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            metricRevenue,
-            const SizedBox(height: UcraftSpacing.space3),
-            metricVisits,
-          ],
-        );
-      },
+        ),
+      ],
     );
   }
 
@@ -510,7 +526,7 @@ final class _OverviewDashboardViewState extends State<OverviewDashboardView> {
     }
 
     return BusinessPageSurface(
-      padding: const EdgeInsets.all(UcraftSpacing.space3),
+      padding: const EdgeInsets.all(UcraftSpacing.space2),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -533,16 +549,15 @@ final class _OverviewDashboardViewState extends State<OverviewDashboardView> {
   }) {
     final bool warn = count > 0;
     return UcraftListRow(
-      monoLeadingWidth: true,
       onTap: onAction,
-      leading: Text(
-        '$count',
-        style: UcraftTypography.headline.copyWith(
-          fontFamily: UcraftTypography.monoFontFamily,
-          fontFeatures: const [FontFeature.tabularFigures()],
-          color: warn ? colors.warning : colors.foreground,
-        ),
-      ),
+      leading: _overview == null
+          ? Text(
+              '$count',
+              style: BusinessTypography.amount.copyWith(
+                color: warn ? colors.warning : colors.foreground,
+              ),
+            )
+          : null,
       title: title,
       subtitle: subtitle,
       trailing: actionLabel != null && onAction != null

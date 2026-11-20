@@ -221,7 +221,7 @@ final class _VisitsLogScreenState extends State<VisitsLogScreen> {
                 ),
               ),
             ],
-            const SizedBox(height: UcraftSpacing.space3),
+            const SizedBox(height: UcraftSpacing.space2),
             if (_loading)
               const UcraftLoadingState(isSkeleton: true, skeletonCount: 4)
             else if (_errorMessage != null && _visits.isEmpty)
@@ -233,10 +233,12 @@ final class _VisitsLogScreenState extends State<VisitsLogScreen> {
                 onRetry: () => unawaited(_loadVisits()),
               )
             else if (_visits.isEmpty)
-              UcraftEmptyState(
-                icon: LucideIcons.calendarCheck,
-                title: strings.visitsEmptyTitle,
-                description: strings.visitsEmptyDesc,
+              UcraftCard(
+                child: UcraftEmptyState(
+                  icon: LucideIcons.calendarCheck,
+                  title: strings.visitsEmptyTitle,
+                  description: strings.visitsEmptyDesc,
+                ),
               )
             else
               UcraftListSection(

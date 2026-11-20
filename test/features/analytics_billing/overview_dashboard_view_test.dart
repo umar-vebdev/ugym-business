@@ -3,6 +3,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:ugym_business/core/session/business_role.dart';
 import 'package:ugym_business/core/session/business_session_controller.dart';
 import 'package:ugym_business/core/storage/app_preferences.dart';
+import 'package:ugym_business/core/theme/business_theme.dart';
 import 'package:ugym_business/features/analytics_billing/domain/analytics_and_billing_models.dart';
 import 'package:ugym_business/features/analytics_billing/presentation/analytics_and_billing_screens.dart';
 import 'package:ugym_business/features/analytics_billing/presentation/overview_dashboard_view.dart';
@@ -401,7 +402,6 @@ void main() {
           home: Scaffold(
             body: SingleChildScrollView(
               child: OverviewDashboardView(
-                appTitle: 'uGym Business',
                 sessionController: session,
                 analyticsRepository: analyticsRepo,
                 salesRepository: salesRepo,
@@ -439,6 +439,8 @@ void main() {
   testWidgets(
     'OverviewDashboardView follows uCraft 1.1: single highlight hero card, single Primary CTA, status pill, and UcraftListSection',
     (tester) async {
+      await tester.binding.setSurfaceSize(const Size(360, 780));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
       final prefs = AppPreferences(storage: InMemoryTokenStorage());
       final session = BusinessSessionController(
         preferences: prefs,
@@ -449,11 +451,10 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          theme: UcraftTheme.light(),
+          theme: BusinessTheme.light,
           home: Scaffold(
             body: SingleChildScrollView(
               child: OverviewDashboardView(
-                appTitle: 'uGym Business',
                 sessionController: session,
                 analyticsRepository: _FakeAnalyticsRepo(),
                 salesRepository: _FakeSalesRepo(),
@@ -489,6 +490,11 @@ void main() {
       expect(primaryButtons, hasLength(1));
       expect(primaryButtons.single.label, 'Сканер QR клиента');
       expect(primaryButtons.single.fullWidth, isTrue);
+      expect(
+        tester.getBottomLeft(find.text('Открыть кассу')).dy,
+        lessThan(510),
+      );
+      expect(tester.takeException(), isNull);
     },
   );
 }
