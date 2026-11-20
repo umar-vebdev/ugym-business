@@ -36,6 +36,8 @@ import '../config/app_config.dart';
 import '../l10n/business_localizations.dart';
 import '../session/business_role.dart';
 import '../session/business_session_controller.dart';
+import '../theme/business_page_surface.dart';
+import '../theme/business_theme.dart';
 import '../theme/theme_controller.dart';
 import 'role_guard_and_banners.dart';
 
@@ -221,7 +223,7 @@ final class _BusinessShellState extends State<BusinessShell> {
                             Text(
                               _labelFor(activeDestination, strings),
                               style: UcraftTypography.headline.copyWith(
-                                color: colors.foreground,
+                                color: BusinessTheme.canvasText(context),
                               ),
                             ),
                             if (widget.sessionController.canView(
@@ -324,7 +326,7 @@ final class _BusinessShellState extends State<BusinessShell> {
     BusinessStrings strings,
     bool isDark,
   ) {
-    return switch (destination) {
+    final body = switch (destination) {
       BusinessDestination.overview => _buildOverview(context, strings),
       BusinessDestination.operations => _buildOperations(context, strings),
       BusinessDestination.members => _buildMembers(context, strings),
@@ -340,6 +342,14 @@ final class _BusinessShellState extends State<BusinessShell> {
               ),
       BusinessDestination.more => _buildMore(context, strings, isDark),
     };
+    if (destination == BusinessDestination.overview) {
+      return body;
+    }
+
+    return BusinessPageSurface(
+      padding: const EdgeInsets.all(UcraftSpacing.space3),
+      child: body,
+    );
   }
 
   Widget _buildOverview(BuildContext context, BusinessStrings strings) {

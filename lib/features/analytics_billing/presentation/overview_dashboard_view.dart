@@ -7,6 +7,7 @@ import 'package:ugym_core/ugym_core.dart';
 import '../../../core/l10n/business_localizations.dart';
 import '../../../core/session/business_role.dart';
 import '../../../core/session/business_session_controller.dart';
+import '../../../core/theme/business_page_surface.dart';
 import '../../../core/theme/business_typography.dart';
 import '../../memberships/domain/memberships_models.dart';
 import '../../sales/domain/sales_and_requests_models.dart';
@@ -236,42 +237,48 @@ final class _OverviewDashboardViewState extends State<OverviewDashboardView> {
             ),
             if (widget.onOpenScanner != null) ...[
               const SizedBox(height: UcraftSpacing.space4),
-              UcraftButton(
-                label: strings.scanClientQrButton,
-                leadingIcon: LucideIcons.qrCode,
-                fullWidth: true,
-                onPressed: canScan ? widget.onOpenScanner : null,
+              BusinessPageSurface(
+                padding: const EdgeInsets.all(UcraftSpacing.space2),
+                child: UcraftButton(
+                  label: strings.scanClientQrButton,
+                  leadingIcon: LucideIcons.qrCode,
+                  fullWidth: true,
+                  onPressed: canScan ? widget.onOpenScanner : null,
+                ),
               ),
             ],
             if (hasSecondaryActions || _hasAnyDataSource) ...[
               const SizedBox(height: UcraftSpacing.space2),
-              Wrap(
-                spacing: UcraftSpacing.space2,
-                runSpacing: UcraftSpacing.space2,
-                alignment: WrapAlignment.spaceBetween,
-                children: [
-                  if (widget.onOpenKiosk != null)
-                    UcraftButton(
-                      label: strings.kioskQrButton,
-                      leadingIcon: LucideIcons.monitorSmartphone,
-                      variant: UcraftButtonVariant.secondary,
-                      onPressed: widget.onOpenKiosk,
-                    ),
-                  if (canPos)
-                    UcraftButton(
-                      label: strings.openPosButton,
-                      leadingIcon: LucideIcons.shoppingBag,
-                      variant: UcraftButtonVariant.secondary,
-                      onPressed: widget.onOpenPos,
-                    ),
-                  if (_hasAnyDataSource)
-                    UcraftButton(
-                      label: strings.refreshLabel,
-                      variant: UcraftButtonVariant.tertiary,
-                      isLoading: _loading,
-                      onPressed: _loading ? null : () => unawaited(_load()),
-                    ),
-                ],
+              BusinessPageSurface(
+                padding: const EdgeInsets.all(UcraftSpacing.space2),
+                child: Wrap(
+                  spacing: UcraftSpacing.space2,
+                  runSpacing: UcraftSpacing.space2,
+                  alignment: WrapAlignment.spaceBetween,
+                  children: [
+                    if (widget.onOpenKiosk != null)
+                      UcraftButton(
+                        label: strings.kioskQrButton,
+                        leadingIcon: LucideIcons.monitorSmartphone,
+                        variant: UcraftButtonVariant.secondary,
+                        onPressed: widget.onOpenKiosk,
+                      ),
+                    if (canPos)
+                      UcraftButton(
+                        label: strings.openPosButton,
+                        leadingIcon: LucideIcons.shoppingBag,
+                        variant: UcraftButtonVariant.secondary,
+                        onPressed: widget.onOpenPos,
+                      ),
+                    if (_hasAnyDataSource)
+                      UcraftButton(
+                        label: strings.refreshLabel,
+                        variant: UcraftButtonVariant.tertiary,
+                        isLoading: _loading,
+                        onPressed: _loading ? null : () => unawaited(_load()),
+                      ),
+                  ],
+                ),
               ),
             ],
             if (_hasAnyDataSource) ...[
@@ -282,12 +289,14 @@ final class _OverviewDashboardViewState extends State<OverviewDashboardView> {
                   _expiringMembershipsCount == null)
                 const UcraftLoadingState(isSkeleton: true, skeletonCount: 2)
               else if (_errorMessage != null)
-                UcraftErrorState(
-                  icon: LucideIcons.circleAlert,
-                  title: strings.overviewErrorTitle,
-                  message: _errorMessage!,
-                  retryLabel: strings.retryLabel,
-                  onRetry: () => unawaited(_load()),
+                BusinessPageSurface(
+                  child: UcraftErrorState(
+                    icon: LucideIcons.circleAlert,
+                    title: strings.overviewErrorTitle,
+                    message: _errorMessage!,
+                    retryLabel: strings.retryLabel,
+                    onRetry: () => unawaited(_load()),
+                  ),
                 )
               else
                 _buildOperationalSection(context, strings, colors),
@@ -500,13 +509,16 @@ final class _OverviewDashboardViewState extends State<OverviewDashboardView> {
       return const SizedBox.shrink();
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        UcraftSectionHeader(title: strings.quickActionsTitle),
-        const SizedBox(height: UcraftSpacing.space2),
-        UcraftListSection(children: rows),
-      ],
+    return BusinessPageSurface(
+      padding: const EdgeInsets.all(UcraftSpacing.space3),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          UcraftSectionHeader(title: strings.quickActionsTitle),
+          const SizedBox(height: UcraftSpacing.space2),
+          UcraftListSection(children: rows),
+        ],
+      ),
     );
   }
 

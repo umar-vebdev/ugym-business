@@ -11,6 +11,7 @@ import 'package:ugym_business/core/router/role_guard_and_banners.dart';
 import 'package:ugym_business/core/session/business_role.dart';
 import 'package:ugym_business/core/session/business_session_controller.dart';
 import 'package:ugym_business/core/storage/app_preferences.dart';
+import 'package:ugym_business/core/theme/business_theme.dart';
 import 'package:ugym_business/core/theme/theme_controller.dart';
 import 'package:ugym_business/features/auth/domain/auth_repository.dart';
 import 'package:ugym_business/features/auth/domain/authenticated_user.dart';
@@ -107,6 +108,86 @@ final class _FakeQrRepo implements ReceptionVisitsRepository {
 }
 
 void main() {
+  test('Business theme meets contrast for text and interactive controls', () {
+    double contrast(Color first, Color second) {
+      final a = first.computeLuminance();
+      final b = second.computeLuminance();
+      return a > b ? (a + 0.05) / (b + 0.05) : (b + 0.05) / (a + 0.05);
+    }
+
+    final light = BusinessTheme.light;
+    final dark = BusinessTheme.dark;
+    final colors = light.extension<UcraftColors>()!;
+    expect(dark.extension<UcraftColors>(), same(colors));
+    expect(
+      contrast(dark.appBarTheme.foregroundColor!, dark.scaffoldBackgroundColor),
+      greaterThanOrEqualTo(4.5),
+    );
+    for (final pair in [
+      (colors.foreground, colors.surface),
+      (colors.foregroundSecondary, colors.surfaceSecondary),
+      (colors.primary, colors.primarySubtle),
+      (colors.onPrimary, colors.primary),
+      (colors.onPrimary, colors.destructive),
+      (colors.successForeground, colors.successBackground),
+      (colors.warningForeground, colors.warningBackground),
+      (colors.destructiveForeground, colors.destructiveBackground),
+    ]) {
+      expect(contrast(pair.$1, pair.$2), greaterThanOrEqualTo(4.5));
+    }
+    expect(
+      contrast(colors.borderStrong, colors.background),
+      greaterThanOrEqualTo(3),
+    );
+  });
+
+  testWidgets('Dark mode keeps light cards and navigation on both layouts', (
+    tester,
+  ) async {
+    final prefs = AppPreferences(storage: InMemoryTokenStorage());
+    final session = BusinessSessionController(
+      preferences: prefs,
+      initialRole: BusinessRole.owner,
+    );
+    final theme = ThemeController(preferences: prefs);
+    addTearDown(session.dispose);
+    addTearDown(theme.dispose);
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    await tester.binding.setSurfaceSize(const Size(390, 844));
+    await tester.pumpWidget(
+      UgymBusinessApp(sessionController: session, themeController: theme),
+    );
+    await tester.pumpAndSettle();
+    final lightNavigation = tester.widget<NavigationBar>(
+      find.byType(NavigationBar),
+    );
+    final lightCardColors = tester
+        .element(find.byType(UcraftCard).first)
+        .ucraftColors;
+
+    await theme.setThemeMode(ThemeMode.dark);
+    await tester.pumpAndSettle();
+    final navigation = find.byType(NavigationBar);
+    final dark = Theme.of(tester.element(navigation));
+    expect(dark.brightness, Brightness.dark);
+    expect(dark.scaffoldBackgroundColor, const Color(0xFF151C29));
+    expect(
+      tester.widget<NavigationBar>(navigation).backgroundColor,
+      lightNavigation.backgroundColor,
+    );
+    expect(
+      tester.element(find.byType(UcraftCard).first).ucraftColors.surface,
+      lightCardColors.surface,
+    );
+
+    await tester.binding.setSurfaceSize(const Size(1024, 768));
+    await tester.pumpAndSettle();
+    final rail = tester.widget<NavigationRail>(find.byType(NavigationRail));
+    expect(rail.backgroundColor, lightNavigation.backgroundColor);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets(
     'BusinessShell adapts across Compact (<600), Medium (600-839), and Expanded (>=840) breakpoints',
     (tester) async {

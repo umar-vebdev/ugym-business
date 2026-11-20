@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:ugym_core/ugym_core.dart';
 
@@ -9,6 +10,7 @@ import 'core/network/business_api_client.dart';
 import 'core/router/business_shell.dart';
 import 'core/session/business_session_controller.dart';
 import 'core/storage/app_preferences.dart';
+import 'core/theme/business_theme.dart';
 import 'core/theme/theme_controller.dart';
 import 'features/analytics_billing/data/remote_analytics_and_billing_repository.dart';
 import 'features/analytics_billing/domain/analytics_and_billing_models.dart';
@@ -217,12 +219,15 @@ final class _UgymBusinessAppState extends State<UgymBusinessApp> {
         return MaterialApp(
           title: 'uGym Business',
           debugShowCheckedModeBanner: false,
-          theme: UcraftTheme.light(),
-          darkTheme: UcraftTheme.dark(),
+          theme: BusinessTheme.light,
+          darkTheme: BusinessTheme.dark,
           themeMode: _effectiveThemeController.themeMode,
-          builder: (context, child) => BusinessStringsScope(
-            strings: _effectiveLocaleController.strings,
-            child: child ?? const SizedBox.shrink(),
+          builder: (context, child) => AnnotatedRegion<SystemUiOverlayStyle>(
+            value: Theme.of(context).appBarTheme.systemOverlayStyle!,
+            child: BusinessStringsScope(
+              strings: _effectiveLocaleController.strings,
+              child: child ?? const SizedBox.shrink(),
+            ),
           ),
           home: requiresAuth
               ? AuthFlowScreen(controller: widget.authController!)
