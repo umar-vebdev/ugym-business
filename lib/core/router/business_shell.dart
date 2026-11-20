@@ -38,6 +38,7 @@ import '../session/business_role.dart';
 import '../session/business_session_controller.dart';
 import '../theme/business_page_surface.dart';
 import '../theme/business_theme.dart';
+import '../theme/business_typography.dart';
 import '../theme/theme_controller.dart';
 import 'role_guard_and_banners.dart';
 
@@ -188,63 +189,101 @@ final class _BusinessShellState extends State<BusinessShell> {
             final bool isExpanded = constraints.maxWidth >= 840;
 
             final Widget content = SafeArea(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(
-                  UcraftSpacing.screenHorizontalPadding,
-                ),
-                child: Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 1040),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        SubscriptionReadOnlyBanner(
-                          controller: widget.sessionController,
-                          message: strings.readOnlyBanner,
-                          onOpenDetails:
-                              widget.analyticsAndBillingRepository != null &&
-                                  widget.sessionController.canView(
-                                    BusinessPermission.viewBilling,
-                                  )
-                              ? () => setState(() {
-                                  _selected = BusinessDestination.more;
-                                  _moreTab = _MoreSubTab.billing;
-                                })
-                              : null,
+              bottom: false,
+              child: Column(
+                children: [
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? Theme.of(context).scaffoldBackgroundColor
+                          : colors.surface,
+                      border: Border(
+                        bottom: BorderSide(
+                          color: isDark
+                              ? colors.border.withValues(alpha: 0.2)
+                              : colors.border,
                         ),
-                        if (widget.sessionController.isReadOnly)
-                          const SizedBox(height: UcraftSpacing.space4),
-                        Wrap(
-                          spacing: UcraftSpacing.space3,
-                          runSpacing: UcraftSpacing.space2,
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          alignment: WrapAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              _labelFor(activeDestination, strings),
-                              style: UcraftTypography.headline.copyWith(
-                                color: BusinessTheme.canvasText(context),
-                              ),
+                      ),
+                    ),
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 1040),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: UcraftSpacing.compactScreenPadding,
+                          ),
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(
+                              minHeight: UcraftSpacing.space12,
                             ),
-                            if (widget.sessionController.canView(
-                              BusinessPermission.viewGyms,
-                            ))
-                              GymBranchSelector(
-                                controller: widget.sessionController,
-                              ),
-                          ],
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    _labelFor(activeDestination, strings),
+                                    style: BusinessTypography.headline.copyWith(
+                                      color: BusinessTheme.canvasText(context),
+                                    ),
+                                  ),
+                                ),
+                                if (widget.sessionController.canView(
+                                  BusinessPermission.viewGyms,
+                                ))
+                                  Flexible(
+                                    child: GymBranchSelector(
+                                      controller: widget.sessionController,
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
                         ),
-                        const SizedBox(height: UcraftSpacing.sectionGap),
-                        _buildDestinationBody(
-                          context,
-                          activeDestination,
-                          strings,
-                          isDark,
-                        ),
-                      ],
+                      ),
                     ),
                   ),
-                ),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(
+                        UcraftSpacing.compactScreenPadding,
+                      ),
+                      child: Align(
+                        alignment: Alignment.topCenter,
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 1040),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              SubscriptionReadOnlyBanner(
+                                controller: widget.sessionController,
+                                message: strings.readOnlyBanner,
+                                onOpenDetails:
+                                    widget.analyticsAndBillingRepository !=
+                                            null &&
+                                        widget.sessionController.canView(
+                                          BusinessPermission.viewBilling,
+                                        )
+                                    ? () => setState(() {
+                                        _selected = BusinessDestination.more;
+                                        _moreTab = _MoreSubTab.billing;
+                                      })
+                                    : null,
+                              ),
+                              if (widget.sessionController.isReadOnly)
+                                const SizedBox(height: UcraftSpacing.space2),
+                              _buildDestinationBody(
+                                context,
+                                activeDestination,
+                                strings,
+                                isDark,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             );
 

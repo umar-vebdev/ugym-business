@@ -17,7 +17,7 @@ abstract final class BusinessTheme {
     foreground: const Color(0xFF151D2B),
     foregroundSecondary: const Color(0xFF526078),
     foregroundMuted: const Color(0xFF526078),
-    border: const Color(0xFFDFE5EF),
+    border: const Color(0xFFCCD6E4),
     borderStrong: const Color(0xFF7989A4),
     primary: const Color(0xFF315FCB),
     primaryHover: const Color(0xFF244CAA),
@@ -94,6 +94,7 @@ abstract final class BusinessTheme {
       borderSide: BorderSide(color: colors.borderStrong),
     );
     return base.copyWith(
+      visualDensity: VisualDensity.compact,
       colorScheme: scheme,
       primaryColor: colors.primary,
       scaffoldBackgroundColor: background,
@@ -103,23 +104,44 @@ abstract final class BusinessTheme {
           color: colors.foreground,
         ),
         headlineLarge: textTheme.headlineLarge?.copyWith(
+          fontSize: BusinessTypography.display.fontSize,
+          height: BusinessTypography.display.height,
           fontWeight: FontWeight.w600,
           letterSpacing: 0,
         ),
-        titleLarge: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w500),
-        labelLarge: textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w500),
+        headlineMedium: BusinessTypography.headline.copyWith(
+          color: colors.foreground,
+        ),
+        titleLarge: BusinessTypography.titleLarge.copyWith(
+          color: colors.foreground,
+        ),
+        titleMedium: BusinessTypography.title.copyWith(
+          color: colors.foreground,
+        ),
+        bodyLarge: BusinessTypography.bodyLarge.copyWith(
+          color: colors.foreground,
+        ),
+        labelLarge: BusinessTypography.label.copyWith(color: colors.foreground),
         labelSmall: textTheme.labelSmall?.copyWith(fontWeight: FontWeight.w500),
       ),
       appBarTheme: base.appBarTheme.copyWith(
-        backgroundColor: background,
+        backgroundColor: darkCanvas ? background : colors.surface,
         foregroundColor: canvasForeground,
         surfaceTintColor: Colors.transparent,
+        toolbarHeight: UcraftSpacing.space12,
+        shape: Border(
+          bottom: BorderSide(
+            color: darkCanvas
+                ? colors.border.withValues(alpha: 0.2)
+                : colors.border,
+          ),
+        ),
         systemOverlayStyle: systemChrome.copyWith(
           statusBarColor: Colors.transparent,
           systemNavigationBarColor: colors.surface,
           systemNavigationBarIconBrightness: Brightness.dark,
         ),
-        titleTextStyle: UcraftTypography.title.copyWith(
+        titleTextStyle: BusinessTypography.title.copyWith(
           color: canvasForeground,
           letterSpacing: 0,
         ),
@@ -127,10 +149,11 @@ abstract final class BusinessTheme {
       dividerTheme: base.dividerTheme.copyWith(color: colors.border),
       navigationBarTheme: base.navigationBarTheme.copyWith(
         backgroundColor: colors.surface,
-        indicatorColor: colors.primarySubtle,
+        height: UcraftSpacing.space12 + UcraftSpacing.space2,
+        indicatorColor: Colors.transparent,
         iconTheme: WidgetStateProperty.resolveWith(
           (states) => IconThemeData(
-            size: 24,
+            size: 20,
             color: states.contains(WidgetState.selected)
                 ? colors.primary
                 : colors.foregroundMuted,
@@ -138,6 +161,7 @@ abstract final class BusinessTheme {
         ),
         labelTextStyle: WidgetStateProperty.resolveWith(
           (states) => UcraftTypography.caption.copyWith(
+            fontSize: UcraftTypography.overline.fontSize,
             fontWeight: FontWeight.w500,
             color: states.contains(WidgetState.selected)
                 ? colors.primary
