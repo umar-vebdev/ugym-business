@@ -13,7 +13,9 @@ final class RemoteMembershipsRepository implements MembershipsRepository {
     try {
       final response = await httpClient.dio.get<Object?>(
         '/business/membership-types',
-        queryParameters: <String, Object?>{'only_active': ?onlyActive},
+        queryParameters: <String, Object?>{
+          if (onlyActive != null) 'only_active': onlyActive ? '1' : '0',
+        },
       );
       return _unwrapList(response.data)
           .map(_parseMembershipType)

@@ -243,15 +243,22 @@ final class _PosCheckoutScreenState extends State<PosCheckoutScreen> {
         child: _loading
             ? UcraftLoadingState(message: strings.posLoadingCatalog)
             : _loadError != null
-            ? UcraftErrorState(
-                title: strings.posLoadErrorTitle,
-                message: _loadError!,
-                retryLabel: strings.retryLabel,
-                onRetry: () => unawaited(_loadCatalog()),
+            ? SingleChildScrollView(
+                padding: const EdgeInsets.all(
+                  UcraftSpacing.compactScreenPadding,
+                ),
+                child: UcraftCard(
+                  child: UcraftErrorState(
+                    title: strings.posLoadErrorTitle,
+                    message: _loadError!,
+                    retryLabel: strings.retryLabel,
+                    onRetry: () => unawaited(_loadCatalog()),
+                  ),
+                ),
               )
             : SingleChildScrollView(
                 padding: const EdgeInsets.all(
-                  UcraftSpacing.screenHorizontalPadding,
+                  UcraftSpacing.compactScreenPadding,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,

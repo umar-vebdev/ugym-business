@@ -74,12 +74,26 @@ void main() {
       final types = await repository.listMembershipTypes(onlyActive: true);
 
       expect(adapter.lastRequest?.path, '/business/membership-types');
-      expect(adapter.lastRequest?.queryParameters, {'only_active': true});
+      expect(adapter.lastRequest?.uri.queryParameters, {'only_active': '1'});
       expect(types, hasLength(1));
       expect(types.first.kind, MembershipKind.unlimitedTime);
       expect(types.first.priceMinor, 25000);
       expect(types.first.durationDays, 30);
       expect(types.first.isActive, isTrue);
+    },
+  );
+
+  test(
+    'listMembershipTypes distinguishes an inactive filter from no filter',
+    () async {
+      adapter.nextStatusCode = 200;
+      adapter.nextBody = {'data': <Object>[]};
+
+      await repository.listMembershipTypes(onlyActive: false);
+      expect(adapter.lastRequest?.uri.queryParameters, {'only_active': '0'});
+
+      await repository.listMembershipTypes();
+      expect(adapter.lastRequest?.uri.queryParameters, isEmpty);
     },
   );
 
