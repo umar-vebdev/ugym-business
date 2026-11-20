@@ -313,7 +313,7 @@ void main() {
 
       expect(analyticsRepo.fetchOverviewCalls, 1);
       expect(find.text('Выручка сегодня'), findsOneWidget);
-      expect(find.text('1 250.00 TJS'), findsOneWidget);
+      expect(find.text('1\u00a0250,00\u00a0TJS'), findsOneWidget);
       expect(find.text('Посещения сегодня'), findsOneWidget);
       expect(find.text('42'), findsOneWidget);
       expect(find.text('Заявки в ожидании'), findsOneWidget);
@@ -431,7 +431,7 @@ void main() {
       await tester.tap(find.text('Повторить'));
       await tester.pumpAndSettle();
 
-      expect(find.text('1 250.00 TJS'), findsOneWidget);
+      expect(find.text('1\u00a0250,00\u00a0TJS'), findsOneWidget);
       expect(find.text('Заявки в ожидании'), findsOneWidget);
     },
   );

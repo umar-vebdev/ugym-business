@@ -7,6 +7,7 @@ import 'package:ugym_core/ugym_core.dart';
 import '../../../core/l10n/business_localizations.dart';
 import '../../../core/session/business_role.dart';
 import '../../../core/session/business_session_controller.dart';
+import '../../../core/theme/business_typography.dart';
 import '../../memberships/domain/memberships_models.dart';
 import '../../sales/domain/sales_and_requests_models.dart';
 import '../domain/analytics_and_billing_models.dart';
@@ -365,18 +366,19 @@ final class _OverviewDashboardViewState extends State<OverviewDashboardView> {
     final revenue = overview.revenue;
     final visits = overview.visits;
     final clients = overview.clients;
-    final total = MoneyFormatter.format(
+    final total = strings.formatMoney(
       revenue.totalMinor,
       currency: revenue.currency,
-      alwaysShowDecimals: true,
     );
-    final memberships = MoneyFormatter.format(
+    final memberships = strings.formatMoney(
       revenue.membershipsMinor,
       currency: revenue.currency,
+      alwaysShowDecimals: false,
     );
-    final products = MoneyFormatter.format(
+    final products = strings.formatMoney(
       revenue.productsMinor,
       currency: revenue.currency,
+      alwaysShowDecimals: false,
     );
 
     return LayoutBuilder(
@@ -393,9 +395,7 @@ final class _OverviewDashboardViewState extends State<OverviewDashboardView> {
             const SizedBox(height: UcraftSpacing.space1),
             Text(
               total,
-              style: UcraftTypography.headline.copyWith(
-                fontFamily: UcraftTypography.monoFontFamily,
-                fontFeatures: const [FontFeature.tabularFigures()],
+              style: BusinessTypography.amountLarge.copyWith(
                 color: colors.foreground,
               ),
             ),

@@ -4,6 +4,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:ugym_core/ugym_core.dart';
 
 import '../../../core/l10n/business_localizations.dart';
+import '../../../core/theme/business_typography.dart';
 import '../domain/analytics_and_billing_models.dart';
 
 /// Accessible vertical bar chart for daily gym visits following uCraft 1.0 §15.
@@ -351,10 +352,9 @@ final class RevenuePaymentMixBar extends StatelessWidget {
                 label: segment.label,
                 color: segment.color,
                 percent: ((segment.minor / total) * 100).round(),
-                amountText: MoneyFormatter.format(
+                amountText: strings.formatMoney(
                   segment.minor,
                   currency: currency,
-                  alwaysShowDecimals: true,
                 ),
               ),
           ],
@@ -397,7 +397,9 @@ final class _LegendEntry extends StatelessWidget {
           const SizedBox(width: UcraftSpacing.space1),
           Text(
             '$label $percent% ($amountText)',
-            style: UcraftTypography.caption.copyWith(
+            style: BusinessTypography.amount.copyWith(
+              fontSize: UcraftTypography.caption.fontSize,
+              height: UcraftTypography.caption.height,
               color: colors.foregroundSecondary,
             ),
           ),

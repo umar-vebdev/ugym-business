@@ -7,6 +7,7 @@ import 'package:ugym_core/ugym_core.dart';
 import '../../../core/l10n/business_localizations.dart';
 import '../../../core/session/business_role.dart';
 import '../../../core/session/business_session_controller.dart';
+import '../../../core/theme/business_typography.dart';
 import '../domain/analytics_and_billing_models.dart';
 import 'analytics_charts.dart';
 
@@ -295,15 +296,14 @@ final class _AnalyticsScreenState extends State<AnalyticsScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            '${strings.analyticsRevenuePrefix}${_money(summary.totalMinor)} $c',
-            style: UcraftTypography.headline.copyWith(
+            '${strings.analyticsRevenuePrefix}${strings.formatMoney(summary.totalMinor, currency: c)}',
+            style: BusinessTypography.amountLarge.copyWith(
               color: colors.foreground,
-              fontFeatures: const [FontFeature.tabularFigures()],
             ),
           ),
           const SizedBox(height: UcraftSpacing.space1),
           Text(
-            '${strings.membershipsLabel}: ${_money(summary.membershipsMinor)} $c • ${strings.subTabProducts}: ${_money(summary.productsMinor)} $c • ${strings.receiptsCountLabel}: ${summary.salesCount}',
+            '${strings.membershipsLabel}: ${strings.formatMoney(summary.membershipsMinor, currency: c)} • ${strings.subTabProducts}: ${strings.formatMoney(summary.productsMinor, currency: c)} • ${strings.receiptsCountLabel}: ${summary.salesCount}',
             style: UcraftTypography.caption.copyWith(
               color: colors.foregroundSecondary,
               fontFeatures: const [FontFeature.tabularFigures()],
@@ -311,7 +311,7 @@ final class _AnalyticsScreenState extends State<AnalyticsScreen> {
           ),
           const SizedBox(height: UcraftSpacing.space1),
           Text(
-            '${strings.paymentCashLabel}: ${_money(summary.byPaymentMethod.cash)} $c • ${strings.paymentTerminalLabel}: ${_money(summary.byPaymentMethod.cardTerminal)} $c • ${strings.paymentTransferLabel}: ${_money(summary.byPaymentMethod.transfer)} $c',
+            '${strings.paymentCashLabel}: ${strings.formatMoney(summary.byPaymentMethod.cash, currency: c)} • ${strings.paymentTerminalLabel}: ${strings.formatMoney(summary.byPaymentMethod.cardTerminal, currency: c)} • ${strings.paymentTransferLabel}: ${strings.formatMoney(summary.byPaymentMethod.transfer, currency: c)}',
             style: UcraftTypography.caption.copyWith(
               color: colors.foregroundSecondary,
               fontFeatures: const [FontFeature.tabularFigures()],
@@ -397,8 +397,11 @@ final class _AnalyticsScreenState extends State<AnalyticsScreen> {
                 UcraftListRow(
                   title: '${item.name} — ${item.soldCount} шт.',
                   trailing: Text(
-                    '${_money(item.revenueMinor)} ${item.currency}',
-                    style: UcraftTypography.mono.copyWith(
+                    strings.formatMoney(
+                      item.revenueMinor,
+                      currency: item.currency,
+                    ),
+                    style: BusinessTypography.amount.copyWith(
                       color: colors.foreground,
                     ),
                   ),
@@ -408,8 +411,6 @@ final class _AnalyticsScreenState extends State<AnalyticsScreen> {
       ],
     );
   }
-
-  String _money(int minor) => (minor / 100).toStringAsFixed(2);
 }
 
 /// Bulk push/SMS announcement screen for `owner` and `admin`.
@@ -806,7 +807,7 @@ final class _BillingStatusScreenState extends State<BillingStatusScreen> {
               for (final plan in _plans)
                 UcraftListRow(
                   title:
-                      '${plan.name} (${plan.period.apiValue}) — ${(plan.priceMinor / 100).toStringAsFixed(2)} ${plan.currency}',
+                      '${plan.name} (${plan.period.apiValue}) — ${strings.formatMoney(plan.priceMinor, currency: plan.currency)}',
                   subtitle:
                       'Лимиты: до ${plan.maxGyms} залов, до ${plan.maxStaff} сотрудников',
                   trailing: UcraftStatusPill(

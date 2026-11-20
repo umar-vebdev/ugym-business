@@ -314,7 +314,7 @@ void main() {
       await tester.tap(find.text('Аналитика'));
       await tester.pumpAndSettle();
       expect(find.byType(AnalyticsScreen), findsOneWidget);
-      expect(find.text('Выручка: 500.00 TJS'), findsOneWidget);
+      expect(find.text('Выручка: 500,00\u00a0TJS'), findsOneWidget);
 
       // More tab: storefront, staff, announcements, billing.
       await tester.tap(find.text('Ещё'));

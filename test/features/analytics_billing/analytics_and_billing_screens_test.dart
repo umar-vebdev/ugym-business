@@ -162,7 +162,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Выручка: 500.00 TJS'), findsOneWidget);
+      expect(find.text('Выручка: 500,00\u00a0TJS'), findsOneWidget);
       expect(find.textContaining('Безлимит 30 — 10 шт.'), findsOneWidget);
 
       await tester.enterText(find.byType(TextField).at(2), '30');
@@ -227,7 +227,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Подписка платформы: Активна (active)'), findsOneWidget);
-      expect(find.text('Pro (month) — 299.00 TJS'), findsOneWidget);
+      expect(find.text('Pro (month) — 299,00\u00a0TJS'), findsOneWidget);
       expect(
         find.text('Лимиты: до 3 залов, до 15 сотрудников'),
         findsOneWidget,

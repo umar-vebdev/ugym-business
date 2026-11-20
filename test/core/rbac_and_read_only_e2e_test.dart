@@ -551,7 +551,7 @@ void main() {
       // Analytics: reads remain available in read-only mode.
       await tester.tap(find.text('Аналитика'));
       await tester.pumpAndSettle();
-      expect(find.text('Выручка: 500.00 TJS'), findsOneWidget);
+      expect(find.text('Выручка: 500,00\u00a0TJS'), findsOneWidget);
 
       // More -> Storefront & Staff mutations locked.
       await tester.tap(find.text('Ещё'));

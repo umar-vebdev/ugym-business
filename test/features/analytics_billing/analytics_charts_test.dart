@@ -76,9 +76,9 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Наличные 60% (300.00 TJS)'), findsOneWidget);
-      expect(find.text('Терминал 30% (150.00 TJS)'), findsOneWidget);
-      expect(find.text('Перевод 10% (50.00 TJS)'), findsOneWidget);
+      expect(find.text('Наличные 60% (300,00\u00a0TJS)'), findsOneWidget);
+      expect(find.text('Терминал 30% (150,00\u00a0TJS)'), findsOneWidget);
+      expect(find.text('Перевод 10% (50,00\u00a0TJS)'), findsOneWidget);
 
       await tester.pumpWidget(
         MaterialApp(
@@ -131,7 +131,7 @@ void main() {
 
     expect(find.text('Ташрифҳо аз рӯи рӯз'), findsOneWidget);
     expect(find.text('Бештарин дар як рӯз: 12'), findsOneWidget);
-    expect(find.text('Нақд 100% (100.00 TJS)'), findsOneWidget);
+    expect(find.text('Нақд 100% (100,00\u00a0TJS)'), findsOneWidget);
 
     await tester.pumpWidget(
       MaterialApp(
