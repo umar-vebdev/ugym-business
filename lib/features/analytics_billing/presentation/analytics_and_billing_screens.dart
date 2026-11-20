@@ -172,7 +172,7 @@ final class _AnalyticsScreenState extends State<AnalyticsScreen> {
                 children: [
                   Text(
                     strings.analyticsPeriodFilterTitle,
-                    style: UcraftTypography.title.copyWith(
+                    style: BusinessTypography.title.copyWith(
                       color: colors.foreground,
                     ),
                   ),
@@ -215,6 +215,7 @@ final class _AnalyticsScreenState extends State<AnalyticsScreen> {
                   ),
                   const SizedBox(height: UcraftSpacing.space2),
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Expanded(
                         child: UcraftTextField(
@@ -238,7 +239,7 @@ final class _AnalyticsScreenState extends State<AnalyticsScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: UcraftSpacing.sectionGap),
+            const SizedBox(height: UcraftSpacing.space3),
             if (_loading)
               const UcraftLoadingState(
                 isSkeleton: true,
@@ -260,16 +261,16 @@ final class _AnalyticsScreenState extends State<AnalyticsScreen> {
               )
             else ...[
               _buildRevenueCard(context, report.summary, strings),
-              const SizedBox(height: UcraftSpacing.sectionGap),
+              const SizedBox(height: UcraftSpacing.space3),
               _buildClientsAndVisitsCard(context, overview, strings),
-              const SizedBox(height: UcraftSpacing.sectionGap),
+              const SizedBox(height: UcraftSpacing.space3),
               _buildPopularitySection(
                 context,
                 title: strings.analyticsTopPlansTitle,
                 items: overview.popularMemberships,
                 strings: strings,
               ),
-              const SizedBox(height: UcraftSpacing.sectionGap),
+              const SizedBox(height: UcraftSpacing.space3),
               _buildPopularitySection(
                 context,
                 title: strings.analyticsTopProductsTitle,
@@ -295,8 +296,20 @@ final class _AnalyticsScreenState extends State<AnalyticsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
-            '${strings.analyticsRevenuePrefix}${strings.formatMoney(summary.totalMinor, currency: c)}',
+          Text.rich(
+            TextSpan(
+              children: [
+                TextSpan(
+                  text: strings.analyticsRevenuePrefix,
+                  style: BusinessTypography.label.copyWith(
+                    color: colors.foregroundSecondary,
+                  ),
+                ),
+                TextSpan(
+                  text: strings.formatMoney(summary.totalMinor, currency: c),
+                ),
+              ],
+            ),
             style: BusinessTypography.amountLarge.copyWith(
               color: colors.foreground,
             ),
@@ -339,7 +352,7 @@ final class _AnalyticsScreenState extends State<AnalyticsScreen> {
         children: [
           Text(
             strings.analyticsClientsAndVisitsTitle,
-            style: UcraftTypography.title.copyWith(color: colors.foreground),
+            style: BusinessTypography.title.copyWith(color: colors.foreground),
           ),
           const SizedBox(height: UcraftSpacing.space1),
           Text(
@@ -534,7 +547,7 @@ final class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
             children: [
               Text(
                 strings.announcementsTitle,
-                style: UcraftTypography.title.copyWith(
+                style: BusinessTypography.title.copyWith(
                   color: colors.foreground,
                 ),
               ),
@@ -571,7 +584,7 @@ final class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
                 const SizedBox(height: UcraftSpacing.space3),
                 Text(
                   _errorMessage!,
-                  style: UcraftTypography.bodyMedium.copyWith(
+                  style: BusinessTypography.bodyMedium.copyWith(
                     color: colors.destructive,
                   ),
                 ),
@@ -580,7 +593,7 @@ final class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
                 const SizedBox(height: UcraftSpacing.space3),
                 Text(
                   _successMessage!,
-                  style: UcraftTypography.bodyMedium.copyWith(
+                  style: BusinessTypography.bodyMedium.copyWith(
                     color: colors.success,
                   ),
                 ),
@@ -736,22 +749,24 @@ final class _BillingStatusScreenState extends State<BillingStatusScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: UcraftStatusPill(
-                        icon: statusIcon,
-                        label: _statusLabel(sub.status, strings),
-                        tone: statusTone,
-                      ),
-                    ),
-                    const SizedBox(height: UcraftSpacing.space2),
-                    Text(
-                      '${strings.billingStatusPrefix}${_statusLabel(sub.status, strings)}',
-                      style: UcraftTypography.titleLarge.copyWith(
-                        color: sub.isReadOnly
-                            ? colors.destructive
-                            : colors.foreground,
-                      ),
+                    Wrap(
+                      alignment: WrapAlignment.spaceBetween,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: UcraftSpacing.space2,
+                      runSpacing: UcraftSpacing.space1,
+                      children: [
+                        Text(
+                          strings.billingStatusTitle,
+                          style: BusinessTypography.title.copyWith(
+                            color: colors.foreground,
+                          ),
+                        ),
+                        UcraftStatusPill(
+                          icon: statusIcon,
+                          label: _statusLabel(sub.status, strings),
+                          tone: statusTone,
+                        ),
+                      ],
                     ),
                     const SizedBox(height: UcraftSpacing.space1),
                     Text(
@@ -788,7 +803,7 @@ final class _BillingStatusScreenState extends State<BillingStatusScreen> {
               );
             },
           ),
-          const SizedBox(height: UcraftSpacing.sectionGap),
+          const SizedBox(height: UcraftSpacing.space3),
         ],
         UcraftSectionHeader(title: strings.billingPlansTitle),
         const SizedBox(height: UcraftSpacing.space2),
@@ -807,7 +822,7 @@ final class _BillingStatusScreenState extends State<BillingStatusScreen> {
               for (final plan in _plans)
                 UcraftListRow(
                   title:
-                      '${plan.name} (${plan.period.apiValue}) — ${strings.formatMoney(plan.priceMinor, currency: plan.currency)}',
+                      '${plan.name} · ${strings.formatMoney(plan.priceMinor, currency: plan.currency)} / ${plan.period == BillingPlanPeriod.month ? strings.billingPlanMonth : strings.billingPlanYear}',
                   subtitle:
                       'Лимиты: до ${plan.maxGyms} залов, до ${plan.maxStaff} сотрудников',
                   trailing: UcraftStatusPill(

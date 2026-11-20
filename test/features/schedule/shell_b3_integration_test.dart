@@ -337,7 +337,7 @@ void main() {
       await tester.tap(find.text('Подписка'));
       await tester.pumpAndSettle();
       expect(find.byType(BillingStatusScreen), findsOneWidget);
-      expect(find.text('Подписка платформы: Активна (active)'), findsOneWidget);
+      expect(find.text('Активна'), findsOneWidget);
     },
   );
 

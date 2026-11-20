@@ -319,10 +319,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(
-        find.text('Подписка платформы: Истекла (expired)'),
-        findsOneWidget,
-      );
+      expect(find.text('Истекла'), findsOneWidget);
       expect(find.textContaining('Business Pro'), findsOneWidget);
       expect(find.text('Оплатить'), findsNothing);
       expect(find.text('Купить'), findsNothing);

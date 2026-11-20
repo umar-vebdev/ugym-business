@@ -583,10 +583,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(BillingStatusScreen), findsOneWidget);
-      expect(
-        find.text('Подписка платформы: Истекла (expired)'),
-        findsOneWidget,
-      );
+      expect(find.text('Истекла'), findsOneWidget);
     },
   );
 

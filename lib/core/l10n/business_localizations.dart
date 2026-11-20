@@ -187,7 +187,9 @@ final class BusinessStrings {
     required this.announcementsSendButton,
     required this.billingNoAccessDesc,
     required this.billingLoading,
-    required this.billingStatusPrefix,
+    required this.billingStatusTitle,
+    required this.billingPlanMonth,
+    required this.billingPlanYear,
     required this.billingValidUntilPrefix,
     required this.billingReadOnlyHint,
     required this.billingPlansTitle,
@@ -570,7 +572,9 @@ final class BusinessStrings {
   final String announcementsSendButton;
   final String billingNoAccessDesc;
   final String billingLoading;
-  final String billingStatusPrefix;
+  final String billingStatusTitle;
+  final String billingPlanMonth;
+  final String billingPlanYear;
   final String billingValidUntilPrefix;
   final String billingReadOnlyHint;
   final String billingPlansTitle;
@@ -958,14 +962,16 @@ final class BusinessStrings {
     billingNoAccessDesc:
         'Подписка платформы доступна владельцу и администратору.',
     billingLoading: 'Загружаем подписку...',
-    billingStatusPrefix: 'Подписка платформы: ',
+    billingStatusTitle: 'Подписка платформы',
+    billingPlanMonth: 'мес.',
+    billingPlanYear: 'год',
     billingValidUntilPrefix: 'Действует до: ',
     billingReadOnlyHint: 'Режим только для чтения: для продления свяжитесь с поддержкой платформы.',
     billingPlansTitle: 'Тарифы платформы',
     billingPlansEmpty: 'Список тарифов пуст.',
-    billingStatusTrial: 'Пробный период (trial)',
-    billingStatusActive: 'Активна (active)',
-    billingStatusExpired: 'Истекла (expired)',
+    billingStatusTrial: 'Пробный период',
+    billingStatusActive: 'Активна',
+    billingStatusExpired: 'Истекла',
     onboardingTitle: 'Создание компании (14 дней бесплатно)',
     onboardingSubtitle: 'Укажите название компании и первого филиала — пробный период активируется автоматически.',
     onboardingCompanyNameLabel: 'Название компании',
@@ -1355,15 +1361,17 @@ final class BusinessStrings {
     announcementsSendButton: 'Фиристодани паёмнома',
     billingNoAccessDesc: 'Обунаи платформа барои соҳиб ва маъмур дастрас аст.',
     billingLoading: 'Обуна бор мешавад...',
-    billingStatusPrefix: 'Обунаи платформа: ',
+    billingStatusTitle: 'Обунаи платформа',
+    billingPlanMonth: 'моҳ',
+    billingPlanYear: 'сол',
     billingValidUntilPrefix: 'Амал мекунад то: ',
     billingReadOnlyHint:
         'Реҷаи танҳо дидан: барои тамдид бо дастгирии платформа тамос гиред.',
     billingPlansTitle: 'Тарифҳои платформа',
     billingPlansEmpty: 'Рӯйхати тарифҳо холӣ аст.',
-    billingStatusTrial: 'Давраи озмоишӣ (trial)',
-    billingStatusActive: 'Фаъол (active)',
-    billingStatusExpired: 'Ба охир расид (expired)',
+    billingStatusTrial: 'Давраи озмоишӣ',
+    billingStatusActive: 'Фаъол',
+    billingStatusExpired: 'Ба охир расид',
     onboardingTitle: 'Сохтани ширкат (14 рӯз ройгон)',
     onboardingSubtitle: 'Номи ширкат ва филиали аввалро ворид кунед — давраи озмоишӣ худкор фаъол мешавад.',
     onboardingCompanyNameLabel: 'Номи ширкат',
@@ -1753,14 +1761,16 @@ final class BusinessStrings {
     billingNoAccessDesc:
         'Platform subscription is available to owner and admin.',
     billingLoading: 'Loading subscription...',
-    billingStatusPrefix: 'Platform subscription: ',
+    billingStatusTitle: 'Platform subscription',
+    billingPlanMonth: 'mo.',
+    billingPlanYear: 'year',
     billingValidUntilPrefix: 'Valid until: ',
     billingReadOnlyHint: 'Read-only mode: contact platform support to renew.',
     billingPlansTitle: 'Platform plans',
     billingPlansEmpty: 'No plans available.',
-    billingStatusTrial: 'Trial period (trial)',
-    billingStatusActive: 'Active (active)',
-    billingStatusExpired: 'Expired (expired)',
+    billingStatusTrial: 'Trial period',
+    billingStatusActive: 'Active',
+    billingStatusExpired: 'Expired',
     onboardingTitle: 'Create company (14-day free trial)',
     onboardingSubtitle: 'Enter your company and first gym name — the 14-day trial starts automatically.',
     onboardingCompanyNameLabel: 'Company name',

@@ -226,8 +226,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Подписка платформы: Активна (active)'), findsOneWidget);
-      expect(find.text('Pro (month) — 299,00\u00a0TJS'), findsOneWidget);
+      expect(find.text('Активна'), findsOneWidget);
+      expect(find.text('Pro · 299,00\u00a0TJS / мес.'), findsOneWidget);
       expect(
         find.text('Лимиты: до 3 залов, до 15 сотрудников'),
         findsOneWidget,
