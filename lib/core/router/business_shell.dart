@@ -231,8 +231,11 @@ final class _BusinessShellState extends State<BusinessShell> {
                                   BusinessPermission.viewGyms,
                                 ))
                                   Flexible(
-                                    child: GymBranchSelector(
-                                      controller: widget.sessionController,
+                                    child: Align(
+                                      alignment: Alignment.centerRight,
+                                      child: GymBranchSelector(
+                                        controller: widget.sessionController,
+                                      ),
                                     ),
                                   ),
                               ],
@@ -342,8 +345,17 @@ final class _BusinessShellState extends State<BusinessShell> {
                           for (final dest in destinations)
                             NavigationDestination(
                               icon: Icon(_iconFor(dest, selected: false)),
-                              selectedIcon: Icon(
-                                _iconFor(dest, selected: true),
+                              selectedIcon: Container(
+                                width:
+                                    UcraftSpacing.space12 -
+                                    UcraftSpacing.space1,
+                                height: UcraftSpacing.space6,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  color: colors.primarySubtle,
+                                  borderRadius: UcraftRadius.borderSm,
+                                ),
+                                child: Icon(_iconFor(dest, selected: true)),
                               ),
                               label: _labelFor(dest, strings),
                             ),

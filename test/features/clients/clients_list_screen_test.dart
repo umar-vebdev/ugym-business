@@ -108,8 +108,8 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Фарход (#1)'), findsOneWidget);
-      expect(find.text('Привязан к uGym'), findsOneWidget);
-      expect(find.text('Оффлайн-карточка'), findsOneWidget);
+      expect(find.text('В uGym'), findsOneWidget);
+      expect(find.text('Офлайн'), findsOneWidget);
       expect(find.text('Объединить дубли'), findsNothing);
 
       await tester.enterText(find.byType(TextField).first, 'Фарход');
@@ -233,8 +233,8 @@ void main() {
 
       expect(find.text('Иловаи мизоҷ'), findsOneWidget);
       expect(find.text('Муттаҳид кардани такрорҳо'), findsOneWidget);
-      expect(find.text('Ба uGym пайваст'), findsOneWidget);
-      expect(find.text('Корти офлайн'), findsOneWidget);
+      expect(find.text('Дар uGym'), findsOneWidget);
+      expect(find.text('Офлайн'), findsOneWidget);
 
       // English
       await tester.pumpWidget(
@@ -257,8 +257,8 @@ void main() {
 
       expect(find.text('Add client'), findsOneWidget);
       expect(find.text('Merge duplicates'), findsOneWidget);
-      expect(find.text('Linked to uGym'), findsOneWidget);
-      expect(find.text('Offline profile'), findsOneWidget);
+      expect(find.text('In uGym'), findsOneWidget);
+      expect(find.text('Offline'), findsOneWidget);
     },
   );
 }

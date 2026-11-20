@@ -235,16 +235,14 @@ final class _OverviewDashboardViewState extends State<OverviewDashboardView> {
             ),
             if (widget.onOpenScanner != null) ...[
               const SizedBox(height: UcraftSpacing.space2),
-              BusinessPageSurface(
-                child: UcraftButton(
-                  label: strings.scanClientQrButton,
-                  leadingIcon: LucideIcons.qrCode,
-                  fullWidth: true,
-                  onPressed: canScan ? widget.onOpenScanner : null,
-                ),
+              UcraftButton(
+                label: strings.scanClientQrButton,
+                leadingIcon: LucideIcons.qrCode,
+                fullWidth: true,
+                onPressed: canScan ? widget.onOpenScanner : null,
               ),
             ],
-            if (hasSecondaryActions || _hasAnyDataSource) ...[
+            if (hasSecondaryActions) ...[
               const SizedBox(height: UcraftSpacing.space2),
               UcraftCard(
                 padding: const EdgeInsets.symmetric(
@@ -268,13 +266,6 @@ final class _OverviewDashboardViewState extends State<OverviewDashboardView> {
                         leadingIcon: LucideIcons.shoppingBag,
                         variant: UcraftButtonVariant.secondary,
                         onPressed: widget.onOpenPos,
-                      ),
-                    if (_hasAnyDataSource)
-                      UcraftButton(
-                        label: strings.refreshLabel,
-                        variant: UcraftButtonVariant.tertiary,
-                        isLoading: _loading,
-                        onPressed: _loading ? null : () => unawaited(_load()),
                       ),
                   ],
                 ),
@@ -330,10 +321,14 @@ final class _OverviewDashboardViewState extends State<OverviewDashboardView> {
             children: [
               Expanded(
                 child: Text(
-                  gymName,
-                  style: BusinessTypography.titleLarge.copyWith(
-                    color: colors.foreground,
-                  ),
+                  overview == null ? gymName : strings.revenueTodayTitle,
+                  style: overview == null
+                      ? BusinessTypography.titleLarge.copyWith(
+                          color: colors.foreground,
+                        )
+                      : UcraftTypography.caption.copyWith(
+                          color: colors.foregroundSecondary,
+                        ),
                 ),
               ),
               const SizedBox(width: UcraftSpacing.space2),
@@ -349,17 +344,39 @@ final class _OverviewDashboardViewState extends State<OverviewDashboardView> {
           if (overview != null) ...[
             const SizedBox(height: UcraftSpacing.space2),
             _buildOwnerKpiStrip(context, overview, strings),
-            if (widget.onOpenAnalytics != null) ...[
-              Align(
-                alignment: Alignment.centerRight,
-                child: UcraftButton(
-                  label: strings.openAnalyticsButton,
-                  variant: UcraftButtonVariant.tertiary,
-                  onPressed: widget.onOpenAnalytics,
-                ),
-              ),
-            ],
           ],
+          if (_hasAnyDataSource ||
+              (overview != null && widget.onOpenAnalytics != null))
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                if (overview != null && widget.onOpenAnalytics != null)
+                  Flexible(
+                    child: UcraftButton(
+                      label: strings.openAnalyticsButton,
+                      variant: UcraftButtonVariant.tertiary,
+                      onPressed: widget.onOpenAnalytics,
+                    ),
+                  ),
+                if (_hasAnyDataSource)
+                  IconButton(
+                    tooltip: strings.refreshLabel,
+                    iconSize: 18,
+                    color: colors.primary,
+                    constraints: const BoxConstraints.tightFor(
+                      width: UcraftSpacing.space12,
+                      height: UcraftSpacing.space12,
+                    ),
+                    onPressed: _loading ? null : () => unawaited(_load()),
+                    icon: _loading
+                        ? const SizedBox.square(
+                            dimension: UcraftSpacing.space4,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(LucideIcons.refreshCw),
+                  ),
+              ],
+            ),
         ],
       ),
     );
@@ -406,7 +423,6 @@ final class _OverviewDashboardViewState extends State<OverviewDashboardView> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(strings.revenueTodayTitle, style: captions),
         Text(
           total,
           style: BusinessTypography.amountLarge.copyWith(

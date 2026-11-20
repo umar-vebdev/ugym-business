@@ -187,6 +187,7 @@ abstract final class BusinessTheme {
         ),
       ),
       inputDecorationTheme: InputDecorationThemeData(
+        visualDensity: VisualDensity.standard,
         border: fieldBorder,
         enabledBorder: fieldBorder,
         focusedBorder: fieldBorder.copyWith(

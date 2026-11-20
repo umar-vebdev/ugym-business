@@ -189,7 +189,6 @@ final class _ClientsListScreenState extends State<ClientsListScreen> {
                         ),
                       UcraftButton(
                         label: strings.clientsAddButton,
-                        leadingIcon: LucideIcons.plus,
                         onPressed: canMutate
                             ? () => unawaited(_openCreateClient())
                             : null,
