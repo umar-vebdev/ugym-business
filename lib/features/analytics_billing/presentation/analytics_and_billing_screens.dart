@@ -314,20 +314,42 @@ final class _AnalyticsScreenState extends State<AnalyticsScreen> {
               color: colors.foreground,
             ),
           ),
-          const SizedBox(height: UcraftSpacing.space1),
-          Text(
-            '${strings.membershipsLabel}: ${strings.formatMoney(summary.membershipsMinor, currency: c)} • ${strings.subTabProducts}: ${strings.formatMoney(summary.productsMinor, currency: c)} • ${strings.receiptsCountLabel}: ${summary.salesCount}',
-            style: UcraftTypography.caption.copyWith(
-              color: colors.foregroundSecondary,
-              fontFeatures: const [FontFeature.tabularFigures()],
+          const SizedBox(height: UcraftSpacing.space3),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              color: colors.surface,
+              borderRadius: UcraftRadius.borderSm,
+              border: Border.all(color: colors.border),
             ),
-          ),
-          const SizedBox(height: UcraftSpacing.space1),
-          Text(
-            '${strings.paymentCashLabel}: ${strings.formatMoney(summary.byPaymentMethod.cash, currency: c)} • ${strings.paymentTerminalLabel}: ${strings.formatMoney(summary.byPaymentMethod.cardTerminal, currency: c)} • ${strings.paymentTransferLabel}: ${strings.formatMoney(summary.byPaymentMethod.transfer, currency: c)}',
-            style: UcraftTypography.caption.copyWith(
-              color: colors.foregroundSecondary,
-              fontFeatures: const [FontFeature.tabularFigures()],
+            child: Padding(
+              padding: const EdgeInsets.all(UcraftSpacing.space3),
+              child: Column(
+                children: [
+                  _buildFieldValueRow(
+                    colors: colors,
+                    label: strings.membershipsLabel,
+                    value: strings.formatMoney(
+                      summary.membershipsMinor,
+                      currency: c,
+                    ),
+                  ),
+                  Divider(height: UcraftSpacing.space4, color: colors.border),
+                  _buildFieldValueRow(
+                    colors: colors,
+                    label: strings.subTabProducts,
+                    value: strings.formatMoney(
+                      summary.productsMinor,
+                      currency: c,
+                    ),
+                  ),
+                  Divider(height: UcraftSpacing.space4, color: colors.border),
+                  _buildFieldValueRow(
+                    colors: colors,
+                    label: strings.receiptsCountLabel,
+                    value: '${summary.salesCount}',
+                  ),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: UcraftSpacing.space3),
@@ -352,33 +374,91 @@ final class _AnalyticsScreenState extends State<AnalyticsScreen> {
         children: [
           Text(
             strings.analyticsClientsAndVisitsTitle,
-            style: BusinessTypography.title.copyWith(color: colors.foreground),
-          ),
-          const SizedBox(height: UcraftSpacing.space1),
-          Text(
-            'Клиентов: ${overview.clients.totalClients} (новых: ${overview.clients.newClients}, постоянных: ${overview.clients.existingClients})',
-            style: UcraftTypography.body.copyWith(
-              color: colors.foregroundSecondary,
-            ),
-          ),
-          const SizedBox(height: UcraftSpacing.space1),
-          Text(
-            'Визиты: ${overview.visits.totalVisits} (QR: ${overview.visits.qrVisits}, ручные: ${overview.visits.manualVisits})',
-            style: UcraftTypography.body.copyWith(
-              color: colors.foregroundSecondary,
-            ),
-          ),
-          const SizedBox(height: UcraftSpacing.space1),
-          Text(
-            'Неактивных за ${overview.visits.inactiveDaysThreshold} дн.: ${overview.visits.inactiveClientsCount}',
-            style: UcraftTypography.caption.copyWith(
-              color: colors.foregroundSecondary,
+            style: BusinessTypography.titleLarge.copyWith(
+              color: colors.foreground,
             ),
           ),
           const SizedBox(height: UcraftSpacing.space3),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              color: colors.surfaceSecondary,
+              borderRadius: UcraftRadius.borderSm,
+              border: Border.all(color: colors.border),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(UcraftSpacing.space3),
+              child: Column(
+                children: [
+                  _buildFieldValueRow(
+                    colors: colors,
+                    label: 'Всего клиентов',
+                    value: '${overview.clients.totalClients}',
+                    subtitle:
+                        'Новых: ${overview.clients.newClients} • Постоянных: ${overview.clients.existingClients}',
+                  ),
+                  Divider(height: UcraftSpacing.space4, color: colors.border),
+                  _buildFieldValueRow(
+                    colors: colors,
+                    label: 'Всего визитов',
+                    value: '${overview.visits.totalVisits}',
+                    subtitle:
+                        'По QR: ${overview.visits.qrVisits} • Вручную: ${overview.visits.manualVisits}',
+                  ),
+                  Divider(height: UcraftSpacing.space4, color: colors.border),
+                  _buildFieldValueRow(
+                    colors: colors,
+                    label:
+                        'Неактивных за ${overview.visits.inactiveDaysThreshold} дн.',
+                    value: '${overview.visits.inactiveClientsCount}',
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: UcraftSpacing.space4),
           VisitsByDayBarChart(byDay: overview.visits.byDay),
         ],
       ),
+    );
+  }
+
+  Widget _buildFieldValueRow({
+    required UcraftColors colors,
+    required String label,
+    required String value,
+    String? subtitle,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: UcraftTypography.bodyMedium.copyWith(
+                  color: colors.foregroundSecondary,
+                ),
+              ),
+              if (subtitle != null) ...[
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  style: UcraftTypography.caption.copyWith(
+                    color: colors.foregroundMuted,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+        const SizedBox(width: UcraftSpacing.space3),
+        Text(
+          value,
+          style: BusinessTypography.amount.copyWith(color: colors.foreground),
+        ),
+      ],
     );
   }
 

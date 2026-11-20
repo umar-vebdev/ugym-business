@@ -181,10 +181,10 @@ final class GymBranchSelector extends StatelessWidget {
         final label = selected?.name ?? strings.branchNotSelected;
 
         final Widget chip = Container(
-          constraints: const BoxConstraints(minHeight: UcraftSpacing.space8),
+          constraints: const BoxConstraints(minHeight: UcraftSpacing.space10),
           padding: const EdgeInsets.symmetric(
-            horizontal: UcraftSpacing.space2,
-            vertical: UcraftSpacing.space1,
+            horizontal: UcraftSpacing.space3,
+            vertical: UcraftSpacing.space2,
           ),
           decoration: BoxDecoration(
             color: colors.surfaceSecondary,
@@ -197,15 +197,15 @@ final class GymBranchSelector extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(LucideIcons.dumbbell, size: 14, color: colors.primary),
-              const SizedBox(width: UcraftSpacing.space1),
+              Icon(LucideIcons.dumbbell, size: 16, color: colors.accent),
+              const SizedBox(width: UcraftSpacing.space2),
               Flexible(
                 child: Text(
                   label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: UcraftTypography.caption.copyWith(
-                    fontWeight: FontWeight.w500,
+                  style: UcraftTypography.label.copyWith(
+                    fontWeight: FontWeight.w600,
                     color: colors.foreground,
                   ),
                 ),
@@ -214,7 +214,7 @@ final class GymBranchSelector extends StatelessWidget {
                 const SizedBox(width: UcraftSpacing.space1),
                 Icon(
                   LucideIcons.chevronDown,
-                  size: 14,
+                  size: 16,
                   color: colors.foregroundSecondary,
                 ),
               ],

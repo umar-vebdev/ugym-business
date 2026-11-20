@@ -1,9 +1,7 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:ugym_core/ugym_core.dart';
 
-import 'business_theme.dart';
-
-/// Keeps text and controls on a light work surface against the Midnight canvas.
+/// Page container that respects the active light or dark theme without
+/// forcing a white background in dark mode.
 final class BusinessPageSurface extends StatelessWidget {
   const BusinessPageSurface({
     super.key,
@@ -16,20 +14,10 @@ final class BusinessPageSurface extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (Theme.of(context).brightness == Brightness.light) {
+    if (padding == EdgeInsets.zero) {
       return child;
     }
-
-    return Theme(
-      data: BusinessTheme.light,
-      child: ClipRRect(
-        borderRadius: UcraftRadius.borderLg,
-        child: ColoredBox(
-          color: BusinessTheme.light.scaffoldBackgroundColor,
-          child: Padding(padding: padding, child: child),
-        ),
-      ),
-    );
+    return Padding(padding: padding, child: child);
   }
 }
 
@@ -46,17 +34,6 @@ final class BusinessPageScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final darkCanvas = Theme.of(context).brightness == Brightness.dark;
-    return Scaffold(
-      appBar: appBar,
-      body: darkCanvas
-          ? Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: UcraftSpacing.space2,
-              ),
-              child: BusinessPageSurface(child: body),
-            )
-          : body,
-    );
+    return Scaffold(appBar: appBar, body: body);
   }
 }

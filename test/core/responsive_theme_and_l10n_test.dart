@@ -118,7 +118,14 @@ void main() {
     final light = BusinessTheme.light;
     final dark = BusinessTheme.dark;
     final colors = light.extension<UcraftColors>()!;
-    expect(dark.extension<UcraftColors>(), same(colors));
+    final darkColors = dark.extension<UcraftColors>()!;
+    expect(light.useMaterial3, isTrue);
+    expect(dark.useMaterial3, isTrue);
+    expect(light.visualDensity, VisualDensity.standard);
+    expect(dark.visualDensity, VisualDensity.standard);
+    expect(light.navigationBarTheme.indicatorColor, colors.primarySubtle);
+    expect(darkColors.primary, colors.primary);
+    expect(darkColors.onPrimary, colors.onPrimary);
     expect(
       contrast(dark.appBarTheme.foregroundColor!, dark.scaffoldBackgroundColor),
       greaterThanOrEqualTo(4.5),
@@ -132,6 +139,10 @@ void main() {
       (colors.successForeground, colors.successBackground),
       (colors.warningForeground, colors.warningBackground),
       (colors.destructiveForeground, colors.destructiveBackground),
+      (darkColors.foreground, darkColors.surface),
+      (darkColors.foregroundSecondary, darkColors.surfaceSecondary),
+      (darkColors.onPrimary, darkColors.primary),
+      (darkColors.accent, darkColors.surface),
     ]) {
       expect(contrast(pair.$1, pair.$2), greaterThanOrEqualTo(4.5));
     }
@@ -139,54 +150,118 @@ void main() {
       contrast(colors.borderStrong, colors.background),
       greaterThanOrEqualTo(3),
     );
+    expect(
+      contrast(darkColors.borderStrong, darkColors.background),
+      greaterThanOrEqualTo(3),
+    );
   });
 
-  testWidgets('Dark mode keeps light cards and navigation on both layouts', (
-    tester,
-  ) async {
-    final prefs = AppPreferences(storage: InMemoryTokenStorage());
-    final session = BusinessSessionController(
-      preferences: prefs,
-      initialRole: BusinessRole.owner,
-    );
-    final theme = ThemeController(preferences: prefs);
-    addTearDown(session.dispose);
-    addTearDown(theme.dispose);
-    addTearDown(() => tester.binding.setSurfaceSize(null));
+  testWidgets(
+    'Dark mode applies dark surfaces to cards and navigation while keeping primary buttons blue',
+    (tester) async {
+      final prefs = AppPreferences(storage: InMemoryTokenStorage());
+      final session = BusinessSessionController(
+        preferences: prefs,
+        initialRole: BusinessRole.owner,
+      );
+      final theme = ThemeController(preferences: prefs);
+      addTearDown(session.dispose);
+      addTearDown(theme.dispose);
+      addTearDown(() => tester.binding.setSurfaceSize(null));
 
-    await tester.binding.setSurfaceSize(const Size(390, 844));
-    await tester.pumpWidget(
-      UgymBusinessApp(sessionController: session, themeController: theme),
-    );
-    await tester.pumpAndSettle();
-    final lightNavigation = tester.widget<NavigationBar>(
-      find.byType(NavigationBar),
-    );
-    final lightCardColors = tester
-        .element(find.byType(UcraftCard).first)
-        .ucraftColors;
+      await tester.binding.setSurfaceSize(const Size(390, 844));
+      await tester.pumpWidget(
+        UgymBusinessApp(sessionController: session, themeController: theme),
+      );
+      await tester.pumpAndSettle();
+      final lightNavigation = tester.widget<NavigationBar>(
+        find.byType(NavigationBar),
+      );
+      final lightCardColors = tester
+          .element(find.byType(UcraftCard).first)
+          .ucraftColors;
 
-    await theme.setThemeMode(ThemeMode.dark);
-    await tester.pumpAndSettle();
-    final navigation = find.byType(NavigationBar);
-    final dark = Theme.of(tester.element(navigation));
-    expect(dark.brightness, Brightness.dark);
-    expect(dark.scaffoldBackgroundColor, const Color(0xFF151C29));
-    expect(
-      tester.widget<NavigationBar>(navigation).backgroundColor,
-      lightNavigation.backgroundColor,
-    );
-    expect(
-      tester.element(find.byType(UcraftCard).first).ucraftColors.surface,
-      lightCardColors.surface,
-    );
+      await theme.setThemeMode(ThemeMode.dark);
+      await tester.pumpAndSettle();
+      final navigation = find.byType(NavigationBar);
+      final dark = Theme.of(tester.element(navigation));
+      final darkCardColors = tester
+          .element(find.byType(UcraftCard).first)
+          .ucraftColors;
+      expect(dark.brightness, Brightness.dark);
+      expect(dark.scaffoldBackgroundColor, UcraftColors.softDark.background);
+      expect(
+        tester.widget<NavigationBar>(navigation).backgroundColor,
+        UcraftColors.softDark.surface,
+      );
+      expect(
+        tester.widget<NavigationBar>(navigation).backgroundColor,
+        isNot(lightNavigation.backgroundColor),
+      );
+      expect(darkCardColors.surface, UcraftColors.softDark.surface);
+      expect(darkCardColors.surface, isNot(lightCardColors.surface));
+      expect(darkCardColors.primary, lightCardColors.primary);
+      expect(darkCardColors.onPrimary, lightCardColors.onPrimary);
 
-    await tester.binding.setSurfaceSize(const Size(1024, 768));
-    await tester.pumpAndSettle();
-    final rail = tester.widget<NavigationRail>(find.byType(NavigationRail));
-    expect(rail.backgroundColor, lightNavigation.backgroundColor);
-    expect(tester.takeException(), isNull);
-  });
+      await tester.binding.setSurfaceSize(const Size(1024, 768));
+      await tester.pumpAndSettle();
+      final rail = tester.widget<NavigationRail>(find.byType(NavigationRail));
+      expect(rail.backgroundColor, UcraftColors.softDark.surface);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'Material 3 light and dark themes render shell tabs cleanly on 360x780 at 1.3x text scale',
+    (tester) async {
+      final prefs = AppPreferences(storage: InMemoryTokenStorage());
+      final session = BusinessSessionController(
+        preferences: prefs,
+        initialRole: BusinessRole.owner,
+      );
+      await session.setGyms(const [GymSummary(id: 1, name: 'Центр')]);
+      final theme = ThemeController(preferences: prefs);
+      addTearDown(session.dispose);
+      addTearDown(theme.dispose);
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.binding.setSurfaceSize(const Size(360, 780));
+      await tester.pumpWidget(
+        MediaQuery(
+          data: const MediaQueryData(textScaler: TextScaler.linear(1.3)),
+          child: UgymBusinessApp(
+            sessionController: session,
+            themeController: theme,
+            visitsRepository: _FakeQrRepo(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      for (final mode in [ThemeMode.light, ThemeMode.dark]) {
+        await theme.setThemeMode(mode);
+        await tester.pumpAndSettle();
+
+        final navBar = tester.widget<NavigationBar>(find.byType(NavigationBar));
+        final activeTheme = Theme.of(
+          tester.element(find.byType(NavigationBar)),
+        );
+        expect(activeTheme.useMaterial3, isTrue);
+        expect(
+          activeTheme.navigationBarTheme.indicatorColor,
+          activeTheme.extension<UcraftColors>()!.primarySubtle,
+        );
+        expect(navBar.destinations, hasLength(5));
+        expect(find.byType(FilledButton), findsWidgets);
+
+        for (var i = 0; i < 5; i++) {
+          await tester.tap(find.byType(NavigationDestination).at(i));
+          await tester.pumpAndSettle();
+          expect(tester.takeException(), isNull);
+        }
+      }
+    },
+  );
 
   testWidgets(
     'BusinessShell adapts across Compact (<600), Medium (600-839), and Expanded (>=840) breakpoints',
@@ -561,10 +636,7 @@ void main() {
         'Point the camera at the client personal QR code in the uGym app',
       );
       expect(instruction, findsOneWidget);
-      expect(
-        Theme.of(tester.element(instruction)).brightness,
-        Brightness.light,
-      );
+      expect(Theme.of(tester.element(instruction)).brightness, Brightness.dark);
       expect(
         Theme.of(tester.element(find.byType(AppBar))).brightness,
         Brightness.dark,

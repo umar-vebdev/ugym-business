@@ -244,31 +244,31 @@ final class _OverviewDashboardViewState extends State<OverviewDashboardView> {
             ],
             if (hasSecondaryActions) ...[
               const SizedBox(height: UcraftSpacing.space2),
-              UcraftCard(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: UcraftSpacing.space2,
-                ),
-                child: Wrap(
-                  spacing: UcraftSpacing.space2,
-                  runSpacing: UcraftSpacing.space2,
-                  alignment: WrapAlignment.spaceBetween,
-                  children: [
-                    if (widget.onOpenKiosk != null)
-                      UcraftButton(
+              Row(
+                children: [
+                  if (widget.onOpenKiosk != null)
+                    Expanded(
+                      child: UcraftButton(
                         label: strings.kioskQrButton,
                         leadingIcon: LucideIcons.monitorSmartphone,
                         variant: UcraftButtonVariant.secondary,
+                        fullWidth: true,
                         onPressed: widget.onOpenKiosk,
                       ),
-                    if (canPos)
-                      UcraftButton(
+                    ),
+                  if (widget.onOpenKiosk != null && canPos)
+                    const SizedBox(width: UcraftSpacing.space2),
+                  if (canPos)
+                    Expanded(
+                      child: UcraftButton(
                         label: strings.openPosButton,
                         leadingIcon: LucideIcons.shoppingBag,
                         variant: UcraftButtonVariant.secondary,
+                        fullWidth: true,
                         onPressed: widget.onOpenPos,
                       ),
-                  ],
-                ),
+                    ),
+                ],
               ),
             ],
             if (_hasAnyDataSource) ...[
@@ -406,10 +406,18 @@ final class _OverviewDashboardViewState extends State<OverviewDashboardView> {
       alwaysShowDecimals: false,
     );
 
-    final captions = UcraftTypography.caption.copyWith(
+    final captions = UcraftTypography.body.copyWith(
+      fontSize: 13,
       color: colors.foregroundSecondary,
     );
+    final valueStyle = UcraftTypography.bodyMedium.copyWith(
+      fontSize: 13,
+      fontWeight: FontWeight.w700,
+      color: colors.foreground,
+      fontFeatures: const [FontFeature.tabularFigures()],
+    );
     final amounts = BusinessTypography.amount.copyWith(
+      fontSize: 18,
       color: colors.foreground,
     );
     final metrics = <(int, String)>[
@@ -420,6 +428,15 @@ final class _OverviewDashboardViewState extends State<OverviewDashboardView> {
         (expiring, strings.subTabExpiring),
     ];
 
+    Widget kvChip(String field, String val) => Text.rich(
+      TextSpan(
+        children: [
+          TextSpan(text: '$field: ', style: captions),
+          TextSpan(text: val, style: valueStyle),
+        ],
+      ),
+    );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -429,21 +446,20 @@ final class _OverviewDashboardViewState extends State<OverviewDashboardView> {
             color: colors.foreground,
           ),
         ),
+        const SizedBox(height: UcraftSpacing.space1),
         Wrap(
-          spacing: UcraftSpacing.space2,
+          spacing: UcraftSpacing.space3,
+          runSpacing: UcraftSpacing.space1,
           children: [
-            Text(
-              '${strings.receiptsCountLabel}: ${revenue.salesCount}',
-              style: captions,
-            ),
-            Text('${strings.membershipsLabel}: $memberships', style: captions),
-            Text('${strings.subTabProducts}: $products', style: captions),
+            kvChip(strings.receiptsCountLabel, '${revenue.salesCount}'),
+            kvChip(strings.membershipsLabel, memberships),
+            kvChip(strings.subTabProducts, products),
           ],
         ),
-        const SizedBox(height: UcraftSpacing.space2),
+        const SizedBox(height: UcraftSpacing.space3),
         DecoratedBox(
           decoration: BoxDecoration(
-            color: colors.surfaceSecondary,
+            color: colors.surface,
             borderRadius: UcraftRadius.borderSm,
             border: Border.all(color: colors.border),
           ),
@@ -461,16 +477,20 @@ final class _OverviewDashboardViewState extends State<OverviewDashboardView> {
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: UcraftSpacing.space1,
-                        vertical: UcraftSpacing.space2,
+                        horizontal: UcraftSpacing.space2,
+                        vertical: UcraftSpacing.space3,
                       ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text('${metric.$1}', style: amounts),
+                          const SizedBox(height: 2),
                           Text(
                             metric.$2,
-                            style: captions,
+                            style: UcraftTypography.caption.copyWith(
+                              fontWeight: FontWeight.w500,
+                              color: colors.foregroundSecondary,
+                            ),
                             textAlign: TextAlign.center,
                           ),
                         ],
@@ -482,19 +502,14 @@ final class _OverviewDashboardViewState extends State<OverviewDashboardView> {
             ),
           ),
         ),
-        const SizedBox(height: UcraftSpacing.space1),
+        const SizedBox(height: UcraftSpacing.space2),
         Wrap(
-          spacing: UcraftSpacing.space2,
+          spacing: UcraftSpacing.space3,
+          runSpacing: UcraftSpacing.space1,
           children: [
-            Text('QR: ${visits.qrVisits}', style: captions),
-            Text(
-              '${strings.manualVisitsLabel}: ${visits.manualVisits}',
-              style: captions,
-            ),
-            Text(
-              '${strings.newClientsLabel}: ${clients.newClients}',
-              style: captions,
-            ),
+            kvChip('QR', '${visits.qrVisits}'),
+            kvChip(strings.manualVisitsLabel, '${visits.manualVisits}'),
+            kvChip(strings.newClientsLabel, '${clients.newClients}'),
           ],
         ),
       ],

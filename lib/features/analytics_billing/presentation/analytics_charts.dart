@@ -4,7 +4,6 @@ import 'package:material_ui/material_ui.dart';
 import 'package:ugym_core/ugym_core.dart';
 
 import '../../../core/l10n/business_localizations.dart';
-import '../../../core/theme/business_typography.dart';
 import '../domain/analytics_and_billing_models.dart';
 
 /// Accessible vertical bar chart for daily gym visits following uCraft 1.0 §15.
@@ -394,13 +393,27 @@ final class _LegendEntry extends StatelessWidget {
               borderRadius: UcraftRadius.borderFull,
             ),
           ),
-          const SizedBox(width: UcraftSpacing.space1),
-          Text(
-            '$label $percent% ($amountText)',
-            style: BusinessTypography.amount.copyWith(
-              fontSize: UcraftTypography.caption.fontSize,
-              height: UcraftTypography.caption.height,
-              color: colors.foregroundSecondary,
+          const SizedBox(width: UcraftSpacing.space2),
+          Text.rich(
+            TextSpan(
+              children: [
+                TextSpan(
+                  text: '$label ',
+                  style: UcraftTypography.body.copyWith(
+                    fontSize: 13,
+                    color: colors.foregroundSecondary,
+                  ),
+                ),
+                TextSpan(
+                  text: '$percent% ($amountText)',
+                  style: UcraftTypography.bodyMedium.copyWith(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: colors.foreground,
+                    fontFeatures: const [FontFeature.tabularFigures()],
+                  ),
+                ),
+              ],
             ),
           ),
         ],
