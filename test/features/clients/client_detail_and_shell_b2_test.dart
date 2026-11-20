@@ -265,7 +265,7 @@ void main() {
 
       await tester.tap(find.text('Покупки/Чеки'));
       await tester.pumpAndSettle();
-      expect(find.text('Чек №70 • 250.00 TJS'), findsOneWidget);
+      expect(find.text('Чек №70 • 250,00\u00a0TJS'), findsOneWidget);
     },
   );
 

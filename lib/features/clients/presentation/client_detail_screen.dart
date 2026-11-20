@@ -438,7 +438,7 @@ final class _ClientDetailScreenState extends State<ClientDetailScreen> {
         for (final sale in _sales)
           UcraftListRow(
             title:
-                'Чек №${sale.id} • ${(sale.totalMinor / 100).toStringAsFixed(2)} ${sale.currency}',
+                'Чек №${sale.id} • ${strings.formatMoney(sale.totalMinor, currency: sale.currency)}',
             subtitle:
                 '${paymentMethodLabel(sale.paymentMethod, strings: strings)} • ${sale.status.apiValue}',
             trailing: UcraftStatusPill(

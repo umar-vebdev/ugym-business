@@ -7,6 +7,7 @@ import 'package:ugym_core/ugym_core.dart';
 import '../../../core/l10n/business_localizations.dart';
 import '../../../core/session/business_role.dart';
 import '../../../core/session/business_session_controller.dart';
+import '../../../core/theme/business_typography.dart';
 import '../domain/memberships_models.dart';
 
 /// Screen listing company membership tariffs with owner management actions.
@@ -236,7 +237,7 @@ final class _MembershipTypeRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.ucraftColors;
     final strings = BusinessStringsScope.of(context);
-    final priceText = (type.priceMinor / 100).toStringAsFixed(2);
+    final price = strings.formatMoney(type.priceMinor, currency: type.currency);
     final details = <String>[
       _kindLabel(type.kind, strings),
       if (type.durationDays != null) '${type.durationDays} дн.',
@@ -251,8 +252,8 @@ final class _MembershipTypeRow extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            '$priceText ${type.currency}',
-            style: UcraftTypography.mono.copyWith(color: colors.foreground),
+            price,
+            style: BusinessTypography.amount.copyWith(color: colors.foreground),
           ),
           const SizedBox(width: UcraftSpacing.space2),
           UcraftStatusPill(

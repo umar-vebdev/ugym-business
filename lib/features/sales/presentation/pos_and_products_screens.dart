@@ -8,6 +8,7 @@ import '../../../core/l10n/business_localizations.dart';
 import '../../../core/router/role_guard_and_banners.dart';
 import '../../../core/session/business_role.dart';
 import '../../../core/session/business_session_controller.dart';
+import '../../../core/theme/business_typography.dart';
 import '../../memberships/domain/memberships_models.dart';
 import '../domain/sales_and_requests_models.dart';
 import 'membership_requests_and_sales_tabs.dart';
@@ -228,8 +229,10 @@ final class _PosCheckoutScreenState extends State<PosCheckoutScreen> {
   Widget _buildScaffold(BuildContext context) {
     final colors = context.ucraftColors;
     final strings = BusinessStringsScope.of(context);
-    final totalFormatted = (_totalMinor() / 100).toStringAsFixed(2);
-    final currency = _currencyLabel();
+    final total = strings.formatMoney(
+      _totalMinor(),
+      currency: _currencyLabel(),
+    );
     final session = widget.sessionController;
     final isReadOnly = _isReadOnly;
 
@@ -270,12 +273,8 @@ final class _PosCheckoutScreenState extends State<PosCheckoutScreen> {
                           ),
                           const SizedBox(height: UcraftSpacing.space1),
                           Text(
-                            '${strings.posTotalPrefix}$totalFormatted $currency',
-                            style: UcraftTypography.headline.copyWith(
-                              fontFamily: UcraftTypography.monoFontFamily,
-                              fontFeatures: const [
-                                FontFeature.tabularFigures(),
-                              ],
+                            '${strings.posTotalPrefix}$total',
+                            style: BusinessTypography.amountLarge.copyWith(
                               color: colors.foreground,
                             ),
                           ),
@@ -309,7 +308,7 @@ final class _PosCheckoutScreenState extends State<PosCheckoutScreen> {
                           for (final type in _membershipTypes)
                             UcraftButton(
                               label:
-                                  '${type.name} (${(type.priceMinor / 100).toStringAsFixed(0)} ${type.currency})',
+                                  '${type.name} (${strings.formatMoney(type.priceMinor, currency: type.currency, alwaysShowDecimals: false)})',
                               variant: UcraftButtonVariant.secondary,
                               leadingIcon: _selectedTypeIds.contains(type.id)
                                   ? LucideIcons.circleCheck
@@ -343,8 +342,10 @@ final class _PosCheckoutScreenState extends State<PosCheckoutScreen> {
                           for (final product in _products)
                             UcraftListRow(
                               title: product.name,
-                              subtitle:
-                                  '${(product.priceMinor / 100).toStringAsFixed(2)} ${product.currency}',
+                              subtitle: strings.formatMoney(
+                                product.priceMinor,
+                                currency: product.currency,
+                              ),
                               trailing: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
@@ -586,7 +587,7 @@ final class _ProductsScreenState extends State<ProductsScreen> {
                     UcraftListRow(
                       title: product.name,
                       subtitle:
-                          '${(product.priceMinor / 100).toStringAsFixed(2)} ${product.currency} • ${strings.productStockLabel}: ${product.stockQuantity ?? 0}',
+                          '${strings.formatMoney(product.priceMinor, currency: product.currency)} • ${strings.productStockLabel}: ${product.stockQuantity ?? 0}',
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [

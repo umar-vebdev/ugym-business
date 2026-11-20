@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:ugym_core/ugym_core.dart';
 
 import '../storage/app_preferences.dart';
 
@@ -26,6 +27,7 @@ enum AppLocale {
 @immutable
 final class BusinessStrings {
   const BusinessStrings._({
+    required this.locale,
     required this.appTitle,
     required this.navOverview,
     required this.navMembers,
@@ -408,6 +410,7 @@ final class BusinessStrings {
     required this.staffMakeAdminButton,
   });
 
+  final AppLocale locale;
   final String appTitle;
   final String navOverview;
   final String navMembers;
@@ -790,6 +793,7 @@ final class BusinessStrings {
   final String staffMakeAdminButton;
 
   static const BusinessStrings ru = BusinessStrings._(
+    locale: AppLocale.ru,
     appTitle: 'uGym Business',
     navOverview: 'Обзор',
     navMembers: 'Клиенты',
@@ -1187,6 +1191,7 @@ final class BusinessStrings {
   );
 
   static const BusinessStrings tg = BusinessStrings._(
+    locale: AppLocale.tg,
     appTitle: 'uGym Business',
     navOverview: 'Шарҳ',
     navMembers: 'Мизоҷон',
@@ -1582,6 +1587,7 @@ final class BusinessStrings {
   );
 
   static const BusinessStrings en = BusinessStrings._(
+    locale: AppLocale.en,
     appTitle: 'uGym Business',
     navOverview: 'Overview',
     navMembers: 'Members',
@@ -1973,6 +1979,26 @@ final class BusinessStrings {
     staffMakeTrainerButton: 'Make trainer',
     staffMakeAdminButton: 'Make admin',
   );
+
+  /// Displays integer minor units using the active interface locale.
+  String formatMoney(
+    int minorUnits, {
+    required String currency,
+    bool alwaysShowDecimals = true,
+  }) {
+    final amount = MoneyFormatter.format(
+      minorUnits,
+      currency: '',
+      alwaysShowDecimals: alwaysShowDecimals,
+    );
+    final localized = switch (locale) {
+      AppLocale.en => amount.replaceAll(' ', ','),
+      AppLocale.ru ||
+      AppLocale.tg => amount.replaceAll(' ', '\u00a0').replaceAll('.', ','),
+    };
+    final code = currency.trim();
+    return code.isEmpty ? localized : '$localized\u00a0$code';
+  }
 
   static BusinessStrings of(AppLocale locale) {
     return switch (locale) {

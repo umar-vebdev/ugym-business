@@ -285,12 +285,12 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Безлимит 30д (250 TJS)'));
+      await tester.tap(find.text('Безлимит 30д (250\u00a0TJS)'));
       await tester.pumpAndSettle();
       await tester.tap(find.byIcon(LucideIcons.plus));
       await tester.pumpAndSettle();
 
-      expect(find.text('Итого: 255.00 TJS'), findsOneWidget);
+      expect(find.text('Итого: 255,00\u00a0TJS'), findsOneWidget);
 
       await tester.ensureVisible(find.text('Провести продажу'));
       await tester.pumpAndSettle();

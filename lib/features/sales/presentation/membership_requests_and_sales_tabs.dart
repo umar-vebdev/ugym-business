@@ -706,7 +706,7 @@ final class _SaleRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.ucraftColors;
     final strings = BusinessStringsScope.of(context);
-    final total = (sale.totalMinor / 100).toStringAsFixed(2);
+    final total = strings.formatMoney(sale.totalMinor, currency: sale.currency);
     final isRefunded = sale.status == SaleStatus.refunded;
     final dateText = DateFormatter.formatDateTime(
       sale.paidAt,
@@ -714,7 +714,7 @@ final class _SaleRow extends StatelessWidget {
     );
 
     return UcraftListRow(
-      title: 'Чек №${sale.id} • $total ${sale.currency}',
+      title: 'Чек №${sale.id} • $total',
       subtitle:
           '${paymentMethodLabel(sale.paymentMethod, strings: strings)} • $dateText${sale.clientId != null ? ' • Клиент №${sale.clientId}' : ''}',
       trailing: UcraftStatusPill(
