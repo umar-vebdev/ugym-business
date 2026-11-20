@@ -7,6 +7,7 @@ import 'package:ugym_core/ugym_core.dart';
 import '../../../core/l10n/business_localizations.dart';
 import '../../../core/session/business_role.dart';
 import '../../../core/session/business_session_controller.dart';
+import '../../../core/theme/business_page_surface.dart';
 import '../domain/trainers_schedule_models.dart';
 
 enum _ScheduleSubView { sessions, templates }
@@ -627,7 +628,7 @@ final class _SessionBookingsScreenState extends State<SessionBookingsScreen> {
     final colors = context.ucraftColors;
     final strings = BusinessStringsScope.of(context);
 
-    return Scaffold(
+    return BusinessPageScaffold(
       appBar: AppBar(title: Text(widget.session.title)),
       body: SafeArea(
         child: Padding(

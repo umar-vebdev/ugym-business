@@ -542,10 +542,10 @@ void main() {
       expect(find.text('Scan this code in the uGym app'), findsOneWidget);
       expect(find.text('Lock kiosk with PIN'), findsOneWidget);
 
-      // ScanClientQrScreen in English.
+      // ScanClientQrScreen in English on a dark canvas.
       await tester.pumpWidget(
         MaterialApp(
-          theme: UcraftTheme.light(),
+          theme: BusinessTheme.dark,
           home: BusinessStringsScope(
             strings: BusinessStrings.en,
             child: ScanClientQrScreen(
@@ -557,11 +557,17 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(find.text('Scan client QR'), findsOneWidget);
+      final instruction = find.text(
+        'Point the camera at the client personal QR code in the uGym app',
+      );
+      expect(instruction, findsOneWidget);
       expect(
-        find.text(
-          'Point the camera at the client personal QR code in the uGym app',
-        ),
-        findsOneWidget,
+        Theme.of(tester.element(instruction)).brightness,
+        Brightness.light,
+      );
+      expect(
+        Theme.of(tester.element(find.byType(AppBar))).brightness,
+        Brightness.dark,
       );
     },
   );

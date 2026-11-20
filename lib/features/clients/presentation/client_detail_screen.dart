@@ -8,6 +8,7 @@ import '../../../core/l10n/business_localizations.dart';
 import '../../../core/router/role_guard_and_banners.dart';
 import '../../../core/session/business_role.dart';
 import '../../../core/session/business_session_controller.dart';
+import '../../../core/theme/business_page_surface.dart';
 import '../../memberships/domain/memberships_models.dart';
 import '../../reception_qr/domain/reception_visits_models.dart';
 import '../../reception_qr/presentation/visits_log_screen.dart';
@@ -208,7 +209,7 @@ final class _ClientDetailScreenState extends State<ClientDetailScreen> {
               BusinessPermission.manageReceptionQrAndVisits,
             );
 
-        return Scaffold(
+        return BusinessPageScaffold(
           appBar: AppBar(title: Text(widget.client.name)),
           body: SafeArea(
             child: SingleChildScrollView(

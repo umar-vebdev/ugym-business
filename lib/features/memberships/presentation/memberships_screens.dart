@@ -7,6 +7,7 @@ import 'package:ugym_core/ugym_core.dart';
 import '../../../core/l10n/business_localizations.dart';
 import '../../../core/session/business_role.dart';
 import '../../../core/session/business_session_controller.dart';
+import '../../../core/theme/business_page_surface.dart';
 import '../../../core/theme/business_typography.dart';
 import '../domain/memberships_models.dart';
 
@@ -449,7 +450,7 @@ final class _CreateMembershipTypeScreenState
     final colors = context.ucraftColors;
     final strings = BusinessStringsScope.of(context);
 
-    return Scaffold(
+    return BusinessPageScaffold(
       appBar: AppBar(title: Text(strings.planNewTitle)),
       body: SafeArea(
         child: SingleChildScrollView(

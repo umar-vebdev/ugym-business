@@ -8,6 +8,7 @@ import '../../../core/l10n/business_localizations.dart';
 import '../../../core/router/role_guard_and_banners.dart';
 import '../../../core/session/business_role.dart';
 import '../../../core/session/business_session_controller.dart';
+import '../../../core/theme/business_page_surface.dart';
 import '../../../core/theme/business_typography.dart';
 import '../../memberships/domain/memberships_models.dart';
 import '../domain/sales_and_requests_models.dart';
@@ -236,7 +237,7 @@ final class _PosCheckoutScreenState extends State<PosCheckoutScreen> {
     final session = widget.sessionController;
     final isReadOnly = _isReadOnly;
 
-    return Scaffold(
+    return BusinessPageScaffold(
       appBar: AppBar(title: Text(strings.posTitle)),
       body: SafeArea(
         child: _loading

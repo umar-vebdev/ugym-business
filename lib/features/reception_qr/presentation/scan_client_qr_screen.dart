@@ -5,6 +5,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:ugym_core/ugym_core.dart';
 
 import '../../../core/l10n/business_localizations.dart';
+import '../../../core/theme/business_page_surface.dart';
 import 'qr_scanner_view.dart';
 import 'reception_scan_controller.dart';
 
@@ -31,7 +32,7 @@ final class ScanClientQrScreen extends StatelessWidget {
     return ListenableBuilder(
       listenable: controller,
       builder: (context, _) {
-        return Scaffold(
+        return BusinessPageScaffold(
           appBar: AppBar(title: Text(strings.scanClientQrButton)),
           body: SafeArea(
             child: switch (controller.phase) {
