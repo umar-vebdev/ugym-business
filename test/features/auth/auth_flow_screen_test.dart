@@ -1,9 +1,11 @@
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:ugym_business/core/router/business_shell.dart';
 import 'package:ugym_business/core/session/business_role.dart';
 import 'package:ugym_business/core/session/business_session_controller.dart';
 import 'package:ugym_business/core/storage/app_preferences.dart';
+import 'package:ugym_business/core/theme/business_theme.dart';
 import 'package:ugym_business/features/auth/domain/auth_repository.dart';
 import 'package:ugym_business/features/auth/domain/authenticated_user.dart';
 import 'package:ugym_business/features/auth/presentation/auth_controller.dart';
@@ -151,10 +153,10 @@ void main() {
       tester,
     ) async {
       final repo = _FakeAuthRepository()..shouldFailLogin = true;
-      final authController = AuthController(repository: repo);
-      addTearDown(authController.dispose);
 
-      for (final theme in [UcraftTheme.light(), UcraftTheme.dark()]) {
+      for (final theme in [BusinessTheme.light, BusinessTheme.dark]) {
+        final authController = AuthController(repository: repo);
+        addTearDown(authController.dispose);
         await tester.pumpWidget(
           MaterialApp(
             theme: theme,
@@ -162,6 +164,15 @@ void main() {
           ),
         );
         await tester.pumpAndSettle();
+        expect(find.byType(SvgPicture), findsOneWidget);
+        final identifier = tester.widget<TextField>(
+          find.byType(TextField).first,
+        );
+        final border = identifier.decoration?.enabledBorder;
+        expect(
+          border?.borderSide.color,
+          theme.extension<UcraftColors>()!.borderStrong,
+        );
 
         await tester.enterText(
           find.byKey(const ValueKey<String>('login_identifier')),
@@ -240,7 +251,9 @@ void main() {
         find.byKey(const ValueKey<String>('reset_password')),
         'newpass123',
       );
-      await tester.tap(find.text('Сохранить новый пароль'));
+      final savePassword = find.text('Сохранить новый пароль');
+      await tester.ensureVisible(savePassword);
+      await tester.tap(savePassword);
       await tester.pumpAndSettle();
 
       expect(repo.resetCode, '112233');

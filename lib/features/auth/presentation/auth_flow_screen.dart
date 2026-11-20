@@ -1,10 +1,13 @@
 import 'dart:async';
 
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:ugym_core/ugym_core.dart';
 
 import '../../../core/l10n/business_localizations.dart';
+import '../../../core/theme/business_theme.dart';
+import '../../../core/theme/business_typography.dart';
 import 'auth_controller.dart';
 
 /// Multi-step authentication view (Login, Register, Email OTP, Reset Password).
@@ -106,17 +109,33 @@ final class _AuthFlowScreenState extends State<AuthFlowScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Text(
-                        strings.appTitle,
-                        style: UcraftTypography.display.copyWith(
-                          color: colors.foreground,
-                        ),
+                      Row(
+                        children: [
+                          SvgPicture.asset(
+                            'assets/brand/ucraft-avatar-light.svg',
+                            width: UcraftSpacing.space10,
+                            height: UcraftSpacing.space10,
+                            semanticsLabel: 'uCraft',
+                          ),
+                          const SizedBox(width: UcraftSpacing.space3),
+                          Expanded(
+                            child: Text(
+                              strings.appTitle,
+                              style: BusinessTypography.display.copyWith(
+                                color: BusinessTheme.canvasText(context),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: UcraftSpacing.space2),
                       Text(
                         _subtitleFor(controller.step, strings),
                         style: UcraftTypography.bodyLarge.copyWith(
-                          color: colors.foregroundSecondary,
+                          color: BusinessTheme.canvasText(
+                            context,
+                            secondary: true,
+                          ),
                         ),
                       ),
                       const SizedBox(height: UcraftSpacing.sectionGap),

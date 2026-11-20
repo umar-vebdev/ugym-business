@@ -5,6 +5,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:ugym_core/ugym_core.dart';
 
 import '../../../core/l10n/business_localizations.dart';
+import '../../../core/theme/business_theme.dart';
 import '../domain/kiosk_security.dart';
 import '../domain/reception_visits_models.dart';
 
@@ -223,7 +224,7 @@ final class _GymQrKioskScreenState extends State<GymQrKioskScreen> {
                             Text(
                               'uGym',
                               style: UcraftTypography.titleLarge.copyWith(
-                                color: colors.primary,
+                                color: BusinessTheme.canvasText(context),
                               ),
                             ),
                             Text(
@@ -231,7 +232,10 @@ final class _GymQrKioskScreenState extends State<GymQrKioskScreen> {
                                   ? strings.kioskLockedBadge
                                   : strings.kioskModeBadge,
                               style: UcraftTypography.label.copyWith(
-                                color: colors.foregroundSecondary,
+                                color: BusinessTheme.canvasText(
+                                  context,
+                                  secondary: true,
+                                ),
                               ),
                             ),
                           ],

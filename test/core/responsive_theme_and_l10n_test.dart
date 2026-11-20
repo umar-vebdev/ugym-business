@@ -256,7 +256,7 @@ void main() {
       await tester.binding.setSurfaceSize(const Size(1024, 768));
       addTearDown(() => tester.binding.setSurfaceSize(null));
 
-      for (final theme in [UcraftTheme.light(), UcraftTheme.dark()]) {
+      for (final theme in [BusinessTheme.light, BusinessTheme.dark]) {
         await tester.pumpWidget(
           MaterialApp(
             theme: theme,
