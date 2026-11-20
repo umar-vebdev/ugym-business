@@ -6,44 +6,60 @@ const palette = {
   board: ['FFFFFF', 'FFFFFF'],
   boardSubtle: ['F3F5F8', 'F3F5F8'],
   boardText: ['526078', '526078'],
-  background: ['F5F7FA', '111827'],
-  surface: ['FFFFFF', '1B2536'],
-  secondary: ['ECF1F8', '243044'],
-  tile: ['F0F4FE', '26364F'],
-  hero: ['E4EBF7', '293B5A'],
-  foreground: ['151D2B', 'F7F9FD'],
-  muted: ['526078', 'ABB9CC'],
-  line: ['DFE5EF', '3B4A61'],
-  inputBorder: ['8090AA', '7285A2'],
-  primary: ['2248F5', 'A2B8FF'],
-  pressed: ['1734C0', 'C3D0FF'],
-  onPrimary: ['FFFFFF', '111A2E'],
-  disabled: ['DCE5FF', '2D3A56'],
-  onDisabled: ['4E608D', 'A6B4CD'],
-  success: ['116443', 'A0EAC2'],
-  successBg: ['E0F6EC', '1A4136'],
-  warning: ['835219', 'FFDA91'],
-  warningBg: ['FFF0D8', '4A3828'],
-  error: ['A82B3B', 'FFB0BA'],
-  errorBg: ['FFEBEF', '4A2B3B'],
-  overlay: ['151D2B', '000000'],
+  background: ['F5F7FA', '151C29'],
+  surface: ['FFFFFF', '202A39'],
+  secondary: ['ECF1F8', '293548'],
+  tile: ['F0F4FE', '293548'],
+  hero: ['E4EBF7', '293B58'],
+  foreground: ['151D2B', 'E5EAF2'],
+  secondaryText: ['526078', 'A8B4C5'],
+  muted: ['526078', '94A3B8'],
+  line: ['DFE5EF', '344156'],
+  inputBorder: ['7989A4', '71819A'],
+  primary: ['315FCB', '7C9CD8'],
+  primaryText: ['315FCB', 'A0B5DE'],
+  pressed: ['244CAA', '6D88BD'],
+  onPrimary: ['FFFFFF', '151C29'],
+  progressTrack: ['C9D4E6', '344156'],
+  disabled: ['E3EAF7', '293548'],
+  onDisabled: ['4E608D', 'A8B4C5'],
+  success: ['116443', '9BC6AD'],
+  successBg: ['E0F6EC', '2B413A'],
+  warning: ['835219', 'CFB487'],
+  warningBg: ['FFF0D8', '443A32'],
+  error: ['A82B3B', 'D7A2AA'],
+  errorBg: ['FFEBEF', '44323D'],
+  overlay: ['151D2B', '151C29'],
 };
 
 const typography = {
-  display: [32, 40, 'Bold'],
-  headline: [24, 32, 'Bold'],
-  title: [20, 28, 'Semi Bold'],
+  display: [32, 40, 'Semi Bold'],
+  headline: [24, 32, 'Semi Bold'],
+  title: [20, 28, 'Medium'],
   section: [18, 26, 'Semi Bold'],
   large: [16, 24, 'Regular'],
   body: [14, 21, 'Regular'],
   medium: [14, 21, 'Medium'],
-  label: [13, 18, 'Semi Bold'],
+  label: [13, 18, 'Medium'],
   caption: [12, 17, 'Regular'],
-  small: [11, 16, 'Semi Bold'],
-  metric: [28, 36, 'SemiBold', 'Geist Mono'],
+  small: [11, 16, 'Medium'],
+  metric: [28, 36, 'Semi Bold'],
+  moneyLabel: [12, 17, 'Medium'],
+  monoSample: [28, 36, 'Medium', 'Geist Mono'],
   number: [16, 24, 'Medium', 'Geist Mono'],
   time: [12, 17, 'Medium', 'Geist Mono'],
 };
+
+const moneyStyles = new Set(['metric', 'moneyLabel']);
+
+// The prototypes use Russian labels. Format their integer TJS amounts without
+// depending on Intl, which is unavailable in the Figma plugin sandbox.
+function somoni(minor) {
+  const sign = minor < 0 ? '−' : '';
+  const digits = String(Math.abs(minor)).padStart(3, '0');
+  const whole = digits.slice(0, -2).replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0');
+  return sign + whole + ',' + digits.slice(-2) + '\u00a0TJS';
+}
 
 const paths = {
   home: 'M3 10l9-7 9 7v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z M9 21v-8h6v8',
@@ -118,12 +134,9 @@ function icon(p, key, x, y, size = 24, color = 'primary') {
   return node(p, 'icon', key, x, y, size, size, { path: paths[key], color });
 }
 
-function mark(p, x, y, size, color = 'primary') {
-  return node(p, 'icon', 'uGym / Знак', x, y, size, size, {
-    path: 'M4 7v6a8 8 0 0 0 16 0V7 M8 4v6 M16 4v6 M4 9h4 M16 9h4',
-    color,
-    weight: 2.8,
-  });
+function logo(p, x, y, size, lockup = 'avatar') {
+  return node(p, 'logo', lockup === 'primary' ? 'uCraft / Логотип' : 'uCraft / Компактный знак',
+    x, y, size, lockup === 'primary' ? size * 0.3 : size, { lockup });
 }
 
 function component(p, group, variant, name, x, y, w, h, label, target) {
@@ -177,8 +190,9 @@ function segment(p, items, selected, x, y, width) {
   const cell = (width - 8) / items.length;
   items.forEach(([label, target], index) => {
     const active = index === selected;
-    const tab = box(frame, label, 4 + index * cell, 4, cell, 40, active ? 'surface' : undefined, 8, undefined, target);
-    text(tab, label, 4, 11, cell - 8, 'label', active ? 'primary' : 'muted', 'center');
+    const tab = box(frame, label, 4 + index * cell, 4, cell, 40,
+      active ? 'surface' : undefined, 8, active ? 'inputBorder' : undefined, target);
+    text(tab, label, 4, 11, cell - 8, 'label', active ? 'primaryText' : 'muted', 'center');
   });
 }
 
@@ -192,12 +206,12 @@ function section(p, title, y, action, target) {
   text(p, title, 20, y, action ? 230 : 350, 'section');
   if (action) {
     const link = box(p, action, 254, y - 10, 116, 48, undefined, 0, undefined, target);
-    text(link, action, 0, 15, 116, 'label', 'primary', 'right');
+    text(link, action, 0, 15, 116, 'label', 'primaryText', 'right');
   }
 }
 
 function progress(p, x, y, w, fraction) {
-  shape(p, 'Шкала', x, y, w, 8, 'inputBorder', 4);
+  shape(p, 'Шкала', x, y, w, 8, 'progressTrack', 4);
   shape(p, 'Значение', x, y, w * fraction, 8, 'primary', 4);
 }
 
@@ -208,14 +222,14 @@ function glyphTile(p, glyph, x, y, size = 40, fill = 'tile') {
 }
 
 function row(p, y, title, detail, options = {}) {
-  const { glyph, time, tail, tone = 'muted', target, last = false } = options;
+  const { glyph, time, tail, tailStyle = 'caption', tone = 'muted', target, last = false } = options;
   const r = box(p, title, 20, y, 350, 64, undefined, 0, undefined, target);
   if (glyph) glyphTile(r, glyph, 0, 12);
   if (time) text(r, time, 0, 23, 48, 'time', 'muted');
   const start = glyph || time ? 52 : 0;
   text(r, title, start, 11, tail ? 210 - start : 275 - start, 'medium');
-  text(r, detail, start, 34, 276 - start, 'caption', 'muted');
-  if (tail) text(r, tail, 234, 13, 116, 'caption', tone, 'right');
+  text(r, detail, start, 34, 276 - start, 'caption', 'secondaryText');
+  if (tail) text(r, tail, 234, 13, 116, tailStyle, tone, 'right');
   else if (target) icon(r, 'next', 328, 22, 20, 'muted');
   if (!last) shape(r, 'Разделитель', 0, 63, 350, 1, 'line');
 }
@@ -254,15 +268,16 @@ function nav(p, entries, selected) {
   entries.forEach(([label, glyph, target], i) => {
     const active = i === selected;
     const item = box(bar, label, i * width, 1, width, 63, undefined, 0, undefined, target);
-    if (active) shape(item, 'Активная вкладка', (width - 44) / 2, 6, 44, 32, 'tile', 12);
+    if (active) shape(item, 'Активная вкладка', (width - 44) / 2, 6, 44, 32, 'hero', 12);
     icon(item, glyph, (width - 24) / 2, 10, 24, active ? 'primary' : 'muted');
-    text(item, label, 0, 41, width, 'small', active ? 'primary' : 'muted', 'center');
+    text(item, label, 0, 41, width, 'small', active ? 'primaryText' : 'muted', 'center');
   });
   homeIndicator(p);
 }
 
 function phone(page, name, id, sectionKey, col, options = {}) {
-  const { dark = false, fill = 'surface', system = true } = options;
+  const { dark = false, system = true } = options;
+  const fill = options.fill || (dark ? 'background' : 'surface');
   const y = appSections.find(({ key }) => key === sectionKey).y + 70;
   const x = 32 + col * 434;
   text(page, name, x, y - 28, W, 'label', 'boardText');
@@ -288,13 +303,18 @@ function description(p, title, detail, top, glyph, tone) {
   const tile = box(p, glyph, 167, top, 56, 56, tone ? tone + 'Bg' : 'tile', 16);
   icon(tile, glyph, 14, 14, 28, tone || 'primary');
   text(p, title, 24, top + 72, 342, 'title', 'foreground', 'center');
-  text(p, detail, 24, top + 108, 342, 'body', 'muted', 'center');
+  text(p, detail, 24, top + 108, 342, 'body', 'secondaryText', 'center');
 }
 
-function boardHeader(page, label, detail) {
+function boardHeader(page, label, detail, styleguide = false) {
   const b = box(page, 'Шапка страницы', 32, 24, pageWidth - 64, 72, 'board', 24);
-  mark(b, 24, 20, 32);
-  text(b, label, 74, 19, 550, 'headline', 'ink');
+  if (styleguide) {
+    logo(b, 24, 14.4, 144, 'primary');
+    text(b, label, 184, 19, 440, 'headline', 'ink');
+  } else {
+    logo(b, 24, 20, 32);
+    text(b, label, 74, 19, 550, 'headline', 'ink');
+  }
   text(b, detail, 632, 27, pageWidth - 732, 'body', 'boardText', 'right');
 }
 
@@ -312,8 +332,8 @@ function keyboard(p, y) {
 }
 
 function brand(p, name, y) {
-  const tile = box(p, 'Знак uGym', 173, y, 44, 44, 'primary', 12);
-  mark(tile, 8, 8, 28, 'onPrimary');
+  const tile = box(p, 'Знак uCraft', 173, y, 44, 44, 'tile', 12);
+  logo(tile, 8, 8, 28);
   text(p, name, 20, y + 52, 350, 'headline', 'foreground', 'center');
 }
 
@@ -324,7 +344,7 @@ function auth(page, prefix, product, main) {
   shape(p, 'Фоновая форма нижняя', 236, 576, 260, 260, 'hero', 130);
   brand(p, product, 308);
   text(p, client ? 'Абонементы и тренировки' : 'Ресепшн и управление залом',
-    20, 410, 350, 'body', 'muted', 'center');
+    20, 410, 350, 'body', 'secondaryText', 'center');
   button(p, 'Войти в аккаунт', 684, prefix + '-login');
   if (client) button(p, 'Посмотреть залы', 744, 'member-clubs', 'Secondary');
   homeIndicator(p);
@@ -332,22 +352,22 @@ function auth(page, prefix, product, main) {
   p = phone(page, '02 · Вход по email', prefix + '-login', 'auth', 1);
   brand(p, product, 84);
   text(p, 'Вход в аккаунт', 20, 178, 350, 'title', 'foreground', 'center');
-  text(p, 'Введите email или телефон и пароль.', 20, 214, 350, 'body', 'muted', 'center');
+  text(p, 'Введите email или телефон и пароль.', 20, 214, 350, 'body', 'secondaryText', 'center');
   segment(p, [['Email'], ['Телефон', prefix + '-phone']], 0, 20, 268, 350);
   field(p, 'Email', 'name@example.com', 338, 'Default', 'mail');
   field(p, 'Пароль', 'Введите пароль', 434, 'Default', 'eye');
-  text(p, 'Забыли пароль?', 20, 530, 350, 'label', 'primary', 'right');
+  text(p, 'Забыли пароль?', 20, 530, 350, 'label', 'primaryText', 'right');
   button(p, 'Войти', 732, undefined, 'Primary', 'Disabled');
   homeIndicator(p);
 
   p = phone(page, '03 · Вход по телефону', prefix + '-phone', 'auth', 2);
   brand(p, product, 84);
   text(p, 'Вход в аккаунт', 20, 178, 350, 'title', 'foreground', 'center');
-  text(p, 'Введите номер, указанный при регистрации.', 20, 214, 350, 'body', 'muted', 'center');
+  text(p, 'Введите номер, указанный при регистрации.', 20, 214, 350, 'body', 'secondaryText', 'center');
   segment(p, [['Email', prefix + '-login'], ['Телефон']], 1, 20, 268, 350);
   field(p, 'Номер телефона', '+992 900 00 00 00', 338, 'Focused');
   field(p, 'Пароль', '••••••••', 434, 'Filled', 'eye');
-  text(p, 'Забыли пароль?', 20, 530, 350, 'label', 'primary', 'right');
+  text(p, 'Забыли пароль?', 20, 530, 350, 'label', 'primaryText', 'right');
   button(p, 'Войти', 732, main);
   homeIndicator(p);
 
@@ -356,7 +376,7 @@ function auth(page, prefix, product, main) {
   const panel = box(p, 'Подтверждение email', 20, 136, 350, 398, 'surface', 20);
   glyphTile(panel, 'mail', 151, 28, 48);
   text(panel, 'Введите код', 16, 90, 318, 'headline', 'foreground', 'center');
-  text(panel, 'Отправили письмо на\nname@example.com', 16, 134, 318, 'body', 'muted', 'center');
+  text(panel, 'Отправили письмо на\nname@example.com', 16, 134, 318, 'body', 'secondaryText', 'center');
   for (let i = 0; i < 6; i++) {
     const active = i === 2;
     const input = box(panel, 'Цифра ' + (i + 1), 16 + i * 54, 196, 48, 54, 'surface', 8, active ? 'primary' : 'inputBorder');
@@ -364,9 +384,9 @@ function auth(page, prefix, product, main) {
     if (i < 2) text(input, i === 0 ? '5' : '4', 0, 15, 48, 'number', 'foreground', 'center');
     if (active) shape(input, 'Курсор', 23, 17, 2, 20, 'primary');
   }
-  text(panel, 'Повторная отправка через 0:42', 16, 272, 318, 'caption', 'muted', 'center');
+  text(panel, 'Повторная отправка через 0:42', 16, 272, 318, 'caption', 'secondaryText', 'center');
   const later = box(panel, 'Подтвердить позже', 16, 300, 318, 48, undefined, 0, undefined, client ? main : undefined);
-  if (client) text(later, 'Подтвердить позже', 0, 14, 318, 'label', 'primary', 'center');
+  if (client) text(later, 'Подтвердить позже', 0, 14, 318, 'label', 'primaryText', 'center');
   keyboard(p, 612);
   homeIndicator(p);
 }
@@ -400,19 +420,19 @@ function memberHome(p, empty = false) {
   text(p, 'Доброе утро', 20, 57, 174, 'caption', 'muted');
   text(p, 'Салом, Мадина!', 20, 75, 280, 'headline');
   const profile = box(p, 'Профиль', 322, 55, 48, 48, 'tile', 24, undefined, notifications);
-  text(profile, 'М', 0, 12, 48, 'large', 'primary', 'center');
+  text(profile, 'М', 0, 12, 48, 'large', 'primaryText', 'center');
 
   const hero = box(p, 'Мой абонемент', 20, 128, 350, 188, 'hero', 20);
-  text(hero, 'МОЙ АБОНЕМЕНТ', 20, 20, 176, 'small', 'muted');
+  text(hero, 'МОЙ АБОНЕМЕНТ', 20, 20, 176, 'small', 'secondaryText');
   text(hero, empty ? 'Первый абонемент' : 'Фитнес · 12 визитов', 20, 58, 310, 'title');
-  text(hero, empty ? 'Выберите тариф в каталоге залов.' : 'Atlas Fitness · Душанбе', 20, 92, 310, 'body', 'muted');
+  text(hero, empty ? 'Выберите тариф в каталоге залов.' : 'Atlas Fitness · Душанбе', 20, 92, 310, 'body', 'secondaryText');
   if (empty) {
     glyphTile(hero, 'ticket', 278, 16, 48, 'surface');
   } else {
     pill(hero, 'Активен', 230, 16, 100);
     progress(hero, 20, 130, 310, 8 / 12);
     text(hero, '8 из 12 визитов', 20, 149, 153, 'time');
-    text(hero, 'До 28 ноября', 178, 149, 152, 'caption', 'muted', 'right');
+    text(hero, 'До 28 ноября', 178, 149, 152, 'caption', 'secondaryText', 'right');
   }
 
   button(p, empty ? 'Выбрать зал' : 'Показать мой QR', 332, empty ? 'member-clubs' : dark ? 'member-qr-dark' : 'member-qr');
@@ -435,10 +455,10 @@ function memberQr(p) {
   segment(p, [['Сканировать зал', 'member-scan'], ['Мой QR-код', dark ? undefined : 'member-qr']], 1, 20, 114, 350);
   const panel = box(p, 'Личный QR-код', 20, 184, 350, 436, 'hero', 20);
   text(panel, 'Мой QR-код', 16, 16, 318, 'title', 'foreground', 'center');
-  text(panel, 'Покажите код администратору у входа.', 16, 51, 318, 'body', 'muted', 'center');
+  text(panel, 'Покажите код администратору у входа.', 16, 51, 318, 'body', 'secondaryText', 'center');
   qr(panel, 57, 95, 236);
   progress(panel, 40, 357, 270, 42 / 60);
-  text(panel, 'Обновление через 42 сек', 16, 377, 318, 'time', 'muted', 'center');
+  text(panel, 'Обновление через 42 сек', 16, 377, 318, 'time', 'secondaryText', 'center');
   button(p, 'Открыть историю визитов', 652, 'member-visits', 'Secondary');
   nav(p, memberNav, 2);
 }
@@ -446,7 +466,7 @@ function memberQr(p) {
 function search(p, value, y, hint = 'Фильтры') {
   const input = box(p, value, 20, y, 292, 48, 'surface', 8, 'inputBorder');
   icon(input, 'search', 12, 14, 20, 'muted');
-  text(input, value, 42, 13, 240, 'body', 'muted');
+  text(input, value, 42, 13, 240, 'body', 'secondaryText');
   const filter = box(p, hint, 322, y, 48, 48, 'secondary', 8);
   icon(filter, 'sliders', 14, 14, 20);
 }
@@ -481,7 +501,7 @@ function memberPage() {
 
   p = phone(page, '08 · Расписание зала', 'member-schedule', 'main', 3);
   header(p, 'Расписание', 'member-home');
-  text(p, 'Atlas Fitness · 19 ноября', 20, 107, 350, 'body', 'muted');
+  text(p, 'Atlas Fitness · 19 ноября', 20, 107, 350, 'body', 'secondaryText');
   const weekdays = ['Пн\n16', 'Вт\n17', 'Ср\n18', 'Чт\n19', 'Пт\n20', 'Сб\n21', 'Вс\n22'];
   weekdays.forEach((day, i) => {
     const pick = box(p, day.replace('\n', ' '), 20 + i * 51, 151, 44, 62, i === 3 ? 'primary' : 'tile', 8);
@@ -511,7 +531,7 @@ function memberPage() {
   segment(p, [['Активные'], ['Прошедшие']], 0, 20, 114, 350);
   const membership = box(p, 'Фитнес · 12 визитов', 20, 188, 350, 166, 'hero', 20);
   pill(membership, 'Активен', 226, 16, 104);
-  text(membership, 'Atlas Fitness', 20, 19, 178, 'caption', 'muted');
+  text(membership, 'Atlas Fitness', 20, 19, 178, 'caption', 'secondaryText');
   text(membership, 'Фитнес · 12 визитов', 20, 58, 310, 'title');
   progress(membership, 20, 104, 310, 8 / 12);
   text(membership, '8 из 12 визитов', 20, 126, 310, 'time');
@@ -531,7 +551,7 @@ function memberPage() {
   const banner = box(p, 'Свободная тренировка', 20, 112, 350, 134, 'hero', 20);
   glyphTile(banner, 'dumbbell', 20, 18);
   text(banner, 'Свободная тренировка', 20, 69, 310, 'title');
-  text(banner, 'Записывайте упражнения и подходы.', 20, 103, 310, 'caption', 'muted');
+  text(banner, 'Записывайте упражнения и подходы.', 20, 103, 310, 'caption', 'secondaryText');
   button(p, 'Начать тренировку', 266);
   section(p, 'Дневник', 338);
   row(p, 376, 'Мои планы', 'Ваши программы', { glyph: 'calendar' });
@@ -543,9 +563,9 @@ function memberPage() {
   header(p, 'Профиль');
   const profile = box(p, 'Аккаунт', 20, 111, 350, 133, 'hero', 20);
   const avatar = box(profile, 'М', 18, 22, 48, 48, 'surface', 24);
-  text(avatar, 'М', 0, 12, 48, 'large', 'primary', 'center');
+  text(avatar, 'М', 0, 12, 48, 'large', 'primaryText', 'center');
   text(profile, 'Мадина Каримова', 80, 19, 251, 'title');
-  text(profile, 'name@example.com', 80, 50, 250, 'caption', 'muted');
+  text(profile, 'name@example.com', 80, 50, 250, 'caption', 'secondaryText');
   pill(profile, 'Email не подтверждён', 80, 81, 172, 'warning', 'mail');
   section(p, 'Мои данные', 271);
   row(p, 311, 'Мои абонементы', 'Активные и прошедшие', { glyph: 'ticket', target: 'member-memberships' });
@@ -583,14 +603,14 @@ function businessHome(p, readOnly = false) {
     shift = 60;
   }
   const hero = box(p, 'Сводка зала', 20, 120 + shift, 350, 178, 'hero', 20);
-  text(hero, 'Сегодня · 19 ноября', 16, 13, 242, 'caption', 'muted');
-  text(hero, '11 476,82 TJS', 16, 32, 312, 'metric');
-  text(hero, 'Выручка зала', 16, 71, 312, 'caption', 'muted');
+  text(hero, 'Сегодня · 19 ноября', 16, 13, 242, 'caption', 'secondaryText');
+  text(hero, somoni(1147682), 16, 32, 312, 'metric');
+  text(hero, 'Выручка зала', 16, 71, 312, 'caption', 'secondaryText');
   const strip = box(hero, 'Показатели дня', 12, 102, 326, 62, 'secondary', 12);
   [['Визиты', '48'], ['Заявки', '6'], ['Истекают', '9']].forEach(([label, value], i) => {
     if (i > 0) shape(strip, 'Разделитель', i * 109, 12, 1, 38, 'line');
     text(strip, value, i * 109, 8, 108, 'number', 'foreground', 'center');
-    text(strip, label, i * 109, 34, 108, 'caption', 'muted', 'center');
+    text(strip, label, i * 109, 34, 108, 'caption', 'secondaryText', 'center');
   });
   button(p, 'Сканировать QR клиента', 314 + shift, dark ? 'biz-allowed' : 'biz-scan',
     'Primary', readOnly ? 'Disabled' : 'Default');
@@ -654,7 +674,7 @@ function businessPage() {
   const form = box(p, 'Форма нового клиента', 0, 278, W, 566, 'surface', 20);
   shape(form, 'Ручка', 175, 10, 40, 4, 'line', 2);
   text(form, 'Новый клиент', 20, 36, 350, 'headline');
-  text(form, 'Заполните имя и номер телефона.', 20, 74, 350, 'body', 'muted');
+  text(form, 'Заполните имя и номер телефона.', 20, 74, 350, 'body', 'secondaryText');
   field(form, 'Имя', 'Например, Мадина Каримова', 123);
   field(form, 'Телефон', '+992 900 00 00 00', 219);
   field(form, 'Email · необязательно', 'name@example.com', 315, 'Default', 'mail');
@@ -689,17 +709,17 @@ function businessPage() {
   header(p, 'Касса', undefined, ['Быстрые действия', 'bolt', 'biz-quick']);
   segment(p, [['Продажи'], ['Заявки'], ['Товары']], 0, 20, 114, 350);
   const turnover = box(p, 'Продажи сегодня', 20, 185, 350, 124, 'hero', 20);
-  text(turnover, 'Продажи сегодня', 20, 19, 310, 'caption', 'muted');
-  text(turnover, '11 476,82 TJS', 20, 43, 310, 'metric');
-  text(turnover, '12 чеков', 20, 89, 310, 'caption', 'muted');
+  text(turnover, 'Продажи сегодня', 20, 19, 310, 'caption', 'secondaryText');
+  text(turnover, somoni(1147682), 20, 43, 310, 'metric');
+  text(turnover, '12 чеков', 20, 89, 310, 'caption', 'secondaryText');
   section(p, 'Последние продажи', 342);
-  row(p, 380, 'Фитнес · 12 визитов', '09:20 · Терминал', { glyph: 'ticket', tail: '550 TJS' });
-  row(p, 444, 'Вода 0,5 л', '09:04 · Наличные', { glyph: 'bag', tail: '5 TJS', last: true });
+  row(p, 380, 'Фитнес · 12 визитов', '09:20 · Терминал', { glyph: 'ticket', tail: somoni(55000), tailStyle: 'moneyLabel' });
+  row(p, 444, 'Вода 0,5 л', '09:04 · Наличные', { glyph: 'bag', tail: somoni(500), tailStyle: 'moneyLabel', last: true });
   nav(p, businessNav, 2);
 
   p = extraPhone(page, '15 · Расписание и группы', 'biz-schedule', 2);
   header(p, 'Расписание');
-  text(p, 'Atlas Fitness · 19 ноября', 20, 107, 350, 'body', 'muted');
+  text(p, 'Atlas Fitness · 19 ноября', 20, 107, 350, 'body', 'secondaryText');
   segment(p, [['Занятия'], ['Тренеры']], 0, 20, 147, 350);
   section(p, 'Занятия сегодня', 228);
   row(p, 266, 'Функциональная', 'Зал 2 · Фарид Саидов', { time: '10:30', tail: '8 из 12' });
@@ -735,10 +755,10 @@ function businessPage() {
   status(tablet, 840);
   const back = box(tablet, 'Выйти из табло', 20, 52, 48, 48, 'tile', 12, undefined, 'biz-home');
   icon(back, 'arrow', 12, 12, 24);
-  mark(tablet, 52, 232, 40);
+  logo(tablet, 52, 232, 40);
   text(tablet, 'Atlas Fitness', 52, 290, 323, 'display');
   text(tablet, 'Отметьте посещение', 52, 348, 320, 'title');
-  text(tablet, 'Откройте uGym и наведите\nкамеру на QR-код зала.', 52, 390, 320, 'large', 'muted');
+  text(tablet, 'Откройте uGym и наведите\nкамеру на QR-код зала.', 52, 390, 320, 'large', 'secondaryText');
   qr(tablet, 442, 150, 324);
   progress(tablet, 469, 508, 270, 42 / 60);
   text(tablet, 'Обновление через 42 сек', 442, 536, 324, 'time', 'muted', 'center');
@@ -748,7 +768,7 @@ function businessPage() {
 
 function lowerPhone(page, name, id, x, dark = false) {
   text(page, name, x, 4066, W, 'label', 'boardText');
-  const p = box(page, name, x, 4094, W, H, 'surface', 24, 'line');
+  const p = box(page, name, x, 4094, W, H, dark ? 'background' : 'surface', 24, 'line');
   Object.assign(p, { id, mode: dark ? 'Dark' : 'Light', clip: true });
   status(p);
   return p;
@@ -766,7 +786,7 @@ const samples = [
   ['display', 'Заголовок экрана'], ['headline', 'Вход в аккаунт'], ['title', 'Мой абонемент'],
   ['section', 'Сегодня в зале'], ['large', 'Данные посетителя'], ['medium', 'Показать мой QR'],
   ['body', 'Посмотрите расписание занятий.'], ['label', 'Номер телефона'],
-  ['caption', 'Обновлено сегодня'], ['metric', '11 476,82 TJS'], ['time', '09:38 · 00:42'],
+  ['caption', 'Обновлено сегодня'], ['metric', somoni(1147682)], ['time', '09:38 · 00:42'],
 ];
 
 function swatches(p, title, colors, y) {
@@ -774,23 +794,26 @@ function swatches(p, title, colors, y) {
   colors.forEach(([label, token], i) => {
     const x = 32 + i * 158;
     text(p, label, x, y + 40, 145, 'label', 'ink');
-    box(p, label, x, y + 65, 142, 66, token, 8, token === 'surface' ? 'line' : undefined);
-    text(p, '#' + palette[token][0], x, y + 141, 142, 'time', 'boardText');
+    const swatch = box(p, label, x, y + 65, 142, 66, token, 8, token === 'surface' ? 'line' : undefined);
+    swatch.clip = true;
+    const dark = box(swatch, label + ' · Dark', 71, 0, 71, 66, token);
+    dark.mode = 'Dark';
+    text(p, palette[token].map((value) => '#' + value).join(' · '), x, y + 141, 142, 'time', 'boardText');
   });
 }
 
 function libraryPage() {
   const page = node(null, 'page', '01 · uCraft', 0, 0, pageWidth, 2760, { fill: 'canvas' });
-  boardHeader(page, 'uCraft · Styleguide', 'Дизайн-система для uGym и uGym Business');
+  boardHeader(page, 'Styleguide', 'Дизайн-система для uGym и uGym Business', true);
 
-  const colors = guideCard(page, 'Палитра', 'Акцент, поверхности и семантические цвета', 32, 132, 848, 784);
+  const colors = guideCard(page, 'Палитра', 'Акцент и семантические цвета · Light / Midnight — Soft', 32, 132, 848, 784);
   swatches(colors, 'Основные', [
-    ['Кобальт', 'primary'], ['Нажатие', 'pressed'], ['Главная панель', 'hero'],
-    ['Плитки', 'tile'], ['Текст', 'foreground'],
+    ['Кобальт', 'primary'], ['Нажатие', 'pressed'], ['Акцентная панель', 'hero'],
+    ['Приглушённый текст', 'muted'], ['Основной текст', 'foreground'],
   ], 122);
   swatches(colors, 'Нейтральные', [
     ['Фон', 'background'], ['Поверхность', 'surface'], ['Вторичный фон', 'secondary'],
-    ['Разделитель', 'line'], ['Вторичный текст', 'muted'],
+    ['Разделитель', 'line'], ['Вторичный текст', 'secondaryText'],
   ], 326);
   swatches(colors, 'Состояния', [
     ['Успех', 'successBg'], ['Внимание', 'warningBg'], ['Ошибка', 'errorBg'],
@@ -798,10 +821,10 @@ function libraryPage() {
   ], 530);
   text(colors, 'Режимы Light и Dark привязаны к переменным макетов.', 32, 730, 784, 'caption', 'boardText');
 
-  const type = guideCard(page, 'Типографика', 'Inter для интерфейса и Geist Mono для чисел и кодов', 912, 132, 856, 784);
+  const type = guideCard(page, 'Типографика', 'Inter для интерфейса и сумм, Geist Mono для времени и кодов', 912, 132, 856, 784);
   const family = box(type, 'Шрифты', 32, 119, 792, 68, 'boardSubtle', 12);
   text(family, 'Аа  Inter', 16, 17, 330, 'headline', 'ink');
-  text(family, 'Aa  Geist Mono', 405, 17, 350, 'metric', 'ink');
+  text(family, 'Aa  Geist Mono', 405, 17, 350, 'monoSample', 'ink');
   samples.forEach(([style, value], i) => {
     const y = 219 + i * 46;
     text(type, value, 32, y, 552, style, 'ink');
@@ -941,6 +964,39 @@ function iconSvg(item, mode) {
     '" viewBox="0 0 ' + view + ' ' + view + '"><path ' + style + ' d="' + item.path + '"/></svg>';
 }
 
+// Inter glyph outlines from the supplied 04, 07 and 08 SVGs. The adjacent
+// logos/ directory keeps the original text-based sources byte for byte.
+const logoOutlines = {
+  primary: [
+    ["59.999999", "188.695305", "M 47.441406 1.460938 C 39.988281 1.460938 33.480469 0.390625 27.910156 -1.746094 C 22.34375 -3.886719 18.039062 -7.003906 14.992188 -11.101562 C 11.949219 -15.195312 10.425781 -20.167969 10.425781 -26.011719 L 10.425781 -69.609375 L 39.800781 -69.609375 L 39.800781 -29.578125 C 39.800781 -24.933594 41.503906 -21.394531 44.910156 -18.957031 C 48.3125 -16.519531 53.082031 -15.300781 59.210938 -15.300781 C 63.257812 -15.300781 66.839844 -15.851562 69.953125 -16.953125 C 73.070312 -18.054688 75.507812 -19.761719 77.265625 -22.078125 C 79.023438 -24.394531 79.90625 -27.347656 79.90625 -30.9375 L 79.90625 -69.609375 L 109.285156 -69.609375 L 109.285156 0 L 80.359375 0 L 80.359375 -18.121094 L 85.367188 -18.121094 C 82.015625 -11.976562 77.257812 -7.175781 71.101562 -3.722656 C 64.945312 -0.265625 57.058594 1.460938 47.441406 1.460938 Z M 47.441406 1.460938"],
+    ["177.450439", "188.695305", "M 76.976562 1.582031 C 63.371094 1.582031 51.238281 -0.46875 40.578125 -4.570312 C 29.917969 -8.675781 21.539062 -14.515625 15.441406 -22.09375 C 9.339844 -29.671875 6.289062 -38.652344 6.289062 -49.042969 C 6.289062 -59.519531 9.332031 -68.554688 15.417969 -76.140625 C 21.5 -83.730469 29.878906 -89.570312 40.554688 -93.664062 C 51.230469 -97.753906 63.371094 -99.800781 76.976562 -99.800781 C 85.699219 -99.800781 93.785156 -98.949219 101.238281 -97.242188 C 108.691406 -95.539062 115.292969 -93.101562 121.039062 -89.929688 C 126.789062 -86.757812 131.507812 -82.949219 135.191406 -78.507812 C 138.875 -74.066406 141.308594 -69.09375 142.492188 -63.597656 L 111.445312 -63.597656 C 110.570312 -66.492188 109.132812 -69.074219 107.128906 -71.34375 C 105.125 -73.617188 102.65625 -75.535156 99.71875 -77.101562 C 96.78125 -78.667969 93.433594 -79.859375 89.675781 -80.671875 C 85.917969 -81.484375 81.828125 -81.890625 77.40625 -81.890625 C 68.96875 -81.890625 61.757812 -80.546875 55.765625 -77.863281 C 49.777344 -75.175781 45.1875 -71.378906 41.992188 -66.46875 C 38.800781 -61.558594 37.207031 -55.75 37.207031 -49.042969 C 37.207031 -42.378906 38.792969 -36.605469 41.96875 -31.714844 C 45.140625 -26.828125 49.734375 -23.039062 55.738281 -20.355469 C 61.746094 -17.667969 68.96875 -16.328125 77.40625 -16.328125 C 81.828125 -16.328125 85.902344 -16.726562 89.625 -17.527344 C 93.351562 -18.328125 96.683594 -19.511719 99.621094 -21.082031 C 102.558594 -22.652344 105.035156 -24.5625 107.050781 -26.808594 C 109.070312 -29.058594 110.550781 -31.617188 111.492188 -34.488281 L 142.492188 -34.488281 C 141.304688 -29.011719 138.871094 -24.058594 135.1875 -19.625 C 131.503906 -15.195312 126.78125 -11.398438 121.011719 -8.238281 C 115.246094 -5.074219 108.644531 -2.648438 101.210938 -0.957031 C 93.777344 0.734375 85.699219 1.582031 76.976562 1.582031 Z M 76.976562 1.582031"],
+    ["323.658276", "188.695305", "M 10.425781 0 L 10.425781 -69.609375 L 38.789062 -69.609375 L 38.789062 -57.742188 L 39.078125 -57.742188 C 41.011719 -61.9375 44.035156 -65.046875 48.15625 -67.066406 C 52.277344 -69.085938 57.816406 -70.09375 64.765625 -70.09375 C 66.511719 -70.09375 68.105469 -70.074219 69.546875 -70.035156 C 70.988281 -69.992188 72.296875 -69.953125 73.464844 -69.914062 L 73.464844 -53.367188 C 72.402344 -53.425781 70.652344 -53.503906 68.21875 -53.59375 C 65.78125 -53.683594 63.3125 -53.730469 60.816406 -53.730469 C 56.808594 -53.730469 53.214844 -53.125 50.03125 -51.914062 C 46.84375 -50.703125 44.34375 -48.914062 42.527344 -46.539062 C 40.710938 -44.164062 39.800781 -41.222656 39.800781 -37.71875 L 39.800781 0 Z M 10.425781 0"],
+    ["396.203161", "188.695305", "M 42.683594 1.160156 C 35.660156 1.160156 29.417969 0.394531 23.964844 -1.140625 C 18.511719 -2.675781 14.214844 -4.984375 11.078125 -8.066406 C 7.9375 -11.148438 6.371094 -14.996094 6.371094 -19.613281 C 6.371094 -23.5625 7.46875 -26.84375 9.671875 -29.457031 C 11.875 -32.066406 14.882812 -34.171875 18.699219 -35.765625 C 22.519531 -37.359375 26.914062 -38.574219 31.882812 -39.402344 C 36.855469 -40.234375 42.078125 -40.820312 47.554688 -41.164062 C 53.988281 -41.589844 59.109375 -41.996094 62.917969 -42.386719 C 66.722656 -42.777344 69.453125 -43.351562 71.101562 -44.101562 C 72.75 -44.851562 73.574219 -45.972656 73.574219 -47.472656 L 73.574219 -47.917969 C 73.574219 -49.636719 72.882812 -51.144531 71.503906 -52.449219 C 70.121094 -53.75 68.152344 -54.773438 65.589844 -55.515625 C 63.03125 -56.253906 59.953125 -56.625 56.355469 -56.625 C 52.71875 -56.625 49.523438 -56.246094 46.769531 -55.492188 C 44.015625 -54.734375 41.835938 -53.675781 40.234375 -52.316406 C 38.636719 -50.960938 37.703125 -49.375 37.433594 -47.570312 L 9.753906 -47.570312 C 10.230469 -52.378906 12.390625 -56.535156 16.230469 -60.042969 C 20.070312 -63.550781 25.449219 -66.265625 32.367188 -68.1875 C 39.285156 -70.109375 47.570312 -71.070312 57.21875 -71.070312 C 64.421875 -71.070312 70.84375 -70.527344 76.488281 -69.4375 C 82.128906 -68.351562 86.894531 -66.777344 90.785156 -64.707031 C 94.675781 -62.636719 97.625 -60.132812 99.632812 -57.1875 C 101.640625 -54.246094 102.644531 -50.917969 102.644531 -47.207031 L 102.644531 0 L 73.898438 0 L 73.898438 -9.816406 L 73.5 -9.816406 C 71.660156 -7.554688 69.363281 -5.597656 66.613281 -3.953125 C 63.863281 -2.3125 60.53125 -1.046875 56.625 -0.164062 C 52.714844 0.71875 48.070312 1.160156 42.683594 1.160156 Z M 50.796875 -12.3125 C 55.527344 -12.3125 59.617188 -12.886719 63.0625 -14.035156 C 66.507812 -15.183594 69.15625 -16.746094 71.011719 -18.71875 C 72.863281 -20.691406 73.789062 -22.929688 73.789062 -25.441406 L 73.789062 -32.433594 C 72.945312 -32.132812 71.820312 -31.84375 70.414062 -31.5625 C 69.011719 -31.28125 67.378906 -31.011719 65.515625 -30.753906 C 63.652344 -30.496094 61.628906 -30.242188 59.4375 -29.992188 C 57.25 -29.746094 54.960938 -29.503906 52.578125 -29.261719 C 49.238281 -28.933594 46.199219 -28.40625 43.472656 -27.679688 C 40.742188 -26.953125 38.570312 -25.984375 36.953125 -24.769531 C 35.335938 -23.550781 34.53125 -22.015625 34.53125 -20.164062 C 34.53125 -18.53125 35.207031 -17.125 36.554688 -15.945312 C 37.90625 -14.765625 39.800781 -13.863281 42.234375 -13.242188 C 44.667969 -12.621094 47.523438 -12.3125 50.796875 -12.3125 Z M 50.796875 -12.3125"],
+    ["506.963514", "188.695305", "M 71.824219 -69.609375 L 71.824219 -54.359375 L 1.769531 -54.359375 L 1.769531 -69.609375 Z M 20.863281 0 L 20.863281 -78.65625 C 20.863281 -82.992188 22.136719 -86.605469 24.6875 -89.5 C 27.238281 -92.390625 31.054688 -94.566406 36.128906 -96.027344 C 41.207031 -97.488281 47.53125 -98.21875 55.09375 -98.21875 C 58.609375 -98.21875 61.964844 -98.21875 65.160156 -98.21875 C 68.359375 -98.21875 70.578125 -98.21875 71.824219 -98.21875 L 71.824219 -82.96875 C 70.972656 -82.96875 69.464844 -82.96875 67.296875 -82.96875 C 65.125 -82.96875 63.28125 -82.96875 61.761719 -82.96875 C 57.585938 -82.96875 54.625 -82.390625 52.871094 -81.234375 C 51.117188 -80.078125 50.242188 -78.125 50.242188 -75.375 L 50.242188 0 Z M 20.863281 0"],
+    ["571.871867", "188.695305", "M 70.960938 -69.609375 L 70.960938 -54.359375 L 1.769531 -54.359375 L 1.769531 -69.609375 Z M 20 -88.59375 L 49.378906 -88.59375 L 49.378906 -21.503906 C 49.378906 -19.15625 50.101562 -17.523438 51.546875 -16.613281 C 52.992188 -15.703125 55.699219 -15.25 59.667969 -15.25 C 61.339844 -15.25 63.328125 -15.25 65.632812 -15.25 C 67.9375 -15.25 69.710938 -15.25 70.960938 -15.25 L 70.960938 0 C 69.195312 0 66.714844 0 63.515625 0 C 60.320312 0 57.101562 0 53.863281 0 C 42.222656 0 33.667969 -1.496094 28.199219 -4.492188 C 22.734375 -7.484375 20 -12.144531 20 -18.464844 Z M 20 -88.59375"],
+  ],
+  avatar: [
+    ["119.999996", "279.105461", "M 84.585938 1.703125 C 71.300781 1.703125 59.691406 0.457031 49.765625 -2.039062 C 39.835938 -4.53125 32.160156 -8.167969 26.730469 -12.949219 C 21.300781 -17.730469 18.585938 -23.527344 18.585938 -30.347656 L 18.585938 -81.210938 L 70.964844 -81.210938 L 70.964844 -34.507812 C 70.964844 -29.089844 74 -24.960938 80.070312 -22.117188 C 86.140625 -19.273438 94.640625 -17.851562 105.570312 -17.851562 C 112.785156 -17.851562 119.167969 -18.492188 124.722656 -19.777344 C 130.277344 -21.0625 134.621094 -23.058594 137.757812 -25.757812 C 140.894531 -28.460938 142.464844 -31.90625 142.464844 -36.09375 L 142.464844 -81.210938 L 194.84375 -81.210938 L 194.84375 0 L 143.273438 0 L 143.273438 -21.140625 L 152.203125 -21.140625 C 146.226562 -13.972656 137.746094 -8.371094 126.769531 -4.339844 C 115.789062 -0.3125 101.730469 1.703125 84.585938 1.703125 Z M 84.585938 1.703125"],
+  ],
+};
+
+function logoSvg(item, mode) {
+  const primary = item.lockup === 'primary';
+  const dark = !primary && mode === 'Dark';
+  const width = primary ? 1200 : 600;
+  const height = primary ? 360 : 600;
+  const letterColor = dark ? '#F9FAFB' : '#111827';
+  const background = dark ? '#111827' : '#F9FAFB';
+  const [cx, cy, radius] = primary ? [835, 225, 19] : [405, 381, 21];
+  const glyphs = logoOutlines[item.lockup].map(([x, y, path]) =>
+    '<path transform="translate(' + x + ' ' + y + ')" d="' + path + '"/>').join('');
+  return '<svg xmlns="http://www.w3.org/2000/svg" role="img" aria-label="uCraft" width="' +
+    item.width + '" height="' + item.height + '" viewBox="0 0 ' + width + ' ' + height + '">' +
+    '<rect width="' + width + '" height="' + height + '" fill="' + background + '"/>' +
+    '<g transform="scale(1.3333333333333333)" fill="' + letterColor + '">' + glyphs + '</g>' +
+    '<circle cx="' + cx + '" cy="' + cy + '" r="' + radius + '" fill="#507DE8"/></svg>';
+}
+
 function keepScreenColors(key) {
   return ['white', 'ink', 'canvas', 'board', 'boardSubtle', 'boardText'].includes(key);
 }
@@ -1032,6 +1088,8 @@ async function importFigma(api) {
       layer.textAutoResize = 'NONE';
       layer.resize(item.width, item.height);
       layer.fills = [paint(item.color, mode)];
+    } else if (item.type === 'logo') {
+      layer = api.createNodeFromSvg(logoSvg(item, mode));
     } else if (item.type === 'icon' || item.type === 'vector') {
       layer = api.createNodeFromSvg(iconSvg(item, mode));
       layer.resize(item.width, item.height);
@@ -1088,6 +1146,8 @@ async function importFigma(api) {
       style.fontName = fonts[key];
       style.fontSize = size;
       style.lineHeight = { value: height, unit: 'PIXELS' };
+      style.letterSpacing = { value: 0, unit: 'PIXELS' };
+      if (moneyStyles.has(key)) style.description = 'Inter · табличные цифры (tnum)';
     }
 
     for (const [index, spec] of specs.entries()) {
@@ -1126,7 +1186,7 @@ async function importFigma(api) {
   api.viewport.scrollAndZoomIntoView(cover.children.slice(0, 3));
   const fallbacks = [];
   if (!darkMode) fallbacks.push('Тёмная тема добавлена отдельными цветами.');
-  if (fonts.metric.family !== 'Geist Mono') fallbacks.push('Числа используют ' + fonts.metric.family + '.');
+  if (fonts.time.family !== 'Geist Mono') fallbacks.push('Коды используют ' + fonts.time.family + '.');
   if (fonts.body.family !== 'Inter') fallbacks.push('Текст использует ' + fonts.body.family + '.');
   api.closePlugin(['Готово. Созданы страницы uCraft, uGym и uGym Business.', ...fallbacks].join(' '));
 }
@@ -1138,5 +1198,5 @@ if (typeof figma !== 'undefined') {
   });
 }
 if (typeof module !== 'undefined') {
-  module.exports = { design, color, iconSvg, componentVisual, typography, importFigma };
+  module.exports = { design, color, iconSvg, logoSvg, componentVisual, typography, moneyStyles, importFigma };
 }

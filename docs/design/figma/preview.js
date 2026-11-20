@@ -1,7 +1,7 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const { design, color, iconSvg, componentVisual, typography } = require('./code');
+const { design, color, iconSvg, logoSvg, componentVisual, typography, moneyStyles } = require('./code');
 
 function escape(value) {
   return String(value).replace(/[&<>"']/g, (char) => ({
@@ -47,6 +47,44 @@ function validate(pages) {
   console.error(variantKeys.size + ' вариантов компонентов · ' + links + ' связей');
 }
 
+function validateContrast(pages) {
+  function luminance(hex) {
+    const [red, green, blue] = hex.slice(1).match(/../g).map((part) => {
+      const value = Number.parseInt(part, 16) / 255;
+      return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+    });
+    return red * 0.2126 + green * 0.7152 + blue * 0.0722;
+  }
+
+  function walk(source, inheritedMode = 'Light', background = 'canvas') {
+    const mode = source.mode || inheritedMode;
+    const item = source.type === 'instance' ? { ...source, children: [] } : source;
+    if (item.type === 'instance') componentVisual(item, item.group, item.variant, item.label);
+    const fill = item.fill || background;
+
+    function pair(foreground, adjacent, minimum) {
+      const a = luminance(color(foreground, mode));
+      const b = luminance(color(adjacent, mode));
+      const ratio = (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+      assert.ok(ratio >= minimum,
+        `${mode} · ${item.name} · ${foreground}/${adjacent} · ${ratio.toFixed(2)} < ${minimum}`);
+    }
+
+    if (item.type === 'text') pair(item.color, background, 4.5);
+    if (item.type === 'icon' || item.type === 'vector') pair(item.color, background, 3);
+    if (item.stroke && item.stroke !== 'line' && item.stroke !== fill) pair(item.stroke, fill, 3);
+    if (item.stroke === 'inputBorder') pair(item.stroke, background, 3);
+    if (item.fill === 'primary' && item.name === 'Значение') pair(item.fill, 'progressTrack', 3);
+    for (const child of item.children) walk(child, mode, fill);
+    if (item.type === 'componentSet') {
+      for (const child of item.children) walk(child, 'Dark', 'surface');
+    }
+  }
+
+  for (const page of pages) walk(page);
+  console.error('Проверен контраст текста, иконок, границ полей и состояний компонентов.');
+}
+
 let clipCount = 0;
 function render(item, inheritedMode) {
   const mode = item.mode || inheritedMode;
@@ -72,15 +110,18 @@ function render(item, inheritedMode) {
   const start = '<g' + id + opacity + ' transform="translate(' + item.x + ' ' + item.y + ')">';
   if (item.type === 'text') {
     const [size, lineHeight, style, family = 'Inter'] = typography[item.style];
-    const weights = { Regular: 400, Medium: 500, 'Semi Bold': 600, SemiBold: 600, Bold: 700 };
+    const weights = { Regular: 400, Medium: 500, 'Semi Bold': 600 };
+    const numerals = moneyStyles.has(item.style) ? ' style="font-variant-numeric:tabular-nums;letter-spacing:0px"' : '';
     const anchors = { left: [0, 'start'], center: [item.width / 2, 'middle'], right: [item.width, 'end'] };
     const [x, anchor] = anchors[item.align];
     for (const [i, line] of item.value.split('\n').entries()) {
       const baseline = lineHeight * i + (lineHeight + size * 0.73) / 2;
       body += '<text data-fit-width="' + item.width + '" x="' + x + '" y="' + baseline + '" text-anchor="' + anchor +
         '" fill="' + color(item.color, mode) + '" font-family="' + family + '" font-size="' + size +
-        '" font-weight="' + weights[style] + '">' + escape(line) + '</text>';
+        '" font-weight="' + weights[style] + '" letter-spacing="0"' + numerals + '>' + escape(line) + '</text>';
     }
+  } else if (item.type === 'logo') {
+    body += logoSvg(item, mode);
   } else if (item.type === 'vector' || item.type === 'icon') {
     body += iconSvg(item, mode);
   } else {
@@ -98,6 +139,7 @@ function render(item, inheritedMode) {
 
 const pages = design();
 validate(pages);
+validateContrast(pages);
 if (process.argv.includes('--check')) process.exit(0);
 
 const boardNames = ['uCraft', 'uGym', 'uGym Business'];
@@ -118,9 +160,9 @@ const html = `<!doctype html>
 *{box-sizing:border-box}body{margin:0}
 header{position:sticky;top:0;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;min-height:64px;padding:12px clamp(16px,4vw,64px);background:#fff;border-bottom:1px solid #dfe5ef}
 header strong{font-size:15px}nav,.controls{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-button{font:600 13px Inter,system-ui,sans-serif;border:1px solid transparent;background:#fff;color:#526078;min-height:36px;padding:6px 12px;border-radius:8px;cursor:pointer}
-button[aria-pressed=true]{background:#edf1ff;color:#1734c0}
-button:hover{border-color:#a2b8ff}button:focus-visible,a:focus-visible{outline:2px solid #2248f5;outline-offset:3px}
+button{font:500 13px Inter,system-ui,sans-serif;border:1px solid transparent;background:#fff;color:#526078;min-height:36px;padding:6px 12px;border-radius:8px;cursor:pointer}
+button[aria-pressed=true]{background:#e4ebf7;color:#315fcb}
+button:hover{border-color:#7989a4}button:focus-visible,a:focus-visible{outline:2px solid #315fcb;outline-offset:3px}
 main{overflow-x:auto}main section{width:var(--board-width,100%);min-width:640px;max-width:2700px;margin:0 auto}
 section>svg{width:100%;height:auto;display:block}svg a{cursor:pointer}
 .controls{font-size:13px;color:#526078}output{min-width:42px;font-variant-numeric:tabular-nums}
